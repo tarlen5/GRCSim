@@ -1,0 +1,9 @@
+# Common editor remnants
+*~
+.swp
+
+# object files
+.o
+
+# lib files:
+.a
