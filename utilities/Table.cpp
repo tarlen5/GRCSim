@@ -2,19 +2,19 @@
 -------------------------------------------------------------------------------
     \file   Table.cpp
 
-    Table class implementation file; classes Table1D and Table2D inherit 
+    Table class implementation file; classes Table1D and Table2D inherit
     from class Table.
-  
+
     \author    Timothy C. Arlen                      \n
                Department of Physics and Astronomy   \n
                UCLA                                  \n
 	       arlen@astro.ucla.edu                  \n
 
     \date      October 10, 2010
-  
+
     \version:  1.0
 
-    \revision: 
+    \revision:
 
     \note:
 
@@ -28,34 +28,34 @@
 Table1D::Table1D(const std::string& tablefile)
 /*!
   Constructor for Table1D.
-  
+
   \param  tablefile - file for 1D table.
-  
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  WARNING: required format of tablefile: 1 column of y values, 
-  followed by 1 column of x values. 
+  WARNING: required format of tablefile: 1 column of y values,
+  followed by 1 column of x values.
   BOTH COLUMNS MUST BE SORTED for future fns to work.
-  It is permissible to start a commented line with the hash ('#') 
+  It is permissible to start a commented line with the hash ('#')
   symbol.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
+
 */
 {
-  
+
   std::ifstream filestream(tablefile.c_str());
-  
+
   // Check if file exists!!!
-  if(filestream == NULL) {
+  if(!filestream) {
     std::cerr<<"ERROR: "<<__PRETTY_FUNCTION__<<"\n file: "<<tablefile<<
       " cannot be found\n"<<std::endl;
     exit(EXIT_FAILURE);
   }
-  
+
   const unsigned MAXCHAR = 800;
   char line[MAXCHAR];
   while( !filestream.getline(line,MAXCHAR).eof() ) {
     if (line[0] == '#')  continue;
-    
+
     std::istringstream ss_line(line);
     double temp_y, temp_x;
     if (filestream) {
@@ -63,9 +63,9 @@ Table1D::Table1D(const std::string& tablefile)
       m_xvector.push_back(temp_x);
       m_yvector.push_back(temp_y);
     }
-    
-  }  
-  
+
+  }
+
     // Testing:
     //for(int index=0; index < m_xvector.size(); index++) {
     //std::cout<<"x: "<<m_xvector[index]<<" y: "<<m_yvector[index]<<std::endl;
@@ -74,7 +74,7 @@ Table1D::Table1D(const std::string& tablefile)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  
+
 double Table1D::LinInterpolate(const double& xval)
 {
 
@@ -89,7 +89,7 @@ double Table1D::LinInterpolate(const double& xval)
       "greater (or equal) to last table value\n"<<std::endl<<std::endl;
     exit(EXIT_FAILURE);
   }
-    
+
 
   // Find x0,x1; y0,y1:
   double x0 = 0.0;
@@ -114,7 +114,7 @@ double Table1D::LinInterpolate(const double& xval)
 }
 
 
-  
+
 /*********************************************************\
  * class Table2D                                         *
  *                                                       *
@@ -124,34 +124,34 @@ double Table1D::LinInterpolate(const double& xval)
 Table2D::Table2D(const std::string& tablefile)
 /*!
   Constructor for Table2D.
-  
+
   \param  tablefile - file for 2D table.
-  
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   WARNING: required format of tablefile: for f(x1,x2)
   need n1 + 1 rows of variable x1, and n2 + 1 columns of x2
-  where n1 is number of x1 points on x1 axis & n2 is num of 
+  where n1 is number of x1 points on x1 axis & n2 is num of
   x2 points on x2 axis.
-  
+
   NOTE: first line MUST be -1 x2_1 x2_2 ...
   all subsequent lines must be x1_i f(x1_i,x2_j) ...
-  
+
   BOTH AXES MUST BE SORTED for table class fns to work.
-  It is permissible to start a commented line with the hash ('#') 
+  It is permissible to start a commented line with the hash ('#')
   symbol.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
+
 */
 {
-    
+
   std::ifstream filestream(tablefile.c_str());
   // Check if file exists.
-  if(filestream == NULL) {
+  if(!filestream) {
     std::cerr<<"ERROR: "<<__PRETTY_FUNCTION__<<"\n file: "<<tablefile<<
       " cannot be found\n"<<std::endl;
     exit(EXIT_FAILURE);
   }
-  
+
   std::string line;
   int irow = 0; int icol = 0;
   while(getline(filestream,line)) {
@@ -182,14 +182,14 @@ Table2D::Table2D(const std::string& tablefile)
       }
     }
     //////////////////////////////
-      
+
   }
   m_row = irow;
-    
-  //DisplayTable();    
+
+  //DisplayTable();
   //std::cout<<"rows: "<<m_row<<" cols: "<<m_col<<std::endl;
-    
-}  
+
+}
 
 
 Table2D::Table2D(std::vector<double>& rows_vec,
@@ -198,7 +198,7 @@ Table2D::Table2D(std::vector<double>& rows_vec,
 
   //std::cout<<"\n  cols: "<<cols_vec.size()<<std::endl;
   //std::cout<<"  rows: "<<rows_vec.size()<<std::endl;
-  
+
   ////////////////////////////////
   /// DO ALL COLS ...
   // Do first col separately:
@@ -209,7 +209,7 @@ Table2D::Table2D(std::vector<double>& rows_vec,
   m_col = m_table[0].size();
   //std::cout<<"m_col: "<<m_col<<std::endl;
   // First row complete...
-  
+
   // Now implement all rows:
   for(unsigned irow=0; irow<rows_vec.size(); irow++) {
     m_table.push_back( std::vector<double>() );
@@ -219,13 +219,13 @@ Table2D::Table2D(std::vector<double>& rows_vec,
     }
   }
   m_row = m_table.size();
-  //std::cout<<"m_row: "<<m_row<<std::endl;  
+  //std::cout<<"m_row: "<<m_row<<std::endl;
   //DisplayTable();
 
 }
-  
-  
-void Table2D::DisplayTable(void) 
+
+
+void Table2D::DisplayTable(void)
 {
   // Output table:
   for(int irow=0; irow<m_row; irow++) {
@@ -234,7 +234,7 @@ void Table2D::DisplayTable(void)
     }
     std::cout<<std::endl;
   }
-  
+
 }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -243,17 +243,17 @@ double Table2D::LinInterpolate(const double& x1val, const double& x2val)
 /*!
   Performs bilinear interpolation on the grid square. If you need a refresher
   on what this is, see Numerical Recipes for C, section 3.6.
-  
+
   \param - x1val Desired x1 coordinate f(x1,x2) (row in table)
-  
+
   \param - x2val Desired x2 coordinate f(x1,x2) (col in table)
-  
+
   WARNING: does not check that table is ordered as low -> high across cols
   and low -> high across rows.
-  
-*/  
+
+*/
 {
-    
+
   ////////////////////////////////////////////////////////////////////////
   // ERROR checking. Make sure we're in range...
   // Again, WARNING: m_table must be ordered as low -> high across row
@@ -286,14 +286,14 @@ double Table2D::LinInterpolate(const double& x1val, const double& x2val)
   //////////////////////////////////////////////////////////////////////////
   // Define points 1-4
   // Assumes x1val and x2val fall between the points on the grid defined by
-  //   y1=m_table[j][k], y2=m_table[j+1][k], y3=m_table[j+1][k+1], 
+  //   y1=m_table[j][k], y2=m_table[j+1][k], y3=m_table[j+1][k+1],
   //   y4m_table[j][k+1]
   //////////////////////////////////////////////////////////////////////////
   int col_lo = 0; int row_lo=0;
   double x1lo=0.0; double x1hi=0.0;double x2lo=0.0; double x2hi=0.0;
   for(int irow = 1; irow < m_row; irow++) {
     if(m_table[irow][0] < x1val) continue;
-    else { 
+    else {
       x1hi = m_table[irow][0];
       x1lo = m_table[irow-1][0];
       row_lo = irow-1;
@@ -308,21 +308,21 @@ double Table2D::LinInterpolate(const double& x1val, const double& x2val)
       x2lo = m_table[0][icol-1];
       col_lo = icol-1;
       break;
-    }      
+    }
   }
   //std::cout<<"x2lo: "<<x2lo<<" x2hi: "<<x2hi<<std::endl;
-    
+
 
   // Do interpolation:
   double interp_t = (x1val-x1lo)/(x1hi - x1lo);
   double interp_u = (x2val-x2lo)/(x2hi - x2lo);
-    
+
   double y1 = m_table[row_lo][col_lo];
   double y2 = m_table[row_lo+1][col_lo];
   double y3 = m_table[row_lo+1][col_lo+1];
   double y4 = m_table[row_lo][col_lo+1];
   //std::cout<<"y1: "<<y1<<" y2: "<<y2<<" y3: "<<y3<<" y4: "<<y4<<std::endl;
-  double val = (1-interp_t)*(1-interp_u)*y1 + interp_t*(1-interp_u)*y2 + 
+  double val = (1-interp_t)*(1-interp_u)*y1 + interp_t*(1-interp_u)*y2 +
     interp_t*interp_u*y3 + (1-interp_t)*interp_u*y4;
 
   return val;
@@ -331,7 +331,7 @@ double Table2D::LinInterpolate(const double& x1val, const double& x2val)
 
 double Table2D::GetVal(const int row, const int col)
 {
-  
+
   if ( (row < 0) || (row >= m_row) ) {
     std::cerr << "ERROR: in function: "<<__PRETTY_FUNCTION__<<"\n";
     std::cerr << "row not in range!\n" <<
@@ -347,9 +347,9 @@ double Table2D::GetVal(const int row, const int col)
       "  col_max: "<<m_col<<std::endl;
     exit(EXIT_FAILURE);
   }
-  
+
   return m_table[row][col];
-  
+
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -363,7 +363,7 @@ double Table2D::GetRowVal(const int row)
       "  row_max: "<<m_row<<std::endl;
     exit(EXIT_FAILURE);
   }
-  
+
   return m_table[row][0];
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -380,13 +380,13 @@ double Table2D::GetColVal(const int col)
     exit(EXIT_FAILURE);
   }
 
-  
+
   return m_table[0][col];
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Table2D::SetVal(const int row, const int col, const double val)
-{ 
+{
   if ( (row < 1) || (row >= m_row) ) {
     std::cerr << "ERROR: in function: "<<__PRETTY_FUNCTION__<<"\n";
     std::cerr << "row not in range!\n" <<
@@ -401,9 +401,9 @@ void Table2D::SetVal(const int row, const int col, const double val)
       "  col_max: "<<m_col<<std::endl;
     exit(EXIT_FAILURE);
   }
-  
-  
-  m_table[row][col] = val; 
-  
+
+
+  m_table[row][col] = val;
+
 }
 

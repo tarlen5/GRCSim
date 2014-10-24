@@ -69,6 +69,7 @@ AnyOption* DefineOptions(int argc, char* argv[], const string& progname)
   opt->setOption("mf_dir");
   opt->setOption("opt_depth_dir");
   opt->setOption("output_dir");
+  opt->setFlag("mf_no_lock");
   opt->setFlag("single_gen");
   opt->setFlag("trk_delay");
   opt->setFlag("trk_leptons");

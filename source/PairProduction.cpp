@@ -3,14 +3,14 @@
     \file   PairProduction.cpp
 
      Pair Production class implementation file for FRW Universe.
-  
+
     \author    Timothy C. Arlen                      \n
                Department of Physics and Astronomy   \n
                UCLA                                  \n
 	       arlen@astro.ucla.edu                  \n
 
     \date      July 4, 2007
-  
+
 
     \revision: 02/15/2008 - Reorganized constants
                07/09/2008 - Changed PropagationLengthEBL() to VEC3D_T
@@ -22,16 +22,16 @@
 			    Only functions we keep with double precision are
 			    in DIRBR.cpp.
 	       10/17/2008 - Rewrite the PropagationLength() function so that
-	                    it "stops" integrating when Photon has reached 
+	                    it "stops" integrating when Photon has reached
 			    R_p (radius in comoving coords).
 	       6/7/2009   - Changed constructor to initialize DIRBR class
 	                    only once per run.
 	       4/14/2010  - Changed the loop condition on the photon integrate
 	                    to next z pair production point. Needed to add the
 			    map to keep track of the exact distance as well.
-	       
-	       10/7/2010  - Removed all dependency on RelParticle class. 
-	                    Should be general enough to work with all kinds of 
+
+	       10/7/2010  - Removed all dependency on RelParticle class.
+	                    Should be general enough to work with all kinds of
 			    inputs (not relying on RelParticle).
 
     \note
@@ -74,7 +74,7 @@ namespace IGCascade
 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+
 
 
   void PairProduction::DefineNumericConst(void)
@@ -83,10 +83,10 @@ namespace IGCascade
     Constructor.
   */
   {
-    
+
     // Public member:
-    m_DE = "1.0E-25"; 
-    
+    m_DE = "1.0E-25";
+
     //~~~~~~~~VEC3D_T Values~~~~~~~~~
     D0 = "0.0";
     D1 = "1.0";
@@ -102,7 +102,7 @@ namespace IGCascade
     m_PI2d6  = VEC3D_PI*VEC3D_PI/D2/D3;  // pi*pi/6 for PolyLog func
 
   }
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
@@ -110,12 +110,12 @@ namespace IGCascade
   {
 
     /////////////////////////////////////////////////
-    // If we are very close to the source, we'd like more steps to integrate 
+    // If we are very close to the source, we'd like more steps to integrate
     // over to find the interaction distance.
     if (ze < 5.0e-2) m_dz_dd = ze/50.0;  // 50 integration steps.
     //if (ze < 2.0e-2) m_dz_dd = "1.0e-4";
     else {      // propagation length dz
-      m_dz_dd = "1.0e-3";   // ~3 Mpc dist 
+      m_dz_dd = "1.0e-3";   // ~3 Mpc dist
       //m_dz_dd = "3.0e-4";     // ~1 Mpc dist
       //m_dz_dd = "1.0e-4";
     }
@@ -136,34 +136,34 @@ namespace IGCascade
     double f_i = 0.0;
     double yi = 0.0;
     // Set up logarithmic grid for the F(q) integration.
-    for (int i = 0; i < m_imax; i++) {	  
+    for (int i = 0; i < m_imax; i++) {
       yi = exp(-(double)(i)*m_dlog_q);
       m_q_vec.push_back(yi);  // q[0]=1.0;
-      
+
       f_i+=((1.0+yi-yi*yi/2.0)*log((1.0+sqrt(1.0-yi))/
 		     (1.0-sqrt(1.0-yi)))- (1.0+yi)*sqrt(1.0-yi) )/yi;
       m_F_vec.push_back(2.0*m_q_vec[i]*m_q_vec[i]*f_i*m_dlog_q);
-      
+
     }
     //////////////////////////////////////////////////////////////
 
   }
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-  
-  
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
   bool PairProduction::
-  PropagatePhotonEBL(DIRBRBase* ebl_model,const double gam_ph_egy, 
-		     const VEC3D_T z_o, const double z_min, 
+  PropagatePhotonEBL(DIRBRBase* ebl_model,const double gam_ph_egy,
+		     const VEC3D_T z_o, const double z_min,
 		     VEC3D_T& z_int, double& TotalLambdaInt)
   /*!
     Propagates the gamma photon, through the EBL, calculating the optical depth
     along the way.
     Does the integration for tau (optical depth).
-    
-    NOTE: 
-        1) Uses main while loop in double precision (rather than double-double 
+
+    NOTE:
+        1) Uses main while loop in double precision (rather than double-double
         to speed things up and accuracy here is not needed) to determine approx.
-   	prop_steps (<=> change in redshift) to where photon interacted. The dz 
+   	prop_steps (<=> change in redshift) to where photon interacted. The dz
    	step here is m_dz (of the class) and its precision depends on the
    	redshift.
 
@@ -174,23 +174,23 @@ namespace IGCascade
 	3) This is the wrapper function for the main loop that does
 	the integration, PropagateToTau().
 
-    MODIFIES: 
+    MODIFIES:
       1) z_int - the interaction redshift
       2) TotalLambdaInt - the total integral over ebl photon wavelength, lambda
          which is used later in determining with what energy of ebl photon
 	 the Gamma Photon pair produced with.
-    
-    \returns - bool true or false depending on whether pair production took 
+
+    \returns - bool true or false depending on whether pair production took
                place.
    */
   {
 
-    
+
     double chi      = m_rng->Uniform();
     double lnchi    = log(chi);
     const double tauFinal = -lnchi;
-      
-    return PropagateToTau(ebl_model, gam_ph_egy, z_o, z_min, tauFinal, 
+
+    return PropagateToTau(ebl_model, gam_ph_egy, z_o, z_min, tauFinal,
 			  z_int, TotalLambdaInt);
 
   }
@@ -198,19 +198,19 @@ namespace IGCascade
 
 
   //void PairProduction::
-  //GetOpticalDepth(DIRBRBase* ebl_model,const double gam_ph_egy, 
+  //GetOpticalDepth(DIRBRBase* ebl_model,const double gam_ph_egy,
   //		  const VEC3D_T z_o, const VEC3D_T z_final)
   //{
-    
-    
-    
+
+
+
   //}
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+
 
   bool PairProduction::
-  PropagateToTau(DIRBRBase* ebl_model,const double gam_ph_egy, 
-		 const VEC3D_T z_o, const double z_min, const double tauFinal, 
+  PropagateToTau(DIRBRBase* ebl_model,const double gam_ph_egy,
+		 const VEC3D_T z_o, const double z_min, const double tauFinal,
 		 VEC3D_T& z_int, double& TotalLambdaInt)
   /*
     Function that does the heavy lifting of the tau (Optical Depth)
@@ -230,7 +230,7 @@ namespace IGCascade
     double me_eV_d = Double(PhysConst::eV_MELEC);
     double me_sq = me_eV_d*me_eV_d;
     double nJtoeV_d = Double(PhysConst::nJ_TO_eV);
-    double tau_const = 
+    double tau_const =
       Double(3.0*PhysConst::CGS_THOM_CS*1.0E-4*gam_ph_egy*4.0*VEC3D_PI/
 	     (8.0*PhysConst::HUB_CONST*me_eV_d*me_eV_d*(1.0+z_o)));
     double DimlessTotalLambdaInt = 0.0;
@@ -254,7 +254,7 @@ namespace IGCascade
 
       double dirbr_temp = 1.0;
       DimlessTotalLambdaInt = 0.0;
-      
+
       // F(q) and DIRBR integral
       double lambda_const = hc_d*gam_ph_egy*z2/(me_sq*(1.0+z_o_d));
       for (int i = (m_imax-1); i >= 0; i--) {
@@ -262,7 +262,7 @@ namespace IGCascade
 	lambda = lambda_const*m_q_vec[i];
 	dirbr_temp = ebl_model->GetDIRBR(lambda,z);
 	if(lambda > 100.0) dirbr_temp+=ebl_model->GetCMBR(lambda);
-	DimlessTotalLambdaInt += m_q_vec[i]*m_F_vec[i]*dirbr_temp;	
+	DimlessTotalLambdaInt += m_q_vec[i]*m_F_vec[i]*dirbr_temp;
       }
       TotalLambdaInt = DimlessTotalLambdaInt*m_dlog_q*nJtoeV_d;
       //tau+= TotalLambdaInt*z4*tau_const*m_dz/Q;
@@ -272,7 +272,7 @@ namespace IGCascade
 
       z-=m_dz;
       //prop_steps += 1.0;
-      
+
       // Testing:
       //std::cout<<"-lnchi: "<<(-lnchi)<<" tau: "<<tau<<" z: "<<z<<std::endl;
       //char getline;
@@ -281,10 +281,10 @@ namespace IGCascade
       if(z < z_min) {
 	z_int = z_min;
 	return false;
-      } 
+      }
     }
     /////////////////////////////////////////////////////////////////////
-    
+
     // Perform interpolation:
     z_int = (VEC3D_T)(z_prior + (z - z_prior)*(tauFinal - tau_prior)/(tau - tau_prior));
 
@@ -294,13 +294,13 @@ namespace IGCascade
     return true;
 
   }
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  
-  bool PairProduction::UpdateGammaPhoton(Vec4D& gam_ph_p4, 
+
+  bool PairProduction::UpdateGammaPhoton(Vec4D& gam_ph_p4,
        Vec4D& gam_ph_r4, VEC3D_T& gam_ph_z, VEC3D_T& gam_ph_z_s,
        VEC3D_T& delta_z_step)
-  //void PairProduction::UpdateGammaPhoton(RelParticle& GammaPhoton, 
+  //void PairProduction::UpdateGammaPhoton(RelParticle& GammaPhoton,
   //					 VEC3D_T prop_steps)
   /*!  Updates Gamma's .r4, .z, .z_s, and .p4
 
@@ -310,16 +310,16 @@ namespace IGCascade
 	gam_ph_z   - gamma ray redshift
 	gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
 	delta_z_step - redshift difference that photon took on this step.
-	
+
      \return True - if pair production occurs before z=0 False otherwise.
   */
   {
 
     bool pair_prod_occurs = true;
-    
-    VEC3D_T z_o = gam_ph_z;
+
+    //VEC3D_T z_o = gam_ph_z;
     VEC3D_T delta_z = m_dz_time_delay;
-    
+
     Vec3D R_o  = gam_ph_r4.r;    // Photon initial radial coord
     Vec3D e_ph = gam_ph_p4.r/gam_ph_p4.r.Norm(); // Photon direction
     VEC3D_T z_final = gam_ph_z - delta_z_step;
@@ -327,20 +327,20 @@ namespace IGCascade
     //////////////////////////////////////////////////////////////
     //------------------Time Delay Computation------------------//
     //////////////////////////////////////////////////////////////
-    VEC3D_T Delta_time = "0.0";
+    //VEC3D_T Delta_time = "0.0";
     VEC3D_T L_prop  = "0.0";            // Dist traveled during propagation
     VEC3D_T z_dd = gam_ph_z;
     unsigned nsteps = 0;
     //while ( ((z_dd-z_final) > m_DE) && (gam_ph_z_s > m_DE) ) {
     while( (z_dd > z_final) && (gam_ph_z_s > m_DE)) {
 
-      if( (z_dd - z_final) < delta_z) 
+      if( (z_dd - z_final) < delta_z)
 	delta_z = (z_dd - z_final);
 
       //std::cout<<"  z_dd: "<<z_dd<<" z_final: "<<z_final<<" delta_z: "<<delta_z<<std::endl;
       VEC3D_T Delta_time = "0.0";
       VEC3D_T deltaz_s = "0.0";
- 
+
       NonRadialPropagation(gam_ph_p4, gam_ph_r4, gam_ph_z,  gam_ph_z_s,
 			   L_prop,delta_z, deltaz_s, Delta_time);
 
@@ -351,7 +351,7 @@ namespace IGCascade
 	VEC3D_T delta_z_R = delta_z;
 
 	while ( fabs(gam_ph_z_s - deltaz_s) > m_DE) {
-	  
+
 	  delta_z = (delta_z_L + delta_z_R)/2.0;
 
 	  NonRadialPropagation(gam_ph_p4, gam_ph_r4, gam_ph_z,  gam_ph_z_s,
@@ -359,9 +359,9 @@ namespace IGCascade
 
 	  if ((gam_ph_z_s - deltaz_s) > 0.0) delta_z_L = delta_z;
 	  else delta_z_R = delta_z;
-	  
+
 	}
-	
+
 	pair_prod_occurs = false;
 
       }
@@ -369,7 +369,7 @@ namespace IGCascade
       gam_ph_z_s -= deltaz_s;
       gam_ph_r4.r0 += Delta_time;
       gam_ph_r4.r += L_prop*PhysConst::CGS_HUBRAD*e_ph;
-	    
+
       gam_ph_p4.r0 *= (1.0+z_dd-delta_z)/(1.0+z_dd);
       gam_ph_p4.r  *= gam_ph_p4.r0/gam_ph_p4.r.Norm();
 
@@ -387,26 +387,26 @@ namespace IGCascade
 
 
 
-  void PairProduction::NonRadialPropagation(Vec4D& gam_ph_p4, 
+  void PairProduction::NonRadialPropagation(Vec4D& gam_ph_p4,
        Vec4D& gam_ph_r4, VEC3D_T& gam_ph_z, VEC3D_T& gam_ph_z_s,
        VEC3D_T& L_prop,VEC3D_T& delta_z,VEC3D_T& deltaz_s,VEC3D_T& Delta_time)
     /*!
-      
+
     For a non-radially propagating photon, calculates updated dynamical
     parameters to fourth order accuracy.
-    
+
     \param
         gam_ph_p4  - gamma ray 4 momentum
 	gam_ph_r4  - gamma ray 4 position
 	gam_ph_z   - gamma ray redshift
-	gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!) 
+	gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
 	L_prop     - dist traveled by gam_ph; calculated here
 	delta_z    - used in calculations (NOT updated here)
 	deltaz_s   - calculated here
 	Delta_time - calculated here to fourth order.
-	
+
     \return - none
-    
+
     */
   {
     VEC3D_T z_dd = gam_ph_z;
@@ -447,7 +447,7 @@ namespace IGCascade
     VEC3D_T Tau = alpha/a*L_prop + (b*alpha/a - beta)/a2/2.0*L_prop2 +
       (gamma/6.0 - b*beta/2.0/a-c*alpha/6.0/a+b2*alpha/2.0/a2)/a3*L_prop3 +
       (b*gamma/4.0/a - delta/24.0 + c*beta/6.0/a + d*alpha/24.0/a -
-       5.0/12.0*b*c*alpha/a2 - 5.0/8.0*b2*beta/a2 + 
+       5.0/12.0*b*c*alpha/a2 - 5.0/8.0*b2*beta/a2 +
        5.0/8.0*b3*alpha/a3)/a4*L_prop4;
 
 
@@ -485,7 +485,7 @@ namespace IGCascade
     VEC3D_T Tau_s = alpha/a*L_prop_s + (b*alpha/a - beta)/a2/2.0*L_prop_s2 +
       (gamma/6.0 - b*beta/2.0/a-c*alpha/6.0/a + b2*alpha/2.0/a2)/a3*L_prop_s3 +
       (b*gamma/4.0/a - delta/24.0 + c*beta/6.0/a + d*alpha/24.0/a -
-       5.0/12.0*b*c*alpha/a2 - 5.0/8.0*b2*beta/a2 + 
+       5.0/12.0*b*c*alpha/a2 - 5.0/8.0*b2*beta/a2 +
        5.0/8.0*b3*alpha/a3)/a4*L_prop_s4;
 
     Delta_time = (Tau - Tau_s)/PhysConst::HUB_CONST;
@@ -496,33 +496,33 @@ namespace IGCascade
     VEC3D_T D = (d/24.0 - 5.0/12.0*b*c/a + 5.0/8.0*b3/a2)/a3/a2;
 
     deltaz_s = A*L_prop_s + B*L_prop_s2 + C*L_prop_s3 + D*L_prop_s4;
-    
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-  VEC3D_T PairProduction::GetEBLPhotonEgy(DIRBRBase* ebl_model, 
+  VEC3D_T PairProduction::GetEBLPhotonEgy(DIRBRBase* ebl_model,
 				       const double TotalLambdaInt,
-				       const double z_int, const double z_o, 
+				       const double z_int, const double z_o,
 				       const double gam_ph_egy)
   /*!
-    Main purpose is to define the energy of the EBL Photon which interacts 
-    with the energetic Gamma Photon, by performing innermost integral of 
+    Main purpose is to define the energy of the EBL Photon which interacts
+    with the energetic Gamma Photon, by performing innermost integral of
     tau integration.
     Results in updated background photon's energy.
 
-    \param 
+    \param
          z_int          - redshift at which gamma photon interacts.
 	 z_o            - redshift at which gamma photon started.
 	 gam_ph_egy     - gamma photon energy
 	 bg_ph_egy      - background photon energy
-	 TotalLambdaInt - total lambda integral, as calculated in 
+	 TotalLambdaInt - total lambda integral, as calculated in
 	                  PropagatePhotonEBL() fn.
 
     \returns - ebl photon egy which interacted to pair produce
 */
   {
-    
+
     VEC3D_T bg_ph_egy = "0.0";
 
     ///////////////////////////////////////////////////////////////////////
@@ -548,17 +548,17 @@ namespace IGCascade
 
     double dirbr_temp = ebl_model->GetDIRBR(EBL_lambda,z_int);
     if(EBL_lambda > 100.0) dirbr_temp+=ebl_model->GetCMBR(EBL_lambda);
-    
-    //double dirbr = nJtoeV_d*TimeEvolDIRBR(EBL_lambda,z,dirbr_temp);  
+
+    //double dirbr = nJtoeV_d*TimeEvolDIRBR(EBL_lambda,z,dirbr_temp);
     // Note: units are in [ eV m^-2 sr^-1 s^-1 ]
     double dirbr = nJtoeV_d*dirbr_temp;
 
      std::cout<<std::endl<<"Integrating to find EBL Photon energy...\n\n";
 
     while(LambdaInt < TotalLambdaInt*chi_rand) {
-      
+
       EBL_lambda_next = m_q_vec[i+1]*hc_d*gam_ph_egy*z2/(me_sq*(1.0+z_o));
-      
+
       double dirbr_temp_next = ebl_model->GetDIRBR(EBL_lambda_next,z_int);
       if(EBL_lambda_next > 100.0){
 	dirbr_temp_next+=ebl_model->GetCMBR(EBL_lambda_next);
@@ -581,32 +581,32 @@ namespace IGCascade
 	LambdaInt += ((m_q_vec[i]*m_F_vec[i]*dirbr+m_q_vec[i+1]*
 		       m_F_vec[i+1]*dirbr_next)*m_dlog_q/2.0);
 	i++;
-	
+
 	EBL_lambda = EBL_lambda_next;
 	dirbr_temp = dirbr_temp_next;
 	dirbr = dirbr_next;
       }
-      
+
     }
-    //////////////////////////////////////////////////////////////    
-    
+    //////////////////////////////////////////////////////////////
+
     bg_ph_egy = (PhysConst::eV_MELEC*PhysConst::eV_MELEC*(1.0+z_o))/gam_ph_egy/m_q_vec[i-1]/z2;
     bg_ph_egy*= (1.0+z_int);
-    
+
     return bg_ph_egy;
 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  void PairProduction::UpdateEBLPhoton(Vec4D& gam_ph_p4, Vec4D& gam_ph_r4, 
+  void PairProduction::UpdateEBLPhoton(Vec4D& gam_ph_p4, Vec4D& gam_ph_r4,
 		  VEC3D_T& gam_ph_z, VEC3D_T& gam_ph_z_s, Vec4D& bg_ph_p4,
 				       Vec4D& bg_ph_r4, VEC3D_T& bg_ph_z)
   /*! Routine defines the EBL 3 momentum, by calling the ImpactAngle()
-    function and rotating into the frame where direction of gamma 
+    function and rotating into the frame where direction of gamma
     photon is along z_axis.
     Also updates all of EBLPhoton dynamical parameters.
-    
-    \param 
+
+    \param
         gam_ph_p4  - gamma ray 4 momentum
 	gam_ph_r4  - gamma ray 4 position
 	gam_ph_z   - gamma ray redshift
@@ -616,11 +616,11 @@ namespace IGCascade
 	bg_ph_z    - background photon redshift; calculated here
   */
   {
-    
+
     bg_ph_z=gam_ph_z;
     bg_ph_r4.r0=gam_ph_r4.r0;
     bg_ph_r4.r=gam_ph_r4.r;
-    
+
     ////////////////////////////////////////////////////////////////
     /// Now for the hard part of updating EBL Photon 3-momentum: ///
     ////////////////////////////////////////////////////////////////
@@ -672,16 +672,16 @@ namespace IGCascade
       /*! This routine Samples the impact angle between the incident gamma
 	  ray and background photon in the lab reference frame.
 
-	  \param 
-	      q = m^2/(E1*E2) Where E1, E2 are the gamma and background 
+	  \param
+	      q = m^2/(E1*E2) Where E1, E2 are the gamma and background
 	          photon energy in the lab r.f.    [1]
-        
+
 	      q ~ 1 - "soft" photon-near threshold energy
 	      q ~ 0 - "hard" photon. (gamma energy in lab frame -> infinity)
-         
-	  \return  cos(theta) where theta is the polar scattering angle 
+
+	  \return  cos(theta) where theta is the polar scattering angle
 	           between each particle's momenta in the lab r.f.  [1]
-        
+
       */
     {
 
@@ -709,20 +709,20 @@ namespace IGCascade
       VEC3D_T eps = DEps + DEps;
       VEC3D_T x = RB;
       VEC3D_T F = D0;
-      
+
       VEC3D_T etaminus_ = D0;
       VEC3D_T etaplus_ = D0;
-      
+
       while (fabs(eps) > DEps) {
 	x = (LB + RB)/D2;
 
 	if ( x < 0.001 ) etaminus_ = x/D2/(D1+sqrt(D1 - x));
 	else etaminus_ = (D1-sqrt(D1 - x))/D2;
-	
+
 	etaplus_ = D1 - etaminus_;
 
 	F = (x/D2-D1+D1/x)*log(etaplus_/etaminus_) - sqrt(D1-x)*(D2/x-D1)
-	    + PolyLog1(etaminus_/etaplus_) - PolyLog1(etaplus_/etaminus_) + 
+	    + PolyLog1(etaminus_/etaplus_) - PolyLog1(etaplus_/etaminus_) +
 	    log(etaminus_/etaplus_)*log(x/D4);
 
 	eps = F - G*chi;
@@ -738,48 +738,48 @@ namespace IGCascade
 
     }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  
-  bool PairProduction::RelativisticKinematics(Vec4D& gam_ph_p4, 
+
+
+  bool PairProduction::RelativisticKinematics(Vec4D& gam_ph_p4,
 		       Vec4D& bg_ph_p4,Vec4D& elec_p4, Vec4D& pos_p4)
   /*! Computes relativistic kinematics of pair production of electron
-    and positron by two incident photons. Scattering angle is 
+    and positron by two incident photons. Scattering angle is
     sampled utilizing full qed cross-section.
-    
-    \param 
+
+    \param
         gam_ph_p4  - gamma ray 4 momentum
 	bg_ph_p4   - background photon 4 momentum
 	elec_p4    - electron 4 momentum
 	pos_p4     - positron 4 momentum
 
     \note All input parameters are assumed to be in the lab frame.
-		 
+
   */
  {
-    
+
    std::cout<<"Computing relativistic kinematics of interaction..."
 	    <<std::endl;
-      
+
    VEC3D_T me_sq = (PhysConst::eV_MELEC)*(PhysConst::eV_MELEC);      // [eV^2]
-      
+
    // Compute boost for the CM frame:
    Vec3D beta = (gam_ph_p4.r+bg_ph_p4.r)/(gam_ph_p4.r0+bg_ph_p4.r0);
-      
+
    // Error check
    if (beta.Norm() >= D1){
      std::cerr<<std::endl<<"ERROR: beta must be less than 1.0"<<std::endl;
      exit(EXIT_FAILURE);
    }
-   
+
    VEC3D_T betasq = beta*beta;
    VEC3D_T gamma = D1/sqrt(D1 - betasq);
    Vec3D e1 = gam_ph_p4.GetDirection();
    Vec3D e2 = bg_ph_p4.GetDirection();
-      
-   VEC3D_T Ecm = (gamma * gam_ph_p4.r0 * bg_ph_p4.r0 / 
+
+   VEC3D_T Ecm = (gamma * gam_ph_p4.r0 * bg_ph_p4.r0 /
 		  (gam_ph_p4.r0 + bg_ph_p4.r0)) * (D1 - e1*e2);
-   VEC3D_T y = D0;
-   
+   //VEC3D_T y = D0;
+
    // First check if enough energy for interaction to occur:
    if (Ecm < PhysConst::eV_MELEC){
      std::cerr<<std::endl;
@@ -788,29 +788,29 @@ namespace IGCascade
      std::cerr<<std::endl<<"Ecm = "<<Ecm<<std::endl;
      return false;
    } else {
-     
+
      // Set up coords for collision in CM frame:
-     Vec3D n1 = gam_ph_p4.r0/Ecm*(e1 - (beta*e1)*beta/betasq + 
+     Vec3D n1 = gam_ph_p4.r0/Ecm*(e1 - (beta*e1)*beta/betasq +
 				  gamma*(beta*e1/betasq-D1)*beta);
 
      VEC3D_T betan1 = beta*n1;
-     VEC3D_T betan1sq = betan1*betan1;
+     //VEC3D_T betan1sq = betan1*betan1;
      Vec3D v = beta^n1;
      VEC3D_T VecCompare = v.Norm()/beta.Norm();
 
      Vec3D n2(D1,D0,D0);
- 
+
      // Set up coords in CM frame. Check to see if beta is parallel to n1
-     if (fabs(VecCompare) > 1.E-12 ){       
+     if (fabs(VecCompare) > 1.E-12 ){
        Vec3D cp = e1^beta;
        VEC3D_T denom = gam_ph_p4.r0/Ecm * cp.Norm();
        n2 = (beta - betan1*n1)/denom;
-     } else {  
+     } else {
        Vec3D n_2(D1,D0,D0);
-	  
+
        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        // Probably overkill, but this makes absolutely certain that
-       // we can get an orthogonal vector.       
+       // we can get an orthogonal vector.
        VEC3D_T DEps = 1.E-10;
        while (fabs(VecCompare) < DEps) {
 	 std::cout<<"v not perpendicular to n1. Retrying..."<<std::endl;
@@ -820,7 +820,7 @@ namespace IGCascade
        }
        n2 = (n2 - (n2*n1)*n1)/sqrt( n2*n2 - (n2*n1)*(n2*n1) ); // normalize
      }
-     
+
      Vec3D n3 = n1^n2;
 
      VEC3D_T s=(gam_ph_p4+bg_ph_p4)*(gam_ph_p4+bg_ph_p4);
@@ -834,12 +834,12 @@ namespace IGCascade
      VEC3D_T cos_theta = Scattering(x);
      VEC3D_T sin_theta = sqrt(D1 - cos_theta*cos_theta);
      //std::cout<<"  Finished."<<std::endl;
-     
+
      VEC3D_T sin_phi = sin(phi);
      VEC3D_T cos_phi = cos(phi);
 
      VEC3D_T p_e = sqrt(Ecm*Ecm - me_sq); // Mag of 3 mom outgoing elec/pos
-     Vec3D n_e = cos_theta*n1 + sin_theta*( cos_phi*n2 + sin_phi*n3 ); 
+     Vec3D n_e = cos_theta*n1 + sin_theta*( cos_phi*n2 + sin_phi*n3 );
      Vec3D pe = p_e*n_e; // 3 momentum of electron in CM frame
      Vec3D ppos = -pe;
 
@@ -848,9 +848,9 @@ namespace IGCascade
      elec_p4.r = pe - (pe*beta)*beta/betasq + gamma*
        (pe*beta/betasq+Ecm)*beta;
      pos_p4.r0 = gamma*(Ecm + beta*ppos);
-     pos_p4.r = ppos - (ppos*beta)*beta/betasq + 
+     pos_p4.r = ppos - (ppos*beta)*beta/betasq +
        gamma*(ppos*beta/betasq + Ecm)*beta;
-    
+
 
      /////////////////////////////////////////////////////
      //--------Testing for Momentum Conservation--------//
@@ -867,11 +867,11 @@ namespace IGCascade
        std::cout<<std::endl<<"s_before = "<<s_before<<std::endl;
        std::cout<<"s_after  = "<<s_after<<std::endl;
        std::cout<<"Energy of Gamma Ray = "<<gam_ph_p4.r0<<std::endl;
-     } 
-     
+     }
+
      std::cout<<"Finished relativistic kinematics."<<std::endl;
      return true;
-     
+
    } //end if
 
 

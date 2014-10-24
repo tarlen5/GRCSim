@@ -1,6 +1,6 @@
 /*! \file RelParticle.hpp
           RelParticle class header file
-  
+
   \author   Yusef Shafi            \n
             UCLA                   \n
 	    yshafi@ucla.edu        \n
@@ -32,7 +32,6 @@
 #include<cmath>
 
 #include<qd/dd_real.h>
-//#include<qd/dd.h>
 
 #include "Vec3D.hpp"
 #include "Vec4D.hpp"
@@ -42,16 +41,16 @@
 namespace IGCascade
 {
   class RelParticle
-  {		
+  {
 
   public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Constructors///////////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
+
     //Default constructor
     inline RelParticle();
-		
+
     //Overloaded Constructors
     inline RelParticle(Vec4D& _r4, Vec4D& _p4);
     inline RelParticle(Vec4D& _r4, Vec4D& _p4, VEC3D_T _z);
@@ -59,48 +58,48 @@ namespace IGCascade
     inline RelParticle(VEC3D_T _p0, VEC3D_T _m0,Vec4D& _r4,Vec3D& _n);
 
     inline RelParticle(RelParticle& _rp);
-			
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Static Functions///////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
+
     //Find/Boost to Center of Momentum Frame:
-    static Vec4D GetUcm(std::vector<RelParticle>& particles); 
+    static Vec4D GetUcm(std::vector<RelParticle>& particles);
     static void BoostSystem(Vec4D& u4,
-			    std::vector<RelParticle>& particles); 
+			    std::vector<RelParticle>& particles);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Member Functions///////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
+
     //When the particle is boosted, just call Vec4D's two boosts
     inline void Boost(Vec4D& u4);	//particle boost
     inline void Rotate(Vec3D& axis);	//particle rotation
     inline void Reflect(Vec3D& norm);	//particle reflection
     inline void P();	//parity transformation
     inline void T();	//time inversion
-			
+
     //Dump Function to get info out
     //void Dump(std::ostream& stream = std::cout) const;
-			
+
     //void Propagate() - give a dt and velocity using += operators, etc
     inline void PropagateFree(VEC3D_T dt);
 
     //Initialize all data members to zero...
     inline void Zero();
-	
+
     //choose a random vector on sphere (uniform distribution)
     /***Moved to Vec3D***/
     /*Vec3D Scatter3DUniform();*/
-			
+
     void Dump(std::ostream& stream = std::cout) const; //!<prints coordinates
-    void DumpShort(std::ostream& stream = std::cout) const; 
+    void DumpShort(std::ostream& stream = std::cout) const;
              //!<prints coordinates
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Public Data Members////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
+
     Vec4D m_r4;	      // Position
     Vec4D m_p4;	      // Energy-Momentum
     VEC3D_T m_m0;       // Mass
@@ -134,14 +133,12 @@ namespace IGCascade
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Private Data Members///////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
+
     //std::string m_tag;
-			
-    static const double m_pi = 3.14159265358979;
 
   };
 
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Default class constructor
   inline RelParticle::RelParticle(): m_r4(), m_p4()
@@ -149,7 +146,7 @@ namespace IGCascade
     // nothing to see here
   }
 
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Overloaded class constructor (1)
   /// \param _r: r
@@ -192,7 +189,7 @@ namespace IGCascade
     m_q  = _q;
   }
 
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Overloaded class constructor (4)
   /// \param _p0: Energy  [eV]
@@ -220,7 +217,7 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Member functions ///
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Boost function
   // \param: 4D velocity
@@ -229,7 +226,7 @@ namespace IGCascade
     m_r4.Boost4D(u4);
     m_p4.Boost4D(u4);
   }
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Rotate function
   // \param: axis about which to rotate
@@ -238,7 +235,7 @@ namespace IGCascade
     m_r4.Rotate(axis);
     m_p4.Rotate(axis);
   }
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Reflect function
   // \param: normalized axis about which to rotate
@@ -247,7 +244,7 @@ namespace IGCascade
     m_r4.Reflect(axis);
     m_p4.Reflect(axis);
   }
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Parity Transformation function
   // \param: N/A
@@ -256,7 +253,7 @@ namespace IGCascade
     m_r4.P();
     m_p4.P();
   }
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Time inversion function
   // \param: N/A
@@ -291,7 +288,7 @@ namespace IGCascade
   // \param: time increment
   inline void RelParticle::PropagateFree(VEC3D_T dt)
   {
-		
+
     m_r4.r.x += (m_p4.r.x/m_p4.r0)*dt;
     m_r4.r.y += (m_p4.r.y/m_p4.r0)*dt;
     m_r4.r.z += (m_p4.r.z/m_p4.r0)*dt;
@@ -316,7 +313,7 @@ namespace std
     R.Dump(stream);
     return stream;
   }
-  
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Stream extraction
   inline istream& operator >> (istream& stream, IGCascade::RelParticle& R)
@@ -332,6 +329,4 @@ namespace std
 
 #endif // IGCASCADE_RELPARTICLE_H
 
-				
-				
 

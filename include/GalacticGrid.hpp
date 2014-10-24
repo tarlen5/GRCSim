@@ -1,10 +1,10 @@
 /*! \file    GalacticGrid.hpp          \n
              Vec3D class header file
-  
+
   \author    Yusef Shafi	       \n
              UCLA		       \n
 	     yshafi@ucla.edu	       \n
-  
+
   \author    Stephen Fegan             \n
              UCLA                      \n
 	     sfegan@astro.ucla.edu     \n
@@ -12,11 +12,11 @@
   \author    Tim Arlen                 \n
              UCLA                      \n
 	     timothyarlen@gmail.com    \n
-  
+
   \date      06/01/2007
-  
+
   \version   1.1
-  
+
   \revision: 1.0 - added code to convert VEC3D_T to double via
              the convert class.
 	     1.1 - Add function to do propagation through expanding
@@ -30,7 +30,6 @@
 
 #include "Vec3D.hpp"
 #include "Vec4D.hpp"
-//#include "RandomNumbers.hpp"
 #include "RelParticle.hpp"
 #include "convert.hpp"
 #include "PhysicsConstants.hpp"
@@ -38,7 +37,6 @@
 #include <iostream>
 #include <fstream>
 #include<qd/dd_real.h>
-//#include<qd/dd.h>
 #include <cmath>
 #include <map>
 #include <cstdlib>
@@ -47,7 +45,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-//#include <fildes.h>
 
 #include "TRandom3.h"
 
@@ -58,18 +55,18 @@ namespace IGCascade
   {
   public:
     ICoord(int _ix, int _iy, int _iz): ix(_ix), iy(_iy), iz(_iz) { }
-    bool operator == (const ICoord& o) { 
-      return (ix==o.ix)&&(iy==o.iy)&&(iz==o.iz); 
+    bool operator == (const ICoord& o) {
+      return (ix==o.ix)&&(iy==o.iy)&&(iz==o.iz);
     }
-    bool operator != (const ICoord& o) { 
-      return (ix!=o.ix)||(iy!=o.iy)||(iz!=o.iz); 
+    bool operator != (const ICoord& o) {
+      return (ix!=o.ix)||(iy!=o.iy)||(iz!=o.iz);
     }
     int ix;
     int iy;
     int iz;
-    
-    void DumpShort(std::ostream& stream ) const { 
-      stream << ix << ' ' << iy << ' ' << iz; 
+
+    void DumpShort(std::ostream& stream ) const {
+      stream << ix << ' ' << iy << ' ' << iz;
     }
 
   };
@@ -98,15 +95,15 @@ namespace IGCascade
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Constructors///////////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
+
     //Default constructor
     inline MagneticGrid();
-			
+
     //Overloaded Constructors
     //MagneticGrid(RandomNumbers * _rng);
     MagneticGrid(TRandom3* _rng, VEC3D_T B_mag, std::string s_cell_size,
 		 std::string sfilename);
-    //MagneticGrid(RandomNumbers * _rng, VEC3D_T B_mag, std::string s_B_mag, 
+    //MagneticGrid(RandomNumbers * _rng, VEC3D_T B_mag, std::string s_B_mag,
     //	 std::string s_cell_size, std::string s_zi);
 
     //Copy Constructor
@@ -118,17 +115,17 @@ namespace IGCascade
 
     inline Vec3D CheckMagneticField(const ICoord& c);
     inline Vec3D CheckMagneticField_Lock(const ICoord& c);
-    
+
     ICoord CheckCurrentCell(Vec3D r);
 
     void PrintFieldMapToFile(std::ofstream& outfile);
     void ReadFieldMap(std::ifstream& infile);
     int LockAttempt(const char* filename, int* fd, std::string rwtype);
-    
+
     void PropagateBFieldRedshift(RelParticle& Photon, RelParticle*&Lepton,
-				 Vec3D& n_eo, VEC3D_T& PL, 
+				 Vec3D& n_eo, VEC3D_T& PL,
 				 VEC3D_T& delta_z, const bool LOCK=false);
-    
+
     void Propagation(RelParticle& Photon,RelParticle*& Lepton,VEC3D_T& PL,
 		     Vec3D& r_new,VEC3D_T& time_delay,Vec3D& n_eo,
 		     VEC3D_T& delta_z,VEC3D_T& delta_zs,Vec3D& e_b);

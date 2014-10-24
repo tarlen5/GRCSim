@@ -1,6 +1,6 @@
 /*  KleinNishina.cpp
   KleinNishina class implementation file
-  
+
   \author   Yusef Shafi            \n
             UCLA                   \n
 	    yshafi@ucla.edu        \n
@@ -21,18 +21,18 @@
 
   \version  1.1
 
-  \revision: 
+  \revision:
      03/11/2008 - Redshift Dependent Propagation Length
      08/26/2008 - Pass RelParticle directly, rather than its
 	          components, so change functions for this.
-     10/14/2008 - Changed the way delta_z is calculated for the electron in 
+     10/14/2008 - Changed the way delta_z is calculated for the electron in
                   function PropagationLengthBB_Redshift().
 
-     6/5/2009   - IMPORTANT! Changed factor of 2 in calls to 
+     6/5/2009   - IMPORTANT! Changed factor of 2 in calls to
                   IsotropicRadiation() and IsotropicSigma() as well as the
 		  factor of 3/4 in IncompleteTotalCrossSection().
-       
-     3/16/2010  - Replacing all D0,D1, etc. with 0.0, 1.0, etc. since this 
+
+     3/16/2010  - Replacing all D0,D1, etc. with 0.0, 1.0, etc. since this
                   works now with the new version of qd/dd_real.h
   \note
 
@@ -50,7 +50,7 @@ namespace IGCascade
   /// \param _rng: rng
   KleinNishina::KleinNishina(TRandom3* _rng)
   {
-	
+
     m_rng=_rng;
 
     m_DE = "1.0E-25";            // Relative computation precision of roots
@@ -72,51 +72,51 @@ namespace IGCascade
       m_lambda_vec.push_back(Double(1.0e4*eVCM_HC/Energy));
       Energy *= m_egy_factor;
     }
-    
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   VEC3D_T KleinNishina::RelativisticKinematics(Vec4D& P_lep, Vec4D& P_p)
-    /*! Computes relativistic kinematics of Compton scattering of massive 
+    /*! Computes relativistic kinematics of Compton scattering of massive
       particle and photon. Scattering angle is sampled utilizing
       full KleinNishina cross-section.
-	
-      \param  P_lep - Energy-Momentum 4-vector of massive particle, 
+
+      \param  P_lep - Energy-Momentum 4-vector of massive particle,
                       in lab frame
               P_p - Energy-Momentum of massless photon in lab frame.
 
-      \note: Returns relative difference between masses of a particle before 
-      and after interaction with photon (should always be zero)  
+      \note: Returns relative difference between masses of a particle before
+      and after interaction with photon (should always be zero)
     */
   {
 
     VEC3D_T m0 = sqrt(P_lep*P_lep);
-		
+
     VEC3D_T gamma = (P_lep.r0)/m0;
     VEC3D_T gammabeta = sqrt(gamma*gamma - 1.0);
     Vec3D e = P_p.GetDirection();
     Vec3D n = P_lep.GetDirection();	 //!may return 0 if norm is 0
-		
+
     VEC3D_T en = e*n;
     VEC3D_T root_e = sqrt(1.0 - en*en);   //!temporary parameter only used once
     Vec3D v = (e - en*n)/root_e; //!add random tiny EPS direction when root_e=0
-		
+
     //Mandelstam invariant
     VEC3D_T s = (P_lep+P_p)*(P_lep+P_p);       //!s_=2E'/m
     VEC3D_T s_ = s/m0/m0 - 1.0;
-	      
+
     //Paramters a, b: perpendicular, parallel components of boosted e' vector
     VEC3D_T ab_divisor = gamma - gammabeta*en;
     VEC3D_T a = (gamma*en-gammabeta)/ab_divisor;
     VEC3D_T b = root_e/ab_divisor;
-		
-    // Sample y=(1-cos(theta))/2, where theta = 
+
+    // Sample y=(1-cos(theta))/2, where theta =
     // photon scattering angle in particle r.f.
     VEC3D_T y = Scattering(s_);
     // y=D0;
 
     //std::cout<<y<<" "<<std::endl;
-		
+
     //compute sin_theta, cos_theta
     VEC3D_T sin_theta = 2.0 * sqrt(y * (1.0 - y));
     VEC3D_T cos_theta = 1.0 - 2.0 * y;
@@ -125,7 +125,7 @@ namespace IGCascade
     VEC3D_T phi = (2.0 * VEC3D_PI)*((VEC3D_T) m_rng->Uniform());
     VEC3D_T sin_phi = sin(phi);
     VEC3D_T cos_phi = cos(phi);
-		
+
     //Calculate E1'/E1, E1, e1
     VEC3D_T a_ = a*cos_theta + b*sin_theta*cos_phi;
     VEC3D_T b_ = b*cos_theta - a*sin_theta*cos_phi;
@@ -134,7 +134,7 @@ namespace IGCascade
     Vec3D e1 = ((gamma*a_+gammabeta)*n + b_*v + sin_theta*sin_phi*(n^v))/c;
 
     //Update state of lepton, photon four momenta
-    P_lep+=P_p;		
+    P_lep+=P_p;
     P_p = Vec4D(en1, en1*e1);
     P_lep-=P_p;
 
@@ -157,28 +157,28 @@ namespace IGCascade
 
   VEC3D_T KleinNishina::Scattering(VEC3D_T x)
     /* Samples Compton scattering angle of the photon in the particle's r.f.
-       Returns y = (1-cos(theta))/2, such that no scattering (theta=0) 
-       corresponds to y=0. 
-           
-       \param x = (s-m0^2)/m0^2 (Mandelstam invariant) = 2*E'/m0 
+       Returns y = (1-cos(theta))/2, such that no scattering (theta=0)
+       corresponds to y=0.
+
+       \param x = (s-m0^2)/m0^2 (Mandelstam invariant) = 2*E'/m0
                   (in particle's rest frame)
 
     */
   {
 
     VEC3D_T chi = (VEC3D_T) (m_rng->Uniform());
-	  
+
     // Klein Nishina total cross section:
-    VEC3D_T KN_ = IncompleteTotalCrossSection(x,x);  
-			
+    VEC3D_T KN_ = IncompleteTotalCrossSection(x,x);
+
     VEC3D_T LB = "0.0";			  // Left bound of the integral
     VEC3D_T RB = "1.0";			  // Right bound of the integral
     VEC3D_T y  = (LB + RB) / 2.0;
     VEC3D_T y_ = "0.0";
-		
-    VEC3D_T G; 
+
+    VEC3D_T G;
     VEC3D_T z;
-		
+
     while ( fabs(y - y_) > m_DE*fabs(y) ) {
       z = x*y;
       G = (IncompleteTotalCrossSection(z,x) - 3.0*y*y*(1.0 - y)/(1.0 + z))/KN_;
@@ -189,22 +189,22 @@ namespace IGCascade
 
       y = (LB + RB) / 2.0;
     }
-    return y;		
+    return y;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
+
   VEC3D_T KleinNishina::IncompleteTotalCrossSection(VEC3D_T z, VEC3D_T x)
     /*
       Klein_Nishina Function
-      Computes the unitless Klein-Nishina total cross section 
-      from 0 to y, [y = (1-cos(theta))/2] given a value of z=xy 
-      and x (x = 2E/m=(s-m0^2)/m0^2). The total KN cross section is 
-		
+      Computes the unitless Klein-Nishina total cross section
+      from 0 to y, [y = (1-cos(theta))/2] given a value of z=xy
+      and x (x = 2E/m=(s-m0^2)/m0^2). The total KN cross section is
+
       sigma (x) =  8/3*Pi*R_o^2 * IncompleteTotalCrossSection(x,x),
 
       where R_o is the classical electron radius.
     */
-  {	
+  {
     //if ( x <= "0.0" || z <= "0.0" ) {
     if ( x <= 0.0 || z <= 0.0 ) {
       std::cout<<"IncompleteTotalCrossSection: Non-positive argument."<<
@@ -214,14 +214,14 @@ namespace IGCascade
     }
 
     VEC3D_T arg = 1.0 + z;
-    
+
     VEC3D_T Ln3;
     VEC3D_T Ln2;
     VEC3D_T Ln1;
 
     // Thomson regime
     if( z < 1.0/2.0 ) {
-    
+
       int i = 2;
       Ln3  = "0.0";
       VEC3D_T dLn3 = "1.0";
@@ -244,10 +244,6 @@ namespace IGCascade
       Ln3 = Ln2+z*z/2.0;
     }
 
-    VEC3D_T x1 = 1.0/x;
-    VEC3D_T x2 = x1*x1;
-    VEC3D_T x3 = x2*x1;
-    
     Ln1/=(x);
     Ln2/=(x*x);
     Ln3/=(x*x*x);
@@ -270,13 +266,13 @@ namespace IGCascade
   //         converted to anything desired.                                  //
   /////////////////////////////////////////////////////////////////////////////
 
-  bool KleinNishina::PropagationLengthStar(StructStar& star, Vec4D& P_lep, 
+  bool KleinNishina::PropagationLengthStar(StructStar& star, Vec4D& P_lep,
 			  Vec4D& R_e,Vec4D& P_p, Vec4D& R_p, VEC3D_T& pl)
     /*!
-      Routine samples propagation length of a particle in 
-      a gas of stellar photons and samples parameters 
-      of a photon with which interaction takes place. 
- 
+      Routine samples propagation length of a particle in
+      a gas of stellar photons and samples parameters
+      of a photon with which interaction takes place.
+
       \param Star - structure for an arbitrary star, containing:
              Radius - Radius of star				         [cm]
              Temperature - Star temperature			         [eV]
@@ -301,14 +297,14 @@ namespace IGCascade
       A0         2.3	      2.6	0.063E+4	0.96E+4
 
       R_sun = 6.96E+10 cm;	M_sun = 1.988E+33 g;   L_sun = 2.389E+45 eV/sec
-		
+
     */
   {
-	
+
     // Define needed integration parameters.
-    
+
     // Particle's parameters
-    VEC3D_T m0 = sqrt(P_lep*P_lep);		
+    VEC3D_T m0 = sqrt(P_lep*P_lep);
     if ( m0 <= 0.0 ) {
       std::cout<<"PropagationLengthStar: Non-positive mass."<<std::endl;
       exit(0);
@@ -337,7 +333,7 @@ namespace IGCascade
 
     // Calculate factors of propagation length integral
     VEC3D_T IntPref = 4.0*VEC3D_PI * ( star.Radius*star.Radius/magRho);
-    { 
+    {
       VEC3D_T x=star.Temp/eVCM_HC;
       IntPref *= x*x*x;
     }
@@ -356,13 +352,13 @@ namespace IGCascade
 
     VEC3D_T tau = "0.0";
     VEC3D_T dtau;
-    VEC3D_T Sum_IS = "0.0";    
+    VEC3D_T Sum_IS = "0.0";
     while ( ( tau < LnChi ) && ( eta > 0.0 ) ) {
-      VEC3D_T coseta=cos(eta);    
-      VEC3D_T S = "0.0";	
+      VEC3D_T coseta=cos(eta);
+      VEC3D_T S = "0.0";
       VEC3D_T x = m_DE;
       VEC3D_T u;
-        
+
       for (j = 0; j < m_num_int; j++) {
 	u = z*x*(gamma - gammabeta * coseta);
 	S += (x*x / ( exp(x) - 1.0))* IncompleteTotalCrossSection(u, u);
@@ -379,10 +375,10 @@ namespace IGCascade
 
       eta -= dEta;
     }
-	
+
     if ( eta < 0.0 ) {  // No interaction, particle leaves stellar photon field
       delete IS;
-      return false; 
+      return false;
     }
     // interpolation scheme
     eta -=dEta*(tau-LnChi)/dtau;
@@ -397,7 +393,7 @@ namespace IGCascade
     //    VEC3D_T PhotEnerInt = D0;
     //--------------------------------------------
 
-    VEC3D_T IntegralRatio = "2.0"; 
+    VEC3D_T IntegralRatio = "2.0";
     VEC3D_T RB = (VEC3D_T) m_num_int;
     VEC3D_T LB = "0.0";
     VEC3D_T Steps = "0.0";
@@ -441,52 +437,52 @@ namespace IGCascade
       j++;
       }
     */
-    
+
 
     VEC3D_T x = ( Steps - 1.0 )*m_dx;  // holds the energy of incoming photon
     std::cout << std::endl << std::endl << "chi_2 = " << chi_2 << std::endl <<
       "IntegralRatio = " << IntegralRatio <<std::endl<<"Energy of Photon = "<<
       x << " kT." << std::endl;
-    
+
     delete IS;
-    
+
     // Update Position of particle and photon
     R_e.r = (R_e.r + n*pl)/star.Radius;
     R_p.r = R_e.r;
-    
+
     // Update 4-momentum of photon
     P_p.r0 = x * star.Temp;
     P_p.r = P_p.r0 * R_p.r;
-      
+
     //	std::cout<<"Photon final position = "<<R_p.r<<std::endl<<
-    // "Particle Final Position = "<<R_e.r << std::endl;   
+    // "Particle Final Position = "<<R_e.r << std::endl;
     //-------------------------------------------------------
-      
+
     return true;
-      
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
-  VEC3D_T KleinNishina::PropagationLengthBB(VEC3D_T  Ebb, Vec4D& P_lep, 
+  VEC3D_T KleinNishina::PropagationLengthBB(VEC3D_T  Ebb, Vec4D& P_lep,
 					    Vec4D& P_p)
 
   /*!
-    Routine samples propagation length of a particle in 
-    the gas of photons with BB spectrum and samples 4 momentum 
-    of the photon with which interaction takes place. 
-    
+    Routine samples propagation length of a particle in
+    the gas of photons with BB spectrum and samples 4 momentum
+    of the photon with which interaction takes place.
+
     \param Ebb   - kT of BB spectrum                                       [eV]
     \param P_lep - 4-momentum of charged particle (charge e assumed),
                    is NOT modified in this function.                     [eV]
     \param P_p   - 4-vector of BB photon, interacting with particle,
                    updated at end of function                            [eV]
-      
+
     \return propagation length                                           [cm]
-    
+
   */
-    
+
   {
     // Particle's parameters
     VEC3D_T m0 = sqrt(P_lep*P_lep);
@@ -512,7 +508,7 @@ namespace IGCascade
       m_egy_dens_bb=q*m_PI2d6*m_PI2d6*8.0*3.0/5.0*Ebb;  // Photon energy density [eV cm^-3]
       m_egy_bb=Ebb;
 
-      VEC3D_T mfp_=eV_MELEC/CGS_THOM_CS/m_egy_dens_bb*3.0/4.0;  // units??
+      //VEC3D_T mfp_=eV_MELEC/CGS_THOM_CS/m_egy_dens_bb*3.0/4.0;  // units??
       //std::cout<<"mfp_: "<<mfp_<<std::endl;
       //std::cout<<"m_num_dens_bb: "<<m_num_dens_bb<<std::endl;
       //std::cout<<"m_egy_dens_bb: "<<m_egy_dens_bb<<std::endl;
@@ -746,24 +742,24 @@ namespace IGCascade
 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
+
   VEC3D_T KleinNishina::IsotropicRadiation(VEC3D_T  z, VEC3D_T gamma)
     /*
-      Routine samples impact angle of the photon that interacts with 
-      the particle. In the lab reference frame the photon field is 
-      isotropic. This distribution is changed by the relative 
+      Routine samples impact angle of the photon that interacts with
+      the particle. In the lab reference frame the photon field is
+      isotropic. This distribution is changed by the relative
       velocity factor as well as dependence of cross-section
-      on photon's energy (KN regime) 
+      on photon's energy (KN regime)
 
       sigma * |v-c*cos(theta)| / v
 
-      \param  z= E/mc^2  energy of the photon in lab r.f. divided by 
+      \param  z= E/mc^2  energy of the photon in lab r.f. divided by
       particle's mass
       \param  gamma      particle's gamma
 
 
     */
-  {	
+  {
     if ( gamma <= 1.0 || z <= 0.0 ) {
       std::cout<<"IsotropicRadiation: Invalid argument."<<std::endl;
       exit(0);
@@ -771,9 +767,9 @@ namespace IGCascade
     }
 
     VEC3D_T b=1.0/gamma;
-    if( fabs(1.0-m_IRd_b/b) > m_DE || fabs(1.0-m_IRd_z/z) > m_DE ) {
-      VEC3D_T S=IsotropicSigma(z, gamma);
-    }
+    //if( fabs(1.0-m_IRd_b/b) > m_DE || fabs(1.0-m_IRd_z/z) > m_DE ) {
+      //VEC3D_T S=IsotropicSigma(z, gamma);
+    //}
 
     VEC3D_T chi = (VEC3D_T) (m_rng->Uniform());
 
@@ -781,7 +777,7 @@ namespace IGCascade
     VEC3D_T RB = gamma+gammabeta;		 // Right bound of the integral
     VEC3D_T LB = 1.0/RB;			  // Left bound of the integral
     VEC3D_T y  = (LB + RB)/2.0;
-    VEC3D_T y_ = LB;					
+    VEC3D_T y_ = LB;
 
     VEC3D_T UI;
     VEC3D_T f1;
@@ -791,7 +787,7 @@ namespace IGCascade
 
       IsotropicFactors(f1, f2, z*y);
       if (y <= b) UI=m_IRd_b*(f1-m_IRd_f1c)/z-(f2-m_IRd_f2c)/z/z;
-      else { 
+      else {
 	UI = -m_IRd_b*(f1+m_IRd_f1c-2.0*m_IRd_f1b)/z+
 	  (f2+m_IRd_f2c-2.0*m_IRd_f2b)/z/z;
       }
@@ -805,15 +801,15 @@ namespace IGCascade
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
+
   void KleinNishina::IsotropicFactors(VEC3D_T & f1, VEC3D_T & f2, VEC3D_T x)
     /*
       Klein_Nishina Isotropic factors
-      Factors f1 and f2 are required to sample impact angle of photon 
-      and particle. This routine assumes isotropic distribution of 
+      Factors f1 and f2 are required to sample impact angle of photon
+      and particle. This routine assumes isotropic distribution of
       photons in the lab frame.
     */
-  {	
+  {
     if ( x < 0.0 ) {
       std::cout<<"IsotropicFactors: Negative argument."<<std::endl;
       exit(0);
@@ -841,7 +837,7 @@ namespace IGCascade
       }
       Ln2 = Ln3 - x*x / 2.0;
       Ln1 = Ln2 + x;
-  
+
     } else {           // large x regime
       Ln1 = log(arg);
       Ln2 = Ln1-x;
@@ -869,13 +865,13 @@ namespace IGCascade
   // \note: should be moved /////////////////////////////////////////
   // \note: not directly relevant to the KleinNishina class /////////
   ///////////////////////////////////////////////////////////////////
-	
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   VEC3D_T KleinNishina::PolyLog1(VEC3D_T x)
     /*
-      Dilogarithm related function. In terms of traditional notation for 
-      dilogarithm, Li_2(z)=z+z^2/4+z^3/9+...+z^n/n^2, it is defined as 
+      Dilogarithm related function. In terms of traditional notation for
+      dilogarithm, Li_2(z)=z+z^2/4+z^3/9+...+z^n/n^2, it is defined as
 
       PolyLog1(x)=-Li_2(-x)
 
@@ -884,7 +880,7 @@ namespace IGCascade
       PolyLog1(x)=Int_1^x  ln(1+x)m_dx/x+pi^2/12
 
       The function is defined for x from 0 to infinity and PolyLog1(1)=pi^2/12
-         
+
     */
   {
     if ( x < 0.0 ) {
@@ -901,7 +897,7 @@ namespace IGCascade
       VEC3D_T PL  = Ln*Ln/2.0 + m_PI2d6;
       VEC3D_T dPL = m_PI2d6;
       VEC3D_T i = "0.0";
-	  
+
       while (fabs(dPL) > m_DE*m_PI2d6 ) {
 	i+=1.0;
 	xPower/=(-x);
@@ -918,7 +914,7 @@ namespace IGCascade
       VEC3D_T PL  = "0.0";
       VEC3D_T dPL = m_PI2d6;
       VEC3D_T i = "0.0";
-	  
+
       while (fabs(dPL) > m_DE*m_PI2d6 ) {
 	i+=1.0;
 	xPower*=(-x);
@@ -928,7 +924,7 @@ namespace IGCascade
       //std::cout<<" 2 "<<PL<<std::endl;
       return PL;
     }
-	  
+
     VEC3D_T xPower = "1.0";                      // x~1 regime
     xPower = -xPower;
 
@@ -937,7 +933,7 @@ namespace IGCascade
     VEC3D_T dPL = m_PI2d6;
     VEC3D_T i = "0.0";
     VEC3D_T y = 1.0 / (1.0 + x);
-	  
+
     while (fabs(dPL) > m_DE*m_PI2d6 ) {
       i+=1.0;
       xPower*=y;
@@ -945,7 +941,7 @@ namespace IGCascade
       PL+=dPL;
     }
     //std::cout<<" 3 "<<PL<<std::endl;
-    return PL;           
+    return PL;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -953,16 +949,16 @@ namespace IGCascade
 
 //   VEC3D_T KleinNishina::natLog(VEC3D_T x)
 //     /*
-//       Natural logarithm function 
-//       Normally log(a) is computed using Newton's method for finding root of 
-//       a-exp(x)=0. 
-//       This method converges rapidly for a>>1 or a<<1. When a=1+eps (eps<<1) 
-//       the evaluation of log(a) is poor. This routine uses a simple Taylor 
+//       Natural logarithm function
+//       Normally log(a) is computed using Newton's method for finding root of
+//       a-exp(x)=0.
+//       This method converges rapidly for a>>1 or a<<1. When a=1+eps (eps<<1)
+//       the evaluation of log(a) is poor. This routine uses a simple Taylor
 //       expansion to improve accuracy of the log(a) calculation in this regime.
 //     */
 //   {
-//     VEC3D_T EPS = ((VEC3D_T)0.5); // Maximal small parameter in log(1 + EPS) 
-//     // for which Taylor series computation is performed 
+//     VEC3D_T EPS = ((VEC3D_T)0.5); // Maximal small parameter in log(1 + EPS)
+//     // for which Taylor series computation is performed
 
 //     VEC3D_T Ln = D0;
 //     VEC3D_T arg = 1.0 - x;
@@ -975,7 +971,7 @@ namespace IGCascade
 //     int i = 0;
 //     VEC3D_T dLn = D1;
 //     VEC3D_T epsPower = - D1;
- 
+
 //     while ( abs(dLn) > m_DE*fabs(Ln) ) {
 //       i++;
 //       epsPower = -epsPower*arg;
@@ -987,7 +983,7 @@ namespace IGCascade
 
 //   }
 
-		
+
 }
 
 

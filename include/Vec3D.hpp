@@ -89,7 +89,7 @@ namespace IGCascade
     inline Vec3D  operator + (const Vec3D& v) const;  //!<addition
     inline Vec3D  operator - (const Vec3D& v) const;  //!<subtraction
     inline VEC3D_T operator * (const Vec3D& v) const;  //!<scalar product
-    inline Vec3D  operator ^ (const Vec3D& v) const;  //!<vector product  
+    inline Vec3D  operator ^ (const Vec3D& v) const;  //!<vector product
 
     inline Vec3D  operator & (const Vec3D& v) const;  //!<addition of rotations
 
@@ -97,13 +97,11 @@ namespace IGCascade
     void Dump(std::ostream& stream = std::cout) const; //!<prints coordinates
     void DumpShort(std::ostream& stream = std::cout) const; //!<prints coords
 #endif
-    
-  public:
+
     VEC3D_T x, y, z;   //!<components
 
   private:
-    static const double SMALLEST_ROTATION_ANGLE = 1.e-12;
-	//static const double PI = 3.14159265358979;
+
   };
 
   inline Vec3D operator - ( const Vec3D& v );           //!<negation

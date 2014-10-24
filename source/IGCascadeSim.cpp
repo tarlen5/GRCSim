@@ -4,14 +4,14 @@
 
     Class than stores all variables related to intergalactic
     simulations. Also runs all qed processes.
-  
+
     \author    Timothy C. Arlen                      \n
                Department of Physics and Astronomy   \n
                UCLA                                  \n
 	       arlen@astro.ucla.edu                  \n
 
     \date      May 20, 2012                          \n
-    
+
     \revision  v1.1  April 19, 2013
                Fairly major revision, by replacing all output to text
                files with all output to ROOT files, using mostly
@@ -23,7 +23,7 @@
 
 #include "IGCascadeSim.hpp"
 
-using PhysConst::OMEGA_R; 
+using PhysConst::OMEGA_R;
 using PhysConst::OMEGA_M;
 using PhysConst::OMEGA_L;
 using PhysConst::OMEGA_0;
@@ -33,43 +33,43 @@ namespace IGCascade
 {
 
   IGCascadeSim::
-  IGCascadeSim(const string& egy, const string& redshift, 
-	       const string& mag_field, const string& coh_len, 
+  IGCascadeSim(const string& egy, const string& redshift,
+	       const string& mag_field, const string& coh_len,
 	       const string& file_count, AnyOption* opt)
   {
-    
+
     string eblmodel, mf_dir, opt_depth_dir, output_dir;
     ProcessOptions(opt,eblmodel,mf_dir,opt_depth_dir,output_dir);
 
     string ebl_model_file = eblmodel+".dat";
     InitializeEBL(ebl_model_file);
-    m_cascade_file = DefineCascadeFile(eblmodel, egy, mag_field, redshift, 
+    m_cascade_file = DefineCascadeFile(eblmodel, egy, mag_field, redshift,
 				       coh_len, file_count, output_dir);
     string MFfilename = DefineMFfile(mf_dir, mag_field, coh_len, redshift);
     string optDepthFile = DefineOptDepthTable(opt_depth_dir,eblmodel,redshift);
-    
+
     if (m_trk_leptons_bool)
       m_save_lepton_file = DefineTrackLeptonFile(eblmodel, egy, mag_field,
 				    redshift,coh_len, file_count, output_dir);
-    
+
     if (m_trk_delay_bool)
-      m_track_time_delay_file = 
+      m_track_time_delay_file =
 	DefineTrackTimeDelayFile(eblmodel,egy,mag_field,redshift,coh_len,
 				 file_count);
-    
+
     // Process Inputs to class:
     m_egy_cascade = egy.c_str();
     m_egy_cascade*=1.0e-3;       // TeV
     m_ze          = redshift.c_str();
     m_bmag        = mag_field.c_str();
-    m_cellsize    = coh_len.c_str();    
-    
+    m_cellsize    = coh_len.c_str();
+
     m_DE = "1.0e-25";
     VEC3D_T Tcmb = 2.73;
     m_egy_cmb = Tcmb*PhysConst::eV_K_B;
 
     DefineRp();
-    
+
     int file_num = atoi(file_count.c_str());
     m_rng = new TRandom3(0);
     m_rng->SetSeed(file_num);
@@ -82,7 +82,7 @@ namespace IGCascade
     cout<<"Using cascade file:   "+m_cascade_file<<endl;
     cout<<"Using Mag Grid file:  "<<MFfilename<<endl;
     cout<<"Using opt depth file: "<<optDepthFile<<endl;
-    
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -98,17 +98,18 @@ namespace IGCascade
     output_dir    = "SimOutputFiles/";
     m_egy_gamma_min = 0.1;
     m_egy_lepton_min = 75.0;
+
     if(opt->getValue("eblmodel") != NULL) eblmodel = opt->getValue("eblmodel");
     if(opt->getValue("mf_dir") != NULL) mf_dir = opt->getValue("mf_dir");
-    if(opt->getValue("opt_depth_dir") != NULL) 
+    if(opt->getValue("opt_depth_dir") != NULL)
       opt_depth_dir = opt->getValue("opt_depth_dir");
-    if(opt->getValue("output_dir") != NULL) 
+    if(opt->getValue("output_dir") != NULL)
       output_dir = opt->getValue("output_dir");
     if(opt->getValue("gam_egy_min") != NULL)
       m_egy_gamma_min = opt->getValue("gam_egy_min");
     if(opt->getValue("lep_egy_min") != NULL)
       m_egy_lepton_min = opt->getValue("lep_egy_min");
-    
+
     // Convert to eV:
     m_egy_gamma_min *= 1.0e9*0.99;
     m_egy_lepton_min *= 1.0e9;
@@ -118,14 +119,10 @@ namespace IGCascade
     m_single_gen_bool = false;
     m_trk_delay_bool = false;
     m_trk_leptons_bool = false;
-    if(opt->getFlag("mf_no_lock") != NULL)
-      m_LOCK = false;
-    if(opt->getFlag("single_gen") != NULL)
-      m_single_gen_bool = true;
-    if(opt->getFlag("trk_delay") != NULL)
-      m_trk_delay_bool = true;
-    if(opt->getFlag("trk_leptons") != NULL)
-      m_trk_leptons_bool = true;
+    if(opt->getFlag("mf_no_lock")) m_LOCK = false;
+    if(opt->getFlag("single_gen")) m_single_gen_bool = true;
+    if(opt->getFlag("trk_delay")) m_trk_delay_bool = true;
+    if(opt->getFlag("trk_leptons")) m_trk_leptons_bool = true;
 
     cout<<"\n>> Options processed"<<endl;
     cout<<"   --eblmodel:      "<<eblmodel<<endl;
@@ -139,21 +136,21 @@ namespace IGCascade
     cout<<"   --trk_delay:     "<<m_trk_delay_bool<<endl;
     cout<<"   --trk_leptons:   "<<m_trk_leptons_bool<<endl;
     cout<<"-------------------------------------"<<endl<<endl;
-    
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  
+
+
   string IGCascadeSim::
   DefineCascadeFile(const string& s_eblmodel,const string& s_egy,
-		    const string& s_Bmag, const string& s_ze, 
+		    const string& s_Bmag, const string& s_ze,
 		    const string& s_cellsize, const string& s_file_num,
 		    const string& output_dir)
   {
     string filename = output_dir+s_eblmodel+"_"+s_egy+"GeV_z"+s_ze+"_B"+s_Bmag+"_L"+
       s_cellsize+"_"+s_file_num+".root";
-    
-    m_secPhotonTree = 
+
+    m_secPhotonTree =
       new TTree("Secondary","egyPrim,egySec,theta,phi,time,thetap,xi,weight");
     m_secPhotonTree->Branch("egyPrim",&m_egyPrim,"egyPrim/D");
     m_secPhotonTree->Branch("egySec",&m_egySec,"egySec/D");
@@ -163,7 +160,7 @@ namespace IGCascade
     m_secPhotonTree->Branch("thetap",&m_thetap,"thetap/D");
     m_secPhotonTree->Branch("xi",&m_xi,"xi/D");
     m_secPhotonTree->Branch("weight",&m_weight,"weight/D");
-    
+
     return filename;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -173,25 +170,25 @@ namespace IGCascade
 	       const string& s_cellsize, const string& s_ze)
   {
 
-    string MFfilename=mf_dir+"MagneticGrid_B"+s_Bmag+"_L"+s_cellsize+"_z"+s_ze+".txt";    
+    string MFfilename=mf_dir+"MagneticGrid_B"+s_Bmag+"_L"+s_cellsize+"_z"+s_ze+".txt";
     return MFfilename;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+
   string IGCascadeSim::
   DefineLowEgyFile(const string& s_eblmodel,const string& s_egy,
-		   const string& s_Bmag, const string& s_ze, 
+		   const string& s_Bmag, const string& s_ze,
 		   const string& s_cellsize, const string& s_file_num)
   {
     string filename = "LowEgy_"+s_eblmodel+"_"+s_egy+"GeV_z"+s_ze+"_B"+s_Bmag+
-      "_L"+s_cellsize+"_"+s_file_num+".txt";    
+      "_L"+s_cellsize+"_"+s_file_num+".txt";
     return filename;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   string IGCascadeSim::
-  DefineTrackLeptonFile(const string& s_eblmodel, const string& s_egy, 
-			const string& s_Bmag, const string& s_ze, 
+  DefineTrackLeptonFile(const string& s_eblmodel, const string& s_egy,
+			const string& s_Bmag, const string& s_ze,
 			const string& s_cellsize, const string& s_file_num,
 			const string& output_dir)
   {
@@ -203,27 +200,27 @@ namespace IGCascade
     rootfile->Close();
     ofstream ofile(m_track_time_delay_file.c_str()); // Overwrite existing
     ofile.close();
-    
+
     return filename;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   string IGCascadeSim::
-  DefineTrackTimeDelayFile(const string& s_eblmodel, const string& s_egy, 
-			const string& s_Bmag, const string& s_ze, 
+  DefineTrackTimeDelayFile(const string& s_eblmodel, const string& s_egy,
+			const string& s_Bmag, const string& s_ze,
 			const string& s_cellsize, const string& s_file_num)
   {
     string filename = "TrackTimeDelay_"+s_eblmodel+"_"+s_egy+"GeV_B"+s_Bmag+"_z"+
       s_ze+"_L"+s_cellsize+"_"+s_file_num+".txt";
-    
+
     return filename;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  
+
+
   void IGCascadeSim::DefineRp(void)
   /*!
-    Calculates magnitude from z=ze point to z_s = 0 surface, in order to come 
+    Calculates magnitude from z=ze point to z_s = 0 surface, in order to come
     up with a proper cutoff for integration for photons to the interaction
     redshift, in function PropagateDirectPhoton() and GetMinZ()
 
@@ -240,7 +237,7 @@ namespace IGCascade
   */
   {
 
-    
+
     /////// Now integrate it...
     double dz = 1.0e-5;
     double zfinal = Double(m_ze);
@@ -248,24 +245,24 @@ namespace IGCascade
     double OmegaR = Double(OMEGA_R);
     double OmegaM = Double(PhysConst::OMEGA_M);
     double OmegaL = Double(PhysConst::OMEGA_L);
-    
+
     double zi = 0.0;
     double R_p = 0.0;
     unsigned num_steps = 0;
     while(zi < zfinal) {
       // zi is the low edge of the bin
       // z is the midpoint, where function is taken.
-      
+
       double z = 0.0;
       if ((zi + dz) > zfinal) z = (zi + zfinal)/2.0;
       else  z = (zi + zi+dz)/2.0;
-      
+
       double z1 = (1.0+z);
       double z2 = z1*z1;
       double z3 = z2*z1;
       double z4 = z3*z1;
       double Q = sqrt(OmegaR*z4 + OmegaM*z3 + OmegaL);
-      
+
       if( (zi + dz) > zfinal) {
 	R_p += (zfinal-zi)/Q;
 	zi = zfinal;
@@ -277,18 +274,18 @@ namespace IGCascade
       num_steps++;
     }
     //////////////////////////////////////
-    
+
     m_R_0 = R_p*R_H;
 
     // cout<<"R_p from integral: "<<R_p<<"\n  in "<<num_steps<<" steps."<<endl;
     // cout<<"percent error: "<<fabs(R_p - m_R_0)/m_R_0*100.0<<endl;
     // char getline;
     // cin>>getline;
-    
+
   }
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
- 
-  
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
   void IGCascadeSim::InitializeEBL(const string& ebl_model_file)
   {
@@ -298,19 +295,19 @@ namespace IGCascade
     if( ebl_model_file.find("table") == string::npos ) {
 
       m_ebl = new DIRBR();
-      
+
       //////////////////////////////////////////////////////////////
       //-------------------INITIALIZE EBL MODEL---------------------
       //////////////////////////////////////////////////////////////
       std::ifstream model;
       model.open(ebl_model_file.c_str());
-      
-      if (model == NULL) {
-	std::cerr << "ERROR: could not open EBL model file: " << ebl_model_file 
+
+      if (!model) {
+	std::cerr << "ERROR: could not open EBL model file: " << ebl_model_file
 		  << std::endl;
 	exit(EXIT_FAILURE);
       }
-      
+
       vector<double> lambda_vec;
       vector<double> nuFnu_vec;
       // Set up DIRBR curve...
@@ -985,9 +982,9 @@ namespace IGCascade
     Vec3D e_p = gam_ph_p4.r/gam_ph_p4.r.Norm();
     m_theta   = 0.0;
     m_phi     = 0.0;
-    VEC3D_T DE = "1.0e-25";
+    //VEC3D_T DE = "1.0e-25";
     // To account for the case of zero interactions:
-    if(fabs(e_r.x) > m_DE || fabs(e_r.y) > m_DE ) { 
+    if(fabs(e_r.x) > m_DE || fabs(e_r.y) > m_DE ) {
       m_theta = Double(atan2(sqrt(e_r.x*e_r.x + e_r.y*e_r.y),e_r.z));
       m_phi = Double(atan2(e_r.y,e_r.x));
     }
@@ -998,29 +995,29 @@ namespace IGCascade
       m_thetap = Double(atan2(sqrt(e_p.x*e_p.x + e_p.y*e_p.y),e_p.z));
     }
     m_xi = m_phi - phi_p;
-    
+
     m_time = Double(gam_ph_r4.r0);
     m_egyPrim = Double(m_egy_cascade);
     m_egySec = Double(gam_ph_p4.r0);
     m_weight = weight;
     m_secPhotonTree->Fill();
-    
+
     //stream<<gam_ph_p4.r0 <<" "<<theta<<" "<<phi<<" "<<
     //gam_ph_r4.r0<<" "<<theta_p<<" "<<xi<<" "<<weight <<std::endl;
 
-    
+
   }
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+
 
   void IGCascadeSim::SaveToLowEnergyFile(RelParticle& Particle)
   {
-    
+
     ofstream low_egy_stream(m_low_egy_file.c_str(), std::ios::app);
     low_egy_stream<<Particle.m_p4.r0<<" "<<Particle.m_z<<" "<<Particle.m_q<<
       endl;
     low_egy_stream.close();
-    // Nothing yet...    
+    // Nothing yet...
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
