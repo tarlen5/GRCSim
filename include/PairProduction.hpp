@@ -1,7 +1,7 @@
-/*! 
+/*!
   \file     PairProduction.hpp
             PairProduction class header file
-  
+
   \author   Tim Arlen              \n
             UCLA                   \n
 	    arlen@astro.ucla.edu   \n
@@ -20,11 +20,11 @@
 
 #include "Vec3D.hpp"
 #include "Vec4D.hpp"
-//#include "RandomNumbers.hpp"
 #include "DIRBRBase.hpp"
 #include "convert.hpp"
 #include "PhysicsConstants.hpp"
 #include "Table.hpp"
+#include "HighPrecProp.hpp"
 
 #include<vector>
 #include<string>
@@ -47,7 +47,7 @@ namespace IGCascade
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Constructors///////////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
     //Overloaded Constructor
     /// \param: RandomNumbers reference
     PairProduction(TRandom3* _rng, VEC3D_T ze);
@@ -55,59 +55,59 @@ namespace IGCascade
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Public Member Functions////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    bool PropagatePhotonEBL(DIRBRBase* ebl_model,const double gam_ph_egy, 
-			    const VEC3D_T z_o, const double z_min, 
-			    VEC3D_T& z_int, double& TotalLambdaInt);
-    //void GetOpticalDepth(DIRBRBase* ebl_model,const double gam_ph_egy, 
+    bool CheckPairProductionEBL(DIRBRBase* ebl_model,const double gam_ph_egy,
+                                const VEC3D_T z_o, const double z_min,
+                                VEC3D_T& z_int, double& TotalLambdaInt);
+    //void GetOpticalDepth(DIRBRBase* ebl_model,const double gam_ph_egy,
     //			 const VEC3D_T z_o, VEC3D_T& z_int);
     bool UpdateGammaPhoton(Vec4D& gam_ph_p4,Vec4D& gam_ph_r4,VEC3D_T& gam_ph_z,
 			   VEC3D_T& gam_ph_z_s,VEC3D_T& delta_z_step);
     VEC3D_T GetEBLPhotonEgy(DIRBRBase* ebl_model, const double TotalLambdaInt,
-			    const double z_int, const double z_o, 
+			    const double z_int, const double z_o,
 			    const double gam_ph_egy);
     void UpdateEBLPhoton(Vec4D& gam_ph_p4, Vec4D& gam_ph_r4, VEC3D_T& gam_ph_z,
 			 VEC3D_T& gam_ph_z_s,Vec4D& bg_ph_p4,Vec4D& bg_ph_r4,
 			 VEC3D_T& bg_ph_z);
-    bool RelativisticKinematics(Vec4D& gam_ph_p4,Vec4D& bg_ph_p4, 
+    bool RelativisticKinematics(Vec4D& gam_ph_p4,Vec4D& bg_ph_p4,
 				Vec4D& elec_p4, Vec4D& pos_p4);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Public Data Members////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
     // computation accuracy
     VEC3D_T m_DE;
-    
+
   private:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Private Member Functions///////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
     //Default constructor
     /// \param: N/A
     inline PairProduction();
 
     void DefineNumericConst(void);
-    void DefineIntegrationParameters(VEC3D_T ze);    
-    
-    bool PropagateToTau(DIRBRBase* ebl_model,const double gam_ph_egy,
-			const VEC3D_T z_o, const double z_min, 
-			const double tauFinal, VEC3D_T& z_int, 
+    void DefineIntegrationParameters(VEC3D_T ze);
+
+    bool IntegrateToTau(DIRBRBase* ebl_model,const double gam_ph_egy,
+			const VEC3D_T z_o, const double z_min,
+			const double tauFinal, VEC3D_T& z_int,
 			double& TotalLambdaInt);
-        
+
     VEC3D_T Scattering(VEC3D_T x);
     VEC3D_T PolyLog1(VEC3D_T x);
 
-    void NonRadialPropagation(Vec4D& gam_ph_p4,Vec4D& gam_ph_r4, 
-           VEC3D_T& gam_ph_z, VEC3D_T& gam_ph_z_s, VEC3D_T& L_prop,
-			      VEC3D_T& delta_z,VEC3D_T& deltaz_s,
-			      VEC3D_T& Delta_time);
+    //void NonRadialPropagation(Vec4D gam_ph_p4,Vec4D gam_ph_r4,
+    //                         VEC3D_T gam_ph_z, VEC3D_T gam_ph_z_s,
+    //                         VEC3D_T delta_z, VEC3D_T& L_prop,
+    //                        VEC3D_T& deltaz_s, VEC3D_T& Delta_time);
     VEC3D_T ImpactAngle(VEC3D_T q);
-    
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Private Data Members///////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
     TRandom3* m_rng;
 
     //~~~~~~~~VEC3D_T Values ~~~~~~~~~
@@ -116,7 +116,7 @@ namespace IGCascade
     //VEC3D_T m_num_steps;
 
     double m_trans_prob_min;
-    
+
     // Relevant mathematical constants
     VEC3D_T m_PI2d6;
     //VEC3D_T PI;
@@ -132,7 +132,7 @@ namespace IGCascade
     double m_OmegaR_d;
     double m_OmegaM_d;
     double m_OmegaL_d;
-    double m_Omega0_d;    
+    double m_Omega0_d;
 
     // dd_real numbers
     VEC3D_T D0;
@@ -144,7 +144,7 @@ namespace IGCascade
     VEC3D_T D6;
     VEC3D_T D7;
     VEC3D_T D8;
-    
+
     std::vector<double> lambda;
     std::vector<double> m_q_vec;
     std::vector<double> m_F_vec;
@@ -153,7 +153,7 @@ namespace IGCascade
     VEC3D_T m_DE_int;
 
   };
-  
+
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Default class constructor
@@ -161,7 +161,7 @@ namespace IGCascade
   {
     m_rng = new TRandom3(0);//("random_numbers.seed");
   }
-    
-  
+
+
 }
 #endif // IGCASCADE_PAIRPRODUCTION_H

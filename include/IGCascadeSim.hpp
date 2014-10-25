@@ -27,6 +27,7 @@
 #include "PhysicsConstants.hpp"
 #include "DIRBR.hpp"
 #include "anyoption.h"
+#include "HighPrecProp.hpp"
 
 
 // ROOT INCLUDES:
@@ -52,20 +53,20 @@ using namespace std;
 
 namespace IGCascade
 {
-  
+
   class IGCascadeSim
   {
   public:
-    
+
     IGCascadeSim(const string& egy,const string& redshift,const string& mag_field,
 		 const string& coh_len,const string& file_count, AnyOption* opt);
-    
+
     inline VEC3D_T GetMinLepEgy() { return m_egy_lepton_min; }
 
     void CreateDirectGamma(RelParticle& GammaPhoton);
-    
+
     void RunCascade(const int numIterations);
-    
+
   private:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,43 +76,43 @@ namespace IGCascade
 			string& mf_dir, string& opt_depth_dir,
 			string& output_dir);
     string DefineCascadeFile(const string& s_eblmodel,const string& s_egy,
-			     const string& s_Bmag, const string& s_ze, 
+			     const string& s_Bmag, const string& s_ze,
 			     const string& s_cellsize, const string& s_file_num,
 			     const string& output_dir);
     string DefineMFfile(const string& static_var_file, const string& s_Bmag,
 			const string& s_cellsize, const string& s_ze);
     string DefineLowEgyFile(const string& s_eblmodel,const string& s_egy,
-		      const string& s_Bmag, const string& s_ze, 
+		      const string& s_Bmag, const string& s_ze,
 		      const string& s_cellsize, const string& s_file_num);
-    string DefineTrackLeptonFile(const string& s_eblmodel, const string& s_egy, 
-		              const string& s_Bmag, const string& s_ze, 
+    string DefineTrackLeptonFile(const string& s_eblmodel, const string& s_egy,
+		              const string& s_Bmag, const string& s_ze,
 			      const string& s_cellsize, const string& s_file_num,
 				 const string& output_dir);
     string DefineTrackTimeDelayFile(const string& s_eblmodel,
 				    const string& s_egy,
-				    const string& s_Bmag, const string& s_ze, 
+				    const string& s_Bmag, const string& s_ze,
 			  const string& s_cellsize, const string& s_file_num);
     void DefineRp(void);
     void InitializeEBL(const string& ebl_model_file);
     string DefineOptDepthTable(const string& opt_depth_dir,
 			     const string& s_eblmodel, const string& s_ze);
     void RunSinglePhotonCascade(void);
-    void PropagateDirectPhoton(RelParticle& GammaPhoton, 
+    void PropagateDirectPhoton(RelParticle& GammaPhoton,
 			       std::stack<RelParticle*>& lepton_stack);
-    void DefineLeptons(RelParticle& GammaPhoton, RelParticle& EBLPhoton, 
+    void DefineLeptons(RelParticle& GammaPhoton, RelParticle& EBLPhoton,
 		       RelParticle* Electron, RelParticle* Positron);
     void CreateLeptonTree(RelParticle* Lepton);
     void WriteLeptonToFile(RelParticle* Lepton);
     double GetOpticalDepthVal(double egy, double z);
     void PropagatePhotonToObserver(RelParticle& GammaPhoton);
-    bool PropagateSecondaryPhoton(RelParticle& GammaPhoton, 
-				  RelParticle* Electron, 
+    bool PropagateSecondaryPhoton(RelParticle& GammaPhoton,
+				  RelParticle* Electron,
 				  RelParticle* Positron);
-    double GetMinZ(const Vec4D& gam_ph_p4, const Vec4D& gam_ph_r4, 
+    double GetMinZ(const Vec4D& gam_ph_p4, const Vec4D& gam_ph_r4,
 		   const VEC3D_T& gam_ph_z);
     void PropagateLepton(std::stack<RelParticle*>& lepton_stack,
 			 RelParticle& GammaPhoton);
-    void StoreSecPhoton(Vec4D& gam_ph_p4, Vec4D& gam_ph_r4, 
+    void StoreSecPhoton(Vec4D& gam_ph_p4, Vec4D& gam_ph_r4,
 			const double& weight);
     void SaveToLowEnergyFile(RelParticle& Particle);
     void SaveDirectPhoton(RelParticle& Particle, std::ofstream& photon_list);
@@ -133,17 +134,17 @@ namespace IGCascade
     // Cascade parameters
     VEC3D_T  m_egy_cascade;    // TeV
     VEC3D_T  m_bmag;
-    VEC3D_T  m_ze;    
+    VEC3D_T  m_ze;
     string   m_cellsize;
-    
+
     unsigned m_globalLeptonNum;
-    
+
     string  m_cascade_file;
     string  m_low_egy_file;
     string  m_save_lepton_file;
     string  m_track_lepton_step_file;
     string  m_track_time_delay_file;
-    
+
     VEC3D_T m_egy_cmb;
 
     VEC3D_T m_R_0;
@@ -160,11 +161,11 @@ namespace IGCascade
 
     // TTree for secondary photons and for tracking leptons:
     TTree*   m_secPhotonTree;
-    Double_t m_egyPrim, m_egySec, m_theta, m_phi, m_time, m_thetap, m_xi, 
+    Double_t m_egyPrim, m_egySec, m_theta, m_phi, m_time, m_thetap, m_xi,
       m_weight;
-    
+
   };
-  
+
 }
 
 #endif // IGCASCADE_IGCASCADESIM_H

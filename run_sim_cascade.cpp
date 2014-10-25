@@ -54,7 +54,7 @@ AnyOption* DefineOptions(int argc, char* argv[], const string& progname)
   opt->addUsage(" --eblmodel      EBLModel4msld        EBLModel name.");
   opt->addUsage(" --mf_dir        MagneticFieldFiles/  magnetic field files dir.");
   opt->addUsage(" --opt_depth_dir OptDepthFiles/       opt depth files dir.");
-  opt->addUsage(" --output_dir    SimOutputFiles/      Directory to output files.");
+  opt->addUsage(" --output_dir    (cwd)      Directory to output files.");
   opt->addUsage(" --gam_egy_min    0.1 min energy [GeV] to track gammas.");
   opt->addUsage(" --lep_egy_min    75. min energy [GeV] to track leptons.");
 
