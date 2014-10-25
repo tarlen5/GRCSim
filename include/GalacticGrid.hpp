@@ -33,10 +33,11 @@
 #include "RelParticle.hpp"
 #include "convert.hpp"
 #include "PhysicsConstants.hpp"
+#include "HighPrecProp.hpp"
 
 #include <iostream>
 #include <fstream>
-#include<qd/dd_real.h>
+#include <qd/dd_real.h>
 #include <cmath>
 #include <map>
 #include <cstdlib>
@@ -126,16 +127,16 @@ namespace IGCascade
 				 Vec3D& n_eo, VEC3D_T& PL,
 				 VEC3D_T& delta_z, const bool LOCK=false);
 
-    void Propagation(RelParticle& Photon,RelParticle*& Lepton,VEC3D_T& PL,
-		     Vec3D& r_new,VEC3D_T& time_delay,Vec3D& n_eo,
-		     VEC3D_T& delta_z,VEC3D_T& delta_zs,Vec3D& e_b);
+    //void Propagation(RelParticle& Photon,RelParticle*& Lepton,VEC3D_T& PL,
+    //               Vec3D& r_new,VEC3D_T& time_delay,Vec3D& n_eo,
+    //		     VEC3D_T& delta_z,VEC3D_T& delta_zs,Vec3D& e_b);
 
     Vec3D UpdatePosition(RelParticle*& Lepton,VEC3D_T& PL,Vec3D& n_eo,
 			 Vec3D& e_b);
 
-    VEC3D_T Delta_z(VEC3D_T& PL, RelParticle*& Lepton);
-    VEC3D_T Delta_zs(VEC3D_T& PL, RelParticle*& Lepton, 
-		     Vec3D&r_new, VEC3D_T& delta_time);
+    //VEC3D_T Delta_z(VEC3D_T& PL, RelParticle*& Lepton);
+    //VEC3D_T Delta_zs(VEC3D_T& PL, RelParticle*& Lepton,
+    //		     Vec3D&r_new, VEC3D_T& delta_time);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Public Data Members////////////////////////////////
@@ -143,7 +144,7 @@ namespace IGCascade
     // These are now public so we can write them to the output file...
     double         m_cellsize;
     VEC3D_T        m_bmag;  //B_magnitude;
-    VEC3D_T        m_DE;     // relative computation precision of roots    
+    VEC3D_T        m_DE;     // relative computation precision of roots
     std::string    m_sfilename;
 
 

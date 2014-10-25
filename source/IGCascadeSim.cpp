@@ -95,7 +95,7 @@ namespace IGCascade
     eblmodel      = "EBLModel4msld";
     mf_dir        = "MagneticFieldFiles/";
     opt_depth_dir = "OptDepthFiles/";
-    output_dir    = "SimOutputFiles/";
+    output_dir    = "";
     m_egy_gamma_min = 0.1;
     m_egy_lepton_min = 75.0;
 
@@ -325,7 +325,7 @@ namespace IGCascade
       cout<<"initializing DIRBR..."<<endl;
 
       // Initialize DIRBR:
-      DIRBR_ERR ebl_err=m_ebl->SetDIRBR(lambda_vec.size(), &lambda_vec[0], 
+      DIRBR_ERR ebl_err=m_ebl->SetDIRBR(lambda_vec.size(), &lambda_vec[0],
 				       &nuFnu_vec[0]);
       std::cout << "SetDIRBR returned: " << ebl_err << std::endl;
       ebl_err=m_ebl->TestDIRBRlimits();
@@ -333,31 +333,31 @@ namespace IGCascade
 
 
     } else {
-      
+
       // Code for declaring the 2D table version of DIRBR EBL Model.
-      
+
     }
-    
-    
+
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   string IGCascadeSim::
-  DefineOptDepthTable(const string& opt_depth_dir, const string& s_eblmodel, 
+  DefineOptDepthTable(const string& opt_depth_dir, const string& s_eblmodel,
 		      const string& s_ze)
   {
     string optDepthFile = opt_depth_dir;
     optDepthFile+="optDepth_"+s_eblmodel+"_z"+s_ze+"_0.01TeV_1TeV.txt";
-    
+
     m_optDepthTable = new Table2D(optDepthFile);
     m_tauCutoff = 0.003;  // This is the approx tau for a 56 GeV
 			  // photon at z = 0.1
-    
+
     return optDepthFile;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  
+
   void IGCascadeSim::RunCascade(const int numIterations)
   {
 
@@ -385,7 +385,7 @@ namespace IGCascade
     m_secPhotonTree->Write();
     rootfilePhotonList->Close();
     delete rootfilePhotonList;
-      
+
     //----------Print End Time----------
     double seconds = difftime(time(0),curr);
     std::cout<<"\nSimulation took: "<< (int(seconds)/3600)<< " hr, "<<
@@ -393,7 +393,7 @@ namespace IGCascade
     cout<<"seconds: "<<seconds<<endl;
     curr=time(0);
     std::cerr<<"End Time: "<<ctime(&curr)<<std::endl;
-      
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -403,23 +403,23 @@ namespace IGCascade
 
     RelParticle GammaPhoton;
     CreateDirectGamma(GammaPhoton);
-    
+
     stack<RelParticle*> lepton_stack;
-    unsigned stack_max = 0;    
+    unsigned stack_max = 0;
     cout<<"Propagating Direct Photon..."<<endl;
-    //bool pair_prod = PropagateDirectPhoton(GammaPhoton,Electron,Positron);    
+    //bool pair_prod = PropagateDirectPhoton(GammaPhoton,Electron,Positron);
     PropagateDirectPhoton(GammaPhoton,lepton_stack);
-    
+
     stack_max = lepton_stack.size();
     while( !lepton_stack.empty() ) {
-      
+
       //cout<<"Propagating lepton..."<<endl;
       PropagateLepton(lepton_stack, GammaPhoton);
       //cout<<"Finished..."<<endl;
-      
+
       //cout<<"  IC scattered photon created with egy: "<<GammaPhoton.m_p4.r0<<
       //" z_s: "<<GammaPhoton.m_z_s<<endl;
-      
+
       //////////////////////////////////////////////////////////////////
       // IF GAMMA ENERGY TOO LOW OF IC PHOTON BEFORE PROPAGATING IT...
       // Don't bother propagating to z_s = 0 surface, just reject it now.
@@ -536,15 +536,15 @@ namespace IGCascade
     GammaPhoton.m_rnext = "0.0";
     GammaPhoton.m_q = 0;
     GammaPhoton.m_weight = 1.0;
-    
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
   void IGCascadeSim::
-  PropagateDirectPhoton(RelParticle& GammaPhoton, 
+  PropagateDirectPhoton(RelParticle& GammaPhoton,
 			stack<RelParticle*>& lepton_stack)
-  /*!  
+  /*!
     At the end of this function, the Electron and Positron are
     created at the interaction redshift, IF a pair production event
     takes place.
@@ -558,10 +558,10 @@ namespace IGCascade
 
     RelParticle* Electron = new RelParticle;
     RelParticle* Positron = new RelParticle;
-    bool pair_prod =  
-      m_pspace->PropagatePhotonEBL(m_ebl,Double(GammaPhoton.m_p4.r0),
-				   Double(GammaPhoton.m_z),z_min,z_int,
-				   tot_lambda_int);
+    bool pair_prod =
+      m_pspace->CheckPairProductionEBL(m_ebl,Double(GammaPhoton.m_p4.r0),
+                                       Double(GammaPhoton.m_z),z_min,z_int,
+                                       tot_lambda_int);
     
     if(!pair_prod) {
       cout<<"NO PAIR PRODUCTION...\n";
@@ -573,30 +573,30 @@ namespace IGCascade
       GammaPhoton.m_p4.r  *= GammaPhoton.m_p4.r0/GammaPhoton.m_p4.r.Norm();
       GammaPhoton.m_z     = 0.0;
       GammaPhoton.m_z_s   = 0.0;
-      
+
     }
-    else { 
+    else {
       // z_min is not reached...However, from propagating photon
       // to z_final, it is possible that z_s=0 surface could be
       // crossed, since z_min does not correspond exactly to the
       // z_s=0 surface for computation time issues.
       VEC3D_T delta_z = (z_emit - z_int);
-      bool pair_prod = 
+      bool pair_prod =
 	m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
-				    GammaPhoton.m_z,GammaPhoton.m_z_s, 
+				    GammaPhoton.m_z,GammaPhoton.m_z_s,
 				    delta_z);
       if( pair_prod ) {
 	// Pair production has legitimately occured and proceed as
 	// usual defining EBL photon interacted with, Leptons, etc.
 	RelParticle EBLPhoton;
-	EBLPhoton.m_p4.r0 = 
+	EBLPhoton.m_p4.r0 =
 	  m_pspace->GetEBLPhotonEgy(m_ebl,tot_lambda_int,
 				    Double(z_int),Double(z_emit),
 				    Double(GammaPhoton.m_p4.r0));
 	m_pspace->UpdateEBLPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
 				  GammaPhoton.m_z,GammaPhoton.m_z_s,
 				  EBLPhoton.m_p4,EBLPhoton.m_r4,EBLPhoton.m_z);
-      
+
 	////////////////////////////////////////////////////
 	// CREATE AND DEFINE LEPTONS PRODUCED BY PAIRPROD //
 	////////////////////////////////////////////////////
@@ -633,7 +633,7 @@ namespace IGCascade
       }
 
     }
-    
+
 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -642,13 +642,13 @@ namespace IGCascade
   void IGCascadeSim::
   DefineLeptons(RelParticle& GammaPhoton, RelParticle& EBLPhoton, RelParticle*
 		Electron, RelParticle* Positron)
-  /*!  
+  /*!
     Uses GammaPhoton and EBLPhoton to define Electron and Positron
     in the lab frame.
-    
+
    */
   {
-    
+
     ////////////////////////////////////////////////////
     // CREATE AND DEFINE LEPTONS PRODUCED BY PAIRPROD //
     ////////////////////////////////////////////////////
@@ -666,7 +666,7 @@ namespace IGCascade
     Electron->m_q       = charge_elec;
     Electron->m_weight  = GammaPhoton.m_weight;
     std::cout<<endl<<"new RelParticle: Electron..."<<endl;
-    
+
     Positron->m_r4 =  Electron->m_r4;
     Positron->m_p4 =  Electron->m_p4;
     Positron->m_m0 =  Electron->m_m0;
@@ -680,16 +680,13 @@ namespace IGCascade
     std::cout<<"new RelParticle: Positron..."<<endl<<endl;
     /////////////////////////////////////////
 
-    //cout<<"gamma: "<<GammaPhoton.m_p4<<endl;
-    //cout<<"EBLPhoton: "<<EBLPhoton.m_p4<<endl;
-    
-    bool RelKinematics = 
+    bool RelKinematics =
       m_pspace->RelativisticKinematics(GammaPhoton.m_p4,EBLPhoton.m_p4,
 				       Electron->m_p4, Positron->m_p4);
-    
+
     if (!RelKinematics)
       std::cerr<<std::endl<<"ERROR: RelativisticKinematics failed...\n\n";
-    
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -743,41 +740,41 @@ namespace IGCascade
     int rowMax = m_optDepthTable->GetNRows();
     double egyMax = m_optDepthTable->GetRowVal(rowMax-1);
     if(egy >= (egyMax*TeV)) return 1.0;
-    
+
     double zMin = m_optDepthTable->GetColVal(1);
     if(z <= zMin) return 1.0;
     int colMax = m_optDepthTable->GetNCols();
     double zMax = m_optDepthTable->GetColVal(colMax-1);
     if(z >= zMax) return 1.0;
-    
+
     egy = egy/TeV;
     return m_optDepthTable->LinInterpolate(egy,z);
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  
+
+
   void IGCascadeSim::
   PropagatePhotonToObserver(RelParticle& GammaPhoton)
   {
-    
+
     double z_min = GetMinZ(GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z);
     VEC3D_T z_emit = GammaPhoton.m_z;
     VEC3D_T delta_z = (z_emit - z_min);
-    //bool pair_prod = 
+    //bool pair_prod =
     m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
-				GammaPhoton.m_z, GammaPhoton.m_z_s, 
+				GammaPhoton.m_z, GammaPhoton.m_z_s,
 				delta_z);
-    
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+
 
   bool IGCascadeSim::
-  PropagateSecondaryPhoton(RelParticle& GammaPhoton, RelParticle* Electron, 
+  PropagateSecondaryPhoton(RelParticle& GammaPhoton, RelParticle* Electron,
 			   RelParticle* Positron)
   {
 
-    //#ifdef DEBUG 
+    //#ifdef DEBUG
     //cout<<"Propagating SECONDARY photon through EBL...";
     //#endif
     if (m_single_gen_bool) {
@@ -791,17 +788,17 @@ namespace IGCascade
     //VEC3D_T delta_z = (z_emit - z_min);
     //bool pair_prod = m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4,
     //						   GammaPhoton.m_r4,
-    //				  GammaPhoton.m_z,GammaPhoton.m_z_s, 
+    //				  GammaPhoton.m_z,GammaPhoton.m_z_s,
     //				  delta_z);
     //return false;
     //}
-    
+
     double tot_lambda_int = 0.0;
     VEC3D_T z_int = "0.0";
-    bool pair_prod =  
-      m_pspace->PropagatePhotonEBL(m_ebl,Double(GammaPhoton.m_p4.r0),
-				   Double(z_emit),z_min,z_int,
-				   tot_lambda_int);
+    bool pair_prod =
+      m_pspace->CheckPairProductionEBL(m_ebl,Double(GammaPhoton.m_p4.r0),
+                                       Double(z_emit),z_min,z_int,
+                                       tot_lambda_int);
     // At this point, either z_min is reached so that no pair
     // production will occur, or z_int is reached at which pair
     // production happens. Either way, propagate gamma photon over
@@ -811,9 +808,9 @@ namespace IGCascade
     //cout<<"egy: "<<GammaPhoton.m_p4.r0<<" zs: "<<GammaPhoton.m_z_s<<endl;
 
     VEC3D_T delta_z = (z_emit - z_int);
-    pair_prod = 
+    pair_prod =
       m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
-				  GammaPhoton.m_z,GammaPhoton.m_z_s, 
+				  GammaPhoton.m_z,GammaPhoton.m_z_s,
 				  delta_z);
     if( !pair_prod ) return false;
     // Otherwise, pair production has occured and proceed as usual
@@ -912,31 +909,32 @@ namespace IGCascade
     //cout<<"Propagating Lepton, at z = "<<Lepton->m_z_s<<" egy: "<<
     //Lepton->m_p4.r0<<endl;
     //cout<<"Propagating Lepton, tag = "<<Lepton->m_tag<<" egy: "<<Lepton->m_p4.r0<<endl;
-    
+
     VEC3D_T Ecmb_e = m_egy_cmb*(1.0+Lepton->m_z);
     VEC3D_T PL=m_kspace->PropagationLengthCMBandIR(m_ebl, Ecmb_e,Lepton->m_p4,
-						GammaPhoton.m_p4);   // [cm]
-    
+                                                   GammaPhoton.m_p4);   // [cm]
+
     GammaPhoton.m_weight = Lepton->m_weight;
-    
-    VEC3D_T delta_z = m_BFieldGrid->Delta_z(PL, Lepton);
-    
+
+    //VEC3D_T delta_z = m_BFieldGrid->Delta_z(PL, Lepton);
+    VEC3D_T delta_z = GetLeptonDelta_z(PL, Lepton);
+
     // Lepton direction at zi, before scattering kinematics computed
     Vec3D n_e = Lepton->m_p4.r/Lepton->m_p4.r.Norm();
     m_kspace->RelativisticKinematics(Lepton->m_p4,GammaPhoton.m_p4);
-    
+
     m_BFieldGrid->PropagateBFieldRedshift(GammaPhoton,Lepton,n_e,
-					 PL,delta_z, m_LOCK);
-    
+                                          PL,delta_z, m_LOCK);
+
     // NOTE: added to keep track of gamma_photon's emitted z_s
     GammaPhoton.m_z_s_int = Lepton->m_z_s;
     GammaPhoton.m_z_int = Lepton->m_z;
     GammaPhoton.m_egy_int = GammaPhoton.m_p4.r0;
     GammaPhoton.m_rnext = Lepton->m_rnext;
-    
+
     if (m_trk_delay_bool) GammaPhoton.m_elec_time = Lepton->m_r4.r0;
-    
-    if(Lepton->m_p4.r0 > m_egy_lepton_min && 
+
+    if(Lepton->m_p4.r0 > m_egy_lepton_min &&
        Lepton->m_z_s > m_BFieldGrid->m_DE) {
       lepton_stack.push(Lepton);
       if (m_trk_leptons_bool) SaveLepton(Lepton);

@@ -521,7 +521,7 @@ namespace IGCascade
     int j;
     VEC3D_T x = m_DE;
     VEC3D_T S = "0.0";
-    for (j=0; j<m_num_int; j++) {   
+    for (j=0; j<m_num_int; j++) {
       IS[j]=x*x / (exp(x)-1.0) * IsotropicSigma(2.0*z*x,gamma);
       S+=IS[j];
       x+=m_dx;
@@ -572,7 +572,7 @@ namespace IGCascade
     else e1/=nrm;
     Vec3D e2 = n^e1;
 
-    // Determine photon's Momentum Vec4 
+    // Determine photon's Momentum Vec4
     Vec3D e = cs*n + sn*sin_phi*e2 + sn*cos_phi*e1;
     P_p=Vec4D(E_p,E_p*e);
     // std::cout<<"mass2: "<<P_p*P_p<<std::endl;
@@ -584,27 +584,26 @@ namespace IGCascade
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  
 
-  VEC3D_T KleinNishina::PropagationLengthCMBandIR(DIRBRBase* ebl_model, 
+  VEC3D_T KleinNishina::PropagationLengthCMBandIR(DIRBRBase* ebl_model,
 			  VEC3D_T Ebb, Vec4D& P_lep, Vec4D& P_p)
     /*!
-      Same as PropagationLengthBB() except it adds the IR Energy Density of 
-      the ebl spectrum to sample the Propagation Length and energy of 
+      Same as PropagationLengthBB() except it adds the IR Energy Density of
+      the ebl spectrum to sample the Propagation Length and energy of
       upscattered photon.
-      
+
       \param ebl_model - ebl model to use.
       \param Ebb - kT of BB spectrum                                       [eV]
       \param P_lep - 4-momentum of charged particle (charge e assumed),
                      is NOT modified in this function.                     [eV]
       \param P_p   - 4-vector of BB photon, interacting with particle,
                      updated at end of function                            [eV]
-      
+
       \return propagation length                                           [cm]
-      
+
     */
   {
-    
+
     // Particle's parameters
     VEC3D_T m0 = sqrt(P_lep*P_lep);
     if ( m0 <= 0.0 ) {
@@ -636,19 +635,19 @@ namespace IGCascade
 
       VEC3D_T temp_IS = temp_dirbr*IsotropicSigma(2.0*epsilon/m0,gamma)
 	/epsilon/epsilon;
-      
+
       IS.push_back(temp_IS);
       S+=temp_IS*delta_epsilon;
       Delta_epsilon.push_back(delta_epsilon);
-      
+
       VEC3D_T epsilon_new = epsilon*m_egy_factor;
       delta_epsilon = epsilon_new - epsilon;
       epsilon = epsilon_new;
       Nstep++;
     }
- 
+
     // Mean free path
-    //VEC3D_T nJtoeV = "6.241506E+09";
+
     VEC3D_T mfp;
     {
       VEC3D_T ST = CGS_THOM_CS*eV_MELEC*eV_MELEC/m0/m0;
@@ -686,15 +685,15 @@ namespace IGCascade
     if (nrm == "0.0") e1=Vec3D(1.0,0.0,0.0);
     else e1/=nrm;
     Vec3D e2 = n^e1;
-  
-    // Determine photon's Momentum Vec4 
+
+    // Determine photon's Momentum Vec4
     Vec3D e = cs*n + sn*sin_phi*e2 + sn*cos_phi*e1;
     P_p=Vec4D(E_p,E_p*e);
 
     VEC3D_T chi_ran = (VEC3D_T) (m_rng->Uniform());
     //VEC3D_T chi_ran = 1.E-8;
-    return -mfp*log(chi_ran);    
-    
+    return -mfp*log(chi_ran);
+
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -702,26 +701,26 @@ namespace IGCascade
 
   VEC3D_T KleinNishina::IsotropicSigma(VEC3D_T z, VEC3D_T gamma)
     /*
-      This routine computes photon direction averaged cross-section 
+      This routine computes photon direction averaged cross-section
       weighted by the relative velocity of particle and photon
 
       <sigma * |v-c*cos(theta)|> / v
 
-      \param  z= E/mc^2  energy of the photon in lab r.f. divided by 
+      \param  z= E/mc^2  energy of the photon in lab r.f. divided by
       particle's mass
       \param  gamma      particle's gamma
 
-      \note To get correct physical units the result must 
+      \note To get correct physical units the result must
       be multiplied by  Thomson cross-section 8/3*Pi*R_o^2
     */
-  {	
+  {
     if ( gamma <= 1.0 || z <= 0.0 ) {
       std::cout<<"IsotropicSigma:  Ivalid argument(s)."<<std::endl;
       exit(0);
       //return;
     }
 
-    if ( z < m_DE ) z=m_DE;   // prevents loss of computational accuracy  
+    if ( z < m_DE ) z=m_DE;   // prevents loss of computational accuracy
 
     VEC3D_T gammabeta = sqrt(gamma*gamma - 1.0);
     VEC3D_T b=1.0/gamma;
@@ -944,45 +943,6 @@ namespace IGCascade
     return PL;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-//   VEC3D_T KleinNishina::natLog(VEC3D_T x)
-//     /*
-//       Natural logarithm function
-//       Normally log(a) is computed using Newton's method for finding root of
-//       a-exp(x)=0.
-//       This method converges rapidly for a>>1 or a<<1. When a=1+eps (eps<<1)
-//       the evaluation of log(a) is poor. This routine uses a simple Taylor
-//       expansion to improve accuracy of the log(a) calculation in this regime.
-//     */
-//   {
-//     VEC3D_T EPS = ((VEC3D_T)0.5); // Maximal small parameter in log(1 + EPS)
-//     // for which Taylor series computation is performed
-
-//     VEC3D_T Ln = D0;
-//     VEC3D_T arg = 1.0 - x;
-
-//     if (abs(arg) > EPS) {
-//       Ln = log(x);
-//       return Ln;
-//     }
-
-//     int i = 0;
-//     VEC3D_T dLn = D1;
-//     VEC3D_T epsPower = - D1;
-
-//     while ( abs(dLn) > m_DE*fabs(Ln) ) {
-//       i++;
-//       epsPower = -epsPower*arg;
-//       dLn=epsPower/((VEC3D_T)((double)i));
-//       Ln += dLn;
-//     }
-
-//     return Ln;
-
-//   }
-
 
 }
 
