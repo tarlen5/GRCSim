@@ -6,6 +6,7 @@ Monte Carlo Simulation of gamma-ray initiated electromagnetic cascades in interg
 Relies on two externals:
 
 1. The qd library, a high-precision software library developed at LBNL, and can be obtained here: http://crd-legacy.lbl.gov/~dhbailey/mpdist/
+	1. May need an older compiler to compile this software (worked for me on gcc v. 4.1.2)
 2. The cern ROOT library, which can be obtained here: http://root.cern.ch/drupal/content/downloading-root
 
 Once these are installed, if you are on a Mac/Linux system, the only thing needed to compile is to run `make`. Please email me at: tca3@psu.edu for details and permission to use and modify this code.
