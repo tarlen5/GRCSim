@@ -15,6 +15,7 @@ ROOTLIBS   = `root-config --libs`
 #--------------------------------------
 # qd/dd directory:
 includeqddir=qd_dd/qd-2.3.13/include
+LIBQD = qd_dd/build_hammer_2014_Nov_13_2.3.13/lib
 UTILDIR = utilities/
 EBLDIR   = ebl/
 
@@ -30,7 +31,8 @@ SRC=source/
 # Compiler
 CC=gcc
 CPP=g++
-CFLAGS= -g -Wall -O3 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+CFLAGS= -g -Wall -O3
+# -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 
 #-----------Use this version if running gprof/gdb-----------
 #CPP=g++ -pg
@@ -42,7 +44,7 @@ CFLAGS += -I$(includeqddir) -I$(INCLUDE) -I$(UTILDIR) -I$(EBLDIR)
 
 # common libraries
 LIBS= $(ROOTLIBS) -lProp -lqd -lpthread -lEBL -lUtility
-LDFLAGS= -L$(LIBLOCAL) -L$(EBLDIR) -L$(UTILDIR)
+LDFLAGS= -L$(LIBLOCAL) -L$(EBLDIR) -L$(UTILDIR) -L$(LIBQD)
 OBJLIBS=libUtility.a libEBL.a
 
 TARGETS = $(OBJDIR) $(OBJLIBS) run_sim_cascade
