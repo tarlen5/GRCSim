@@ -1147,27 +1147,28 @@ void
 AnyOption::printUsage()
 {
 	
-	if( once ) {
-		once = false ;
-		cout << endl ;
-		for( int i = 0 ; i < usage_lines ; i++ )
-			cout << usage[i] << endl ;	
-		cout << endl ;
-	}
+  if( once ) {
+    once = false ;
+    cout << endl ;
+    for( int i = 0 ; i < usage_lines ; i++ )
+      cout << usage[i] << endl ;	
+    cout << endl ;
+  }
 }
 	
 	
 void
 AnyOption::addUsage( const char *line )
 {
-	if( usage_lines >= max_usage_lines ){
-		if( doubleUsageStorage() == false ){
-			addUsageError( line );
-			exit(1);
-		}
-	}
-	usage[ usage_lines ] = line ;	
-	usage_lines++;
+  if( usage_lines >= max_usage_lines ){
+    if( doubleUsageStorage() == false ){
+      addUsageError( line );
+      exit(1);
+    }
+  }
+  usage[ usage_lines ] = line ;	
+  usage_lines++;
+    
 }
 
 void

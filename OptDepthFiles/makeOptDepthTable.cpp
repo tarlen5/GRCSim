@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
   DefineBinning(egyBinsVec, zBinsVec, egyLo, egyHi, redshift);
 
   
-  string ebl_modelfile = "/u/home/vvv/tarlen/GammaRayPropagation/sim_cascade/"+eblmodel+".dat";
+  string ebl_modelfile = "/gpfs/home/tca3/work/GRCSim/"+eblmodel+".dat";
   DIRBR ebl;
   InitializeEBL(ebl_modelfile, ebl);
 

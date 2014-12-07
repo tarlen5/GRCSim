@@ -14,8 +14,7 @@ ROOTLIBS   = `root-config --libs`
 # lib and include directories
 #--------------------------------------
 # qd/dd directory:
-includeqddir=qd_dd/qd-2.3.13/include
-LIBQD = qd_dd/build_hammer_2014_Nov_13_2.3.13/lib
+#QDLIB = qd_dd/build_hammer_2014_Nov_13_2.3.13/lib
 UTILDIR = utilities/
 EBLDIR   = ebl/
 
@@ -39,17 +38,14 @@ CFLAGS= -g -Wall -O3
 #CFLAGS= -Wall -O0 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 #-----------------------------------------------------------
 
-CFLAGS += -I$(includeqddir) -I$(INCLUDE) -I$(UTILDIR) -I$(EBLDIR)
-
+CFLAGS += -I$(QDINC) -I$(INCLUDE) -I$(UTILDIR) -I$(EBLDIR)
 
 # common libraries
 LIBS= $(ROOTLIBS) -lProp -lqd -lpthread -lEBL -lUtility
-LDFLAGS= -L$(LIBLOCAL) -L$(EBLDIR) -L$(UTILDIR) -L$(LIBQD)
+LDFLAGS= -L$(LIBLOCAL) -L$(EBLDIR) -L$(UTILDIR) -L$(QDLIB)
 OBJLIBS=libUtility.a libEBL.a
 
 TARGETS = $(OBJDIR) $(OBJLIBS) run_sim_cascade
-#OBJ = anyoption.o IGCascadeSim.o PairProduction.o KleinNishina.o \
-#	  RelParticle.o Vec4D.o Vec3D.o GalacticGrid.o
 OBJ = $(subst $(SRC), $(OBJDIR), $(patsubst %.cpp, %.o, $(wildcard $(SRC)*.cpp)))
 
 .PHONY: $(OBJLIBS)
@@ -83,8 +79,3 @@ $(OBJDIR)%.o: $(SRC)%.cpp
 %.o: %.cpp
 	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $<
 
-#%.o: source/%.cpp
-#	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $<
-
-#%.o: %.cpp
-#	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $<

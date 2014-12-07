@@ -5,8 +5,8 @@
 CXX = g++ -g -Wall -O3
 
 # Directories
-UTILITYDIR = /u/home/vvv/tarlen/GammaRayPropagation/sim_cascade/utilities
-EBLDIR = /u/home/vvv/tarlen/GammaRayPropagation/sim_cascade/ebl
+UTILITYDIR=/gpfs/home/tca3/work/GRCSim/utilities
+EBLDIR=/gpfs/home/tca3/work/GRCSim/ebl
 
 # Libraries
 UTILITYLIB = -L$(UTILITYDIR) -lUtility
