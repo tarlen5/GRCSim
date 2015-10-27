@@ -327,7 +327,7 @@ namespace IGCascade
 
 	  // If the grid cell has been defined already in the file
 	  if (c_ == coord) {
-	    
+
 	    ReadFieldMap(infile);
 	    Vec3D b = m_MagneticField[c];
 
@@ -340,12 +340,12 @@ namespace IGCascade
 	    return b;
 	  }
 	}
-	
+
 	// Grid cell has not been defined in file.
 	// Need: close file for reading, open for writing, AND lock! Then:
-	//   1) read entire map from file into MagneticField[], 
+	//   1) read entire map from file into MagneticField[],
 	//   2) define random field vector
-	//   3) write map into text file	
+	//   3) write map into text file
 
 	infile.clear(); // Must clear ifstream before resetting file ptr!!
 	infile.seekg (0, std::ios::beg);
@@ -370,9 +370,9 @@ namespace IGCascade
  	  std::cerr<<"error_msg = "<<error_msg<<std::endl;
  	  exit(EXIT_FAILURE);
  	}
-	
+
 	outfile.open(m_sfilename.c_str());
-	
+
  	if (outfile.fail()) {
  	  std::cerr << "Unable to open: "<< m_sfilename <<std::endl;
  	  std::cerr << "ERROR CheckMagneticField_Lock 2." << std::endl;
@@ -401,7 +401,7 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-  //  void MagneticGrid::ReadFieldMap(Field& MagneticField, 
+  //  void MagneticGrid::ReadFieldMap(Field& MagneticField,
   void MagneticGrid::ReadFieldMap( std::ifstream& infile)
     /*
       
@@ -431,7 +431,7 @@ namespace IGCascade
 
       infile>>x>>y>>z;
       infile>>Bx>>By>>Bz;
-    
+
       coord.ix = x;
       coord.iy = y;
       coord.iz = z;
@@ -459,7 +459,7 @@ namespace IGCascade
       std::cerr << "ERROR PrintFieldMapToFile." << std::endl;
       exit(EXIT_FAILURE);
     }
-  
+
     for(Field::const_iterator it = m_MagneticField.begin();
 	it != m_MagneticField.end(); ++it)
       {
@@ -478,10 +478,10 @@ namespace IGCascade
 				std::string rwtype)
     /*
       file locking (so multiple users don't interfere with each other)
-      
+
       \return: a file descriptor if successful, else negative number for
                error message.
-      
+
       \note: locks are released when the files are closed in UnLock()
              function when file descriptor is closed.
     */
@@ -502,9 +502,9 @@ namespace IGCascade
       std::cerr<<"Invalid Lock Type: "<<rwtype<<std::endl;
       exit(EXIT_FAILURE);
     }
-    
+
     if (*fd < 0) return -1; // file not found, or could not be opened
-    
+
     // set up the record locking structure, the address of which
     // is passed to the fcntl system call.
     lck.l_whence = SEEK_SET;

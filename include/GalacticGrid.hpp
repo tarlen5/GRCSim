@@ -100,15 +100,8 @@ namespace IGCascade
     //Default constructor
     inline MagneticGrid();
 
-    //Overloaded Constructors
-    //MagneticGrid(RandomNumbers * _rng);
     MagneticGrid(TRandom3* _rng, VEC3D_T B_mag, std::string s_cell_size,
 		 std::string sfilename);
-    //MagneticGrid(RandomNumbers * _rng, VEC3D_T B_mag, std::string s_B_mag,
-    //	 std::string s_cell_size, std::string s_zi);
-
-    //Copy Constructor
-    //inline MagneticGrid(const MagneticGrid& _mg);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Member Functions///////////////////////////////////
@@ -127,16 +120,8 @@ namespace IGCascade
 				 Vec3D& n_eo, VEC3D_T& PL,
 				 VEC3D_T& delta_z, const bool LOCK=false);
 
-    //void Propagation(RelParticle& Photon,RelParticle*& Lepton,VEC3D_T& PL,
-    //               Vec3D& r_new,VEC3D_T& time_delay,Vec3D& n_eo,
-    //		     VEC3D_T& delta_z,VEC3D_T& delta_zs,Vec3D& e_b);
-
     Vec3D UpdatePosition(RelParticle*& Lepton,VEC3D_T& PL,Vec3D& n_eo,
 			 Vec3D& e_b);
-
-    //VEC3D_T Delta_z(VEC3D_T& PL, RelParticle*& Lepton);
-    //VEC3D_T Delta_zs(VEC3D_T& PL, RelParticle*& Lepton,
-    //		     Vec3D&r_new, VEC3D_T& delta_time);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Public Data Members////////////////////////////////
@@ -155,9 +140,8 @@ namespace IGCascade
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     TRandom3* m_rng;
     Field          m_MagneticField;
-    
-  };
 
+  };
 
 }
 

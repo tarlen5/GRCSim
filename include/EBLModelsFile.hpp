@@ -18,7 +18,7 @@ template<class T> struct Model
   unsigned fNumParam;
   T*  fParam;
   Model(): fModelIndex(0), fNumParam(0), fParam(0) 
-  { 
+  {
 #ifdef LOUDLOUDLOUD
     std::cerr << "CREATE: " << (void*)this << ' '  << *this << ' ' 
 	      << fParam << std::endl; 
@@ -78,7 +78,7 @@ template<class T> struct Model
 #endif
     if(fParam)delete[] fParam; 
   }
-  
+
   bool operator < (const Model& o) const
   {
     assert(fNumParam == o.fNumParam);
