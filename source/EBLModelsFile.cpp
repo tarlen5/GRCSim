@@ -9,6 +9,7 @@
 #include<cassert>
 #include<cctype>
 #include<errno.h>
+#include<cstring>
 
 #include<EBLModelsFile.hpp>
 
@@ -68,24 +69,24 @@ EBLModelsFile::~EBLModelsFile()
 // ****************************************************************************
 // ****************************************************************************
 
-EBLModelsFile::EBLModelsFile(const std::string& filename, 
+EBLModelsFile::EBLModelsFile(const std::string& filename,
 			     unsigned num_ebl_param, const double* ebl_lambda,
 			     unsigned num_agn_param,
 			     const char** agn_param_names,
-			     unsigned num_match_param,  
+			     unsigned num_match_param,
 			     const char** match_param_names,
-			     const std::string& vhe_dataset_name, 
-			     unsigned vhe_num_data, 
-			     const double* vhe_e, 
+			     const std::string& vhe_dataset_name,
+			     unsigned vhe_num_data,
+			     const double* vhe_e,
 			     const double* vhe_i, const double* vhe_di):
   fFileName(filename), fFP(), fWritable(true), fSeekPos(0),
   fEBLNumParameters(num_ebl_param), fEBLLambda(), fEBLParameters(0),
-  fEBLTau01(), fEBLTau1(), fEBLTau10(), fEBLIStars(), fEBLIDust(), 
+  fEBLTau01(), fEBLTau1(), fEBLTau10(), fEBLIStars(), fEBLIDust(),
   fEBLNumModels(0),
-  fAGNNumParameters(num_agn_param), fAGNParameterNames(), 
-  fAGNModelsLookup(),  fAGNModels(), fAGNModelsUnwritten(), 
+  fAGNNumParameters(num_agn_param), fAGNParameterNames(),
+  fAGNModelsLookup(),  fAGNModels(), fAGNModelsUnwritten(),
   fAGNNumModels(0),
-  fAcceptableNumParameters(num_match_param), fAcceptableParameterNames(), 
+  fAcceptableNumParameters(num_match_param), fAcceptableParameterNames(),
   fAcceptableModels(), fNextAcceptableModel(), fAcceptableModelsNum(0),
   fVHEDatasetName(vhe_dataset_name), fVHENumData(vhe_num_data),
   fVHEDataE(), fVHEDataI(), fVHEDataIError()
@@ -102,7 +103,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename,
 
   for(unsigned i=0;i<num_match_param;i++)
     fAcceptableParameterNames.push_back(std::string(match_param_names[i]));
-  
+
   for(unsigned i=0;i<vhe_num_data;i++)
     {
       fVHEDataE.push_back(vhe_e[i]);
@@ -111,7 +112,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename,
     }
 
   fEBLParameters = new double[num_ebl_param];
-  
+
   // **************************************************************************
   // Open file and write the data
   // **************************************************************************
@@ -186,8 +187,8 @@ EBLModelsFile::EBLModelsFile(const std::string& filename,
     {
       perror("write [6]");
       exit(EXIT_FAILURE);
-    }  
-  
+    }
+
   if(!b_write(fAGNParameterNames, fFP))
     {
       perror("write [7]");
@@ -215,7 +216,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename,
     }
 }
 
-void EBLModelsFile::setEBLModel(const double* param, 
+void EBLModelsFile::setEBLModel(const double* param,
 				double tau01, double tau1, double tau10,
 				double i_stars, double i_dust)
 {
@@ -229,11 +230,11 @@ void EBLModelsFile::setEBLModel(const double* param,
   fEBLIDust  = i_dust;
   fEBLNumModels++;
 
-  for(std::vector<ModelMatch*>::iterator i = fAcceptableModels.begin(); 
+  for(std::vector<ModelMatch*>::iterator i = fAcceptableModels.begin();
       i != fAcceptableModels.end(); i++)delete *i;
-  fAcceptableModels.clear();  
+  fAcceptableModels.clear();
 }
-  
+
 void EBLModelsFile::writeEBLModel()
 {
 #if 0
@@ -245,11 +246,11 @@ void EBLModelsFile::writeEBLModel()
     << "AGN lookup size:          " << fAGNModelsLookup.size() << std::endl;
 
   unsigned count = 0;
-  for(std::set<AGNModel*,AGNModel>::iterator i = 
+  for(std::set<AGNModel*,AGNModel>::iterator i =
 	fAGNModelsLookup.begin(); i != fAGNModelsLookup.end(); i++)
     count++;
 
-  std::cout 
+  std::cout
     << "AGN lookup count:         " << count << std::endl;
 #endif
 
@@ -261,7 +262,7 @@ void EBLModelsFile::writeEBLModel()
   // --------------------------------------------------------------------------
   // 1) Write the AGN models accumulated
   // --------------------------------------------------------------------------
-  
+
   if(!b_write(fAGNModelsUnwritten, fFP))
     {
       perror("write [10]");
@@ -269,11 +270,11 @@ void EBLModelsFile::writeEBLModel()
     }
 
   fAGNModelsUnwritten.clear();
-      
+
   // --------------------------------------------------------------------------
   // 2) Write the EBL parameters
   // --------------------------------------------------------------------------
-      
+
   if(!b_write(fEBLParameters, fEBLNumParameters, fFP) ||
      !b_write(fEBLTau01, fFP) ||
      !b_write(fEBLTau1, fFP) ||
@@ -295,7 +296,7 @@ void EBLModelsFile::writeEBLModel()
     }
 }
 
-void EBLModelsFile::setAcceptableAGNModel(const double* param, 
+void EBLModelsFile::setAcceptableAGNModel(const double* param,
 					  const float* match_param)
 {
   assert(fWritable);
@@ -320,17 +321,17 @@ void EBLModelsFile::setAcceptableAGNModel(const double* param,
 	    std::cout << param[i] << ' ' << model->fParam[i] << std::endl;
 
 	  std::cout << "Dumping fAGNModels: " << std::endl;
-	  std::copy(fAGNModels.begin(), fAGNModels.end(), 
+	  std::copy(fAGNModels.begin(), fAGNModels.end(),
 		    std::ostream_iterator<const AGNModel*>(std::cout, "\n"));
 
 	  std::cout << "Dumping fAGNModelsLookup: " << std::endl;
-	  std::copy(fAGNModelsLookup.begin(), fAGNModelsLookup.end(), 
+	  std::copy(fAGNModelsLookup.begin(), fAGNModelsLookup.end(),
 		    std::ostream_iterator<const AGNModel*>(std::cout, "\n"));
 
 	  assert(0);
 	}
 #endif
- 
+
       fAGNModelsUnwritten.push_back(model);
     }
   else
@@ -338,7 +339,7 @@ void EBLModelsFile::setAcceptableAGNModel(const double* param,
       // Model found
       model = *found;
     }
-  
+
 #if 0
   std::cerr << fEBLNumModels << '\t' << fAGNNextIndex << '\t';
   for(unsigned i=0;i<fAGNNumParameters;i++)
@@ -346,7 +347,7 @@ void EBLModelsFile::setAcceptableAGNModel(const double* param,
   std::cerr << std::endl;
 #endif
 
-  fAcceptableModels.push_back(new ModelMatch(model->fModelIndex, 
+  fAcceptableModels.push_back(new ModelMatch(model->fModelIndex,
 					     fAcceptableNumParameters,
 					     match_param));
   fAcceptableModelsNum++;
@@ -370,13 +371,13 @@ void EBLModelsFile::setAcceptableAGNModel(const double* param,
 EBLModelsFile::EBLModelsFile(const std::string& filename):
   fFileName(filename), fFP(), fWritable(false), fSeekPos(0),
   fEBLNumParameters(0), fEBLLambda(), fEBLParameters(0),
-  fEBLTau01(), fEBLTau1(), fEBLTau10(), fEBLIStars(), fEBLIDust(), 
+  fEBLTau01(), fEBLTau1(), fEBLTau10(), fEBLIStars(), fEBLIDust(),
   fEBLNumModels(0),
-  fAGNNumParameters(), fAGNParameterNames(), 
-  fAGNModelsLookup(),  fAGNModels(), fAGNModelsUnwritten(), 
+  fAGNNumParameters(), fAGNParameterNames(),
+  fAGNModelsLookup(),  fAGNModels(), fAGNModelsUnwritten(),
   fAGNNumModels(0),
   fAcceptableModels(), fNextAcceptableModel(),
-  fVHEDatasetName(), fVHENumData(), 
+  fVHEDatasetName(), fVHENumData(),
   fVHEDataE(), fVHEDataI(), fVHEDataIError()
 {
   // **************************************************************************
@@ -390,7 +391,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
 		<< "fopen: " << strerror(errno) << std::endl;
       exit(EXIT_FAILURE);
     }
-  
+
   // --------------------------------------------------------------------------
   // 1) Read and test the MAGIC number
   // --------------------------------------------------------------------------
@@ -403,7 +404,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
 
   assert((magic.c[0] == 'E') && (magic.c[1] == 'B') && (magic.c[2] == 'L') &&
 	 (magic.c[3] == '\0'));
-  
+
   // --------------------------------------------------------------------------
   // 2) Read and test the VERSION number
   // --------------------------------------------------------------------------
@@ -415,7 +416,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
     }
 
   assert(version == scVersion);
-  
+
   // --------------------------------------------------------------------------
   // 3) Read the VHE dataset name
   // --------------------------------------------------------------------------
@@ -457,8 +458,8 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
     {
       perror("read [6]");
       exit(EXIT_FAILURE);
-    }  
-  
+    }
+
   if(!b_read(fAGNParameterNames, fFP))
     {
       perror("read [7]");
@@ -514,14 +515,14 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
 #if 0
 	  std::cout << *i << std::endl;
 #endif
-	  AGNModel* model = 
+	  AGNModel* model =
 	    new AGNModel((*i)->fModelIndex, (*i)->fNumParam, (*i)->fParam);
 	  fAGNModels.push_back(model);
 	  fAGNModelsLookup.insert(model);
 	}
-      
+
       // SKIP the EBL model information
-      if(fseek(fFP, 
+      if(fseek(fFP,
 	       sizeof(double)*fEBLNumParameters+
 	       sizeof(fEBLTau01)+sizeof(fEBLTau1)+sizeof(fEBLTau10)+
 	       sizeof(fEBLIStars)+sizeof(fEBLIDust),
@@ -530,7 +531,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
 	  perror("fseek [2]");
 	  exit(EXIT_FAILURE);
 	}
-      
+
       // READ the number of matches and SKIP them
       unsigned num_acceptable;
       if(!b_read(num_acceptable, fFP))
@@ -542,17 +543,17 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
       num_acceptable_models += num_acceptable;
 
       if(fseek(fFP,
-	       num_acceptable*(sizeof(unsigned) + 
+	       num_acceptable*(sizeof(unsigned) +
 			       fAcceptableNumParameters*sizeof(float)),
 	       SEEK_CUR) < 0)
 	{
 	  perror("fseek [3]");
 	  exit(EXIT_FAILURE);
 	}
-      
+
       num_ebl_models++;
     }
-  
+
   // --------------------------------------------------------------------------
   // Sanity Checks
   // --------------------------------------------------------------------------
@@ -585,7 +586,7 @@ bool EBLModelsFile::readNextEBLModel()
 
   unsigned num_agn_to_skip;
 
-  bool temp = b_read(num_agn_to_skip, fFP);  
+  bool temp = b_read(num_agn_to_skip, fFP);
   if(!temp)
     {
       if(feof(fFP))return false;
@@ -595,15 +596,15 @@ bool EBLModelsFile::readNextEBLModel()
 	  exit(EXIT_FAILURE);
 	}
     }
-  
-  if(fseek(fFP, 
+
+  if(fseek(fFP,
 	   num_agn_to_skip*(sizeof(unsigned)+sizeof(double)*fAGNNumParameters),
 	   SEEK_CUR) < 0)
     {
       perror("fseek [5]");
       exit(EXIT_FAILURE);
     }
-  
+
   // --------------------------------------------------------------------------
   // 2) Read the EBL parameters
   // --------------------------------------------------------------------------
@@ -628,7 +629,7 @@ bool EBLModelsFile::readNextEBLModel()
       perror("read [14]");
       exit(EXIT_FAILURE);
     }
-  
+
   // --------------------------------------------------------------------------
   // Set iterator
   // --------------------------------------------------------------------------
@@ -638,7 +639,7 @@ bool EBLModelsFile::readNextEBLModel()
 }
 
 bool EBLModelsFile::
-nextAcceptableAGNModel(unsigned& param_index, const double* &param, 
+nextAcceptableAGNModel(unsigned& param_index, const double* &param,
 		       const float* &match_param)
 {
   if(fNextAcceptableModel == fAcceptableModels.end())return false;
@@ -752,7 +753,7 @@ bool VHEData::getline(std::istream& stream, std::string& line)
 	    {
 	      std::string key = comment.substr(0,colon);
 	      std::string val = comment.substr(colon+1);
-	      
+
 	      if(!key.empty())
 		{
 		  last_char = key.find_last_not_of(SPC);
@@ -760,7 +761,7 @@ bool VHEData::getline(std::istream& stream, std::string& line)
 		  for(std::string::iterator i=key.begin(); i!=key.end(); i++)
 		    *i = char(tolower(*i));
 		}
-	      
+
 	      if(!val.empty())
 		{
 		  first_char = val.find_first_not_of(SPC);
