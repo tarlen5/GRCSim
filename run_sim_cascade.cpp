@@ -12,6 +12,8 @@
 
   \author   Timothy C. Arlen
 	    tca3@psu.edu
+	    Thomas Brandon Stevenson
+	    tbrandonstevenson@gmail.com
 
   \date     Jan 24, 2014
 
