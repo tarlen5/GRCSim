@@ -5,8 +5,8 @@
 CXX = g++ -g -Wall -O3
 
 # Directories
-UTILITYDIR=/gpfs/home/tca3/work/GRCSim/utilities
-EBLDIR=/gpfs/home/tca3/work/GRCSim/ebl
+UTILITYDIR=../utilities
+EBLDIR=../ebl
 
 # Libraries
 UTILITYLIB = -L$(UTILITYDIR) -lUtility

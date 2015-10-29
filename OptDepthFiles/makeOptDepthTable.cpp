@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
   DefineBinning(egyBinsVec, zBinsVec, egyLo, egyHi, redshift);
 
   
-  string ebl_modelfile = "/gpfs/home/tca3/work/GRCSim/"+eblmodel+".dat";
+  string ebl_modelfile = "../"+eblmodel+".dat";
   DIRBR ebl;
   InitializeEBL(ebl_modelfile, ebl);
 
