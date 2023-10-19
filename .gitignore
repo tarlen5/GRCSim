@@ -7,3 +7,12 @@
 
 # lib files:
 *.a
+
+# executable
+run_sim_cascade
+
+# Magnetic Grid files:
+MagneticFieldFiles/*
+
+# all ROOT files:
+*.root

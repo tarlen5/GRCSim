@@ -15,6 +15,7 @@ ROOTLIBS   = `root-config --libs`
 #--------------------------------------
 # qd/dd directory:
 #QDLIB = qd_dd/build_hammer_2014_Nov_13_2.3.13/lib
+QDLIB = /usr/local/lib
 UTILDIR = utilities/
 EBLDIR   = ebl/
 
@@ -52,8 +53,12 @@ OBJ = $(subst $(SRC), $(OBJDIR), $(patsubst %.cpp, %.o, $(wildcard $(SRC)*.cpp))
 
 all: $(TARGETS)
 
+# run_sim_cascade: run_sim_cascade.o $(LIBLOCAL)libProp.a $(OBJLIBS)
+# 	$(CPP) $(LDFLAGS) -o $@ $< $(LIBS)
+# 	mv $< $(OBJDIR)
+
 run_sim_cascade: run_sim_cascade.o $(LIBLOCAL)libProp.a $(OBJLIBS)
-	$(CPP) $(LDFLAGS) -o $@ $< $(LIBS)
+	$(CPP) $(LDFLAGS) $< $(LIBS) $(ROOTLIBS) -Iinclude/ -o $@
 	mv $< $(OBJDIR)
 
 $(LIBLOCAL)libProp.a: $(OBJ)
@@ -74,8 +79,8 @@ clean:
 	$(MAKE) clean -C $(EBLDIR)
 
 $(OBJDIR)%.o: $(SRC)%.cpp
-	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $< -o $@
+	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $< -o $@ -Iinclude/
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $<
+	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $< -Iinclude/
 
