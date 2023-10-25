@@ -34,6 +34,7 @@
 #include "convert.hpp"
 #include "PhysicsConstants.hpp"
 #include "HighPrecProp.hpp"
+#include "RandomNumbers.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -47,7 +48,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "TRandom3.h"
+// #include "TRandom3.h"
 
 namespace IGCascade
 {
@@ -100,7 +101,7 @@ namespace IGCascade
     //Default constructor
     inline MagneticGrid();
 
-    MagneticGrid(TRandom3* _rng, VEC3D_T B_mag, std::string s_cell_size,
+    MagneticGrid(RandomNumbers* _rng, VEC3D_T B_mag, std::string s_cell_size,
 		 std::string sfilename);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,7 +139,7 @@ namespace IGCascade
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Private Data Members////////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    TRandom3* m_rng;
+    RandomNumbers* m_rng;
     Field          m_MagneticField;
 
   };

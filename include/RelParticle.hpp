@@ -32,11 +32,10 @@
 #include<cmath>
 
 #include<qd/dd_real.h>
+#include <TROOT.h>
 
 #include "Vec3D.hpp"
 #include "Vec4D.hpp"
-
-#include "TROOT.h"
 
 namespace IGCascade
 {

@@ -34,8 +34,8 @@
 //#include<qd/dd.h>
 //#include<qd/qd.h>
 
-//#include "RandomNumbers.hpp"
-#include "TRandom3.h"
+#include "RandomNumbers.hpp"
+// #include "TRandom3.h"
 
 #include <cmath>
 
@@ -69,7 +69,7 @@ namespace IGCascade
     void Rotate(const Vec3D& axis);  //!<rotates vector around axis
     inline void P();                 //!<parity transformation
     inline void Reflect(const Vec3D& norm);  //!<reflect in normal
-    static inline Vec3D UniformSphereDirection(TRandom3* rng); 
+    static inline Vec3D UniformSphereDirection(RandomNumbers* rng); 
                            //!<choose a (normalized) direction randomly
 
     //void ScatterDirection(VEC3D_T dispersion, RandomNumbers& rng);
@@ -350,7 +350,7 @@ namespace IGCascade
     return temp;
   }
   
-  inline Vec3D Vec3D::UniformSphereDirection(TRandom3* rng)
+  inline Vec3D Vec3D::UniformSphereDirection(RandomNumbers* rng)
   {
     VEC3D_T phi = (2.*VEC3D_PI)*rng->Uniform();
     VEC3D_T cos_theta = 1. - 2.*rng->Uniform();

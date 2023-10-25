@@ -1,5 +1,8 @@
 #include <random>
 
+#ifndef RANDOMNUMBERS_H
+#define RANDOMNUMBERS_H
+
 using namespace std;
 
 class RandomNumbers{
@@ -58,3 +61,4 @@ class RandomNumbers{
         }
 };
 
+#endif // RANDOMNUMBERS_H

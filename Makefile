@@ -15,7 +15,8 @@ ROOTLIBS   = `root-config --libs`
 #--------------------------------------
 # qd/dd directory:
 #QDLIB = qd_dd/build_hammer_2014_Nov_13_2.3.13/lib
-QDLIB = /usr/local/lib
+QDLIB = /usr/local/lib/
+QDINC = /usr/local/include/
 UTILDIR = utilities/
 EBLDIR   = ebl/
 

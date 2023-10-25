@@ -71,8 +71,9 @@ namespace IGCascade
     DefineRp();
 
     int file_num = atoi(file_count.c_str());
-    m_rng = new TRandom3(0);
-    m_rng->SetSeed(file_num);
+    // m_rng = new TRandom3(0);
+    // m_rng->SetSeed(file_num);
+    m_rng = new RandomNumbers(0.0,1.0);
     m_BFieldGrid =
       new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
     m_pspace = new PairProduction(m_rng, m_ze);
