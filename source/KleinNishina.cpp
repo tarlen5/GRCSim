@@ -48,7 +48,7 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Overloaded class constructor
   /// \param _rng: rng
-  KleinNishina::KleinNishina(TRandom3* _rng)
+  KleinNishina::KleinNishina(RandomNumbers* _rng)
   {
 
     m_rng=_rng;

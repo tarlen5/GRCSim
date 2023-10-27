@@ -47,7 +47,7 @@ namespace IGCascade
   /// Overloaded class constructor (1)
   /// \param _MagneticField: m_MagneticField
   /// \param _rng: rng
-  MagneticGrid::MagneticGrid(TRandom3 * _rng, VEC3D_T B_mag,
+  MagneticGrid::MagneticGrid(RandomNumbers* _rng, VEC3D_T B_mag,
 			     std::string s_cell_size, std::string filename)
   {
 
