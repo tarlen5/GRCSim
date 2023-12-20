@@ -57,7 +57,7 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /// Overloaded class constructor
   /// \param _rng: rng
-  PairProduction::PairProduction(TRandom3* _rng, VEC3D_T ze)
+  PairProduction::PairProduction(RandomNumbers* _rng, VEC3D_T ze)
   {
 
     m_rng=_rng;

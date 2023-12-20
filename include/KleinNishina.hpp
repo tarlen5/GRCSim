@@ -33,7 +33,7 @@
 
 #include "Vec3D.hpp"
 #include "Vec4D.hpp"
-//#include "RandomNumbers.hpp"
+#include "RandomNumbers.hpp"
 //#include "RelParticle.hpp"
 #include "DIRBRBase.hpp"
 #include "convert.hpp"
@@ -59,7 +59,7 @@ namespace IGCascade
 		
     //Overloaded Constructor
     /// \param: RandomNumbers reference
-    KleinNishina(TRandom3* _rng);
+    KleinNishina(RandomNumbers* _rng);
 			
     //Copy Constructor... are we sure we are checking for self assignment?
     //! note: default constructor is provided as a
@@ -121,7 +121,7 @@ namespace IGCascade
     //Private Data Members///////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	  
-    TRandom3* m_rng;
+    RandomNumbers* m_rng;
 
     // Relevant mathematical constants
     VEC3D_T m_PI2d6;
@@ -165,7 +165,7 @@ namespace IGCascade
   /// Default class constructor
   inline KleinNishina::KleinNishina()
   {
-    m_rng = new TRandom3(0);  //("random_numbers.seed");
+    m_rng = new RandomNumbers(0.0, 1.0);  //("random_numbers.seed");
   }
 	
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

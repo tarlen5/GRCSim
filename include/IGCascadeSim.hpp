@@ -28,13 +28,14 @@
 #include "DIRBR.hpp"
 #include "anyoption.h"
 #include "HighPrecProp.hpp"
+#include "RandomNumbers.hpp"
 
 
 // ROOT INCLUDES:
 #include <TROOT.h>
 #include <TFile.h>
 #include <TTree.h>
-#include <TRandom3.h>
+// #include <TRandom3.h>
 
 #include <iostream>
 #include <fstream>
@@ -154,7 +155,8 @@ namespace IGCascade
     Table2D*       m_optDepthTable;
     double         m_tauCutoff;
 
-    TRandom3*       m_rng;
+    // TRandom3*       m_rng;
+    RandomNumbers*  m_rng;
     MagneticGrid*   m_BFieldGrid;
     PairProduction* m_pspace;
     KleinNishina*   m_kspace;
