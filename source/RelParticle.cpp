@@ -32,11 +32,10 @@ namespace IGCascade
   {
     Vec3D momenta;
     VEC3D_T mass = 0;
-    for(unsigned ctr = 0; ctr<particles.size(); ctr++)
-      {
-	momenta += particles[ctr].m_p4.r;
-	mass += particles[ctr].m_p4.r0;
-      }
+    for(unsigned ctr = 0; ctr<particles.size(); ctr++) {
+    	momenta += particles[ctr].m_p4.r;
+	    mass += particles[ctr].m_p4.r0;
+    }
 
     Vec3D u_cm;
 
@@ -51,10 +50,9 @@ namespace IGCascade
 
   void RelParticle::BoostSystem(Vec4D& u4, std::vector<RelParticle>& particles)
   {
-    for(unsigned ctr = 0; ctr<particles.size(); ctr++)
-      {
-	particles[ctr].Boost(u4);
-      }
+    for(unsigned ctr = 0; ctr<particles.size(); ctr++) {
+    	particles[ctr].Boost(u4);
+    }
   }
 
   /*Vec3D RelParticle::UniformSphereDirection()
