@@ -72,7 +72,9 @@ namespace IGCascade
     int file_num = atoi(file_count.c_str());
     // m_rng = new TRandom3(0);
     // m_rng->SetSeed(file_num);
-    m_rng = new RandomNumbers(0.0, 1.0);
+    // use seed for testing purposes:
+    uint32_t rng_seed = 12192111;
+    m_rng = new RandomNumbers(0.0, 1.0, rng_seed);
     m_BFieldGrid = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
     m_pspace = new PairProduction(m_rng, m_ze);
     m_kspace = new KleinNishina(m_rng);

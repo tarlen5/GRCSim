@@ -32,7 +32,8 @@ void InitializeEBL(string& ebl_modelname, DIRBR& ebl)
   ifstream model;
   model.open(ebl_modelname.c_str());
   
-  if (model == NULL) {
+  //if (model == NULL) {
+  if (!model.is_open()) {
     std::cerr << "ERROR: could not open EBL model file: " << ebl_modelname 
 	      << std::endl;
     exit(EXIT_FAILURE);
