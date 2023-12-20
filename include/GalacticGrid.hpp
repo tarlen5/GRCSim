@@ -48,8 +48,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// #include "TRandom3.h"
-
 namespace IGCascade
 {
 

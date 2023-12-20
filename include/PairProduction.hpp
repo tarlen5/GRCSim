@@ -32,8 +32,6 @@
 #include<iostream>
 #include<fstream>
 
-// #include "TRandom3.h"
-
 #include<qd/dd_real.h>
 
 

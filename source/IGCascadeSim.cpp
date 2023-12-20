@@ -5,19 +5,19 @@
     Class than stores all variables related to intergalactic
     simulations. Also runs all qed processes.
 
-    \author    Timothy C. Arlen                      \n
-               Department of Physics and Astronomy   \n
-               UCLA                                  \n
-	       arlen@astro.ucla.edu                  \n
+    \author   Timothy C. Arlen                      \n
+              Department of Physics and Astronomy   \n
+              UCLA                                  \n
+	            arlen@astro.ucla.edu                  \n
 
     \date      May 20, 2012                          \n
 
-    \revision  v1.1  April 19, 2013
-               Fairly major revision, by replacing all output to text
-               files with all output to ROOT files, using mostly
-               TTree.  This also requires rewrites of the intermediate
-               scripts to convert the raw output from teh simulatios
-               into the workable rootfiles per model of EBL,z,B,Lcoh.
+    \revision v1.1  April 19, 2013
+              Fairly major revision, by replacing all output to text
+              files with all output to ROOT files, using mostly
+              TTree.  This also requires rewrites of the intermediate
+              scripts to convert the raw output from teh simulatios
+              into the workable rootfiles per model of EBL,z,B,Lcoh.
 -------------------------------------------------------------------------------
 */
 
@@ -49,13 +49,12 @@ namespace IGCascade
     string optDepthFile = DefineOptDepthTable(opt_depth_dir,eblmodel,redshift);
 
     if (m_trk_leptons_bool)
-      m_save_lepton_file = DefineTrackLeptonFile(eblmodel, egy, mag_field,
-				    redshift,coh_len, file_count, output_dir);
+      m_save_lepton_file = DefineTrackLeptonFile(
+        eblmodel, egy, mag_field, redshift,coh_len, file_count, output_dir);
 
     if (m_trk_delay_bool)
-      m_track_time_delay_file =
-	DefineTrackTimeDelayFile(eblmodel,egy,mag_field,redshift,coh_len,
-				 file_count);
+      m_track_time_delay_file = DefineTrackTimeDelayFile(
+        eblmodel,egy,mag_field,redshift,coh_len, file_count);
 
     // Process Inputs to class:
     m_egy_cascade = egy.c_str();
@@ -73,9 +72,8 @@ namespace IGCascade
     int file_num = atoi(file_count.c_str());
     // m_rng = new TRandom3(0);
     // m_rng->SetSeed(file_num);
-    m_rng = new RandomNumbers(0.0,1.0);
-    m_BFieldGrid =
-      new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
+    m_rng = new RandomNumbers(0.0, 1.0);
+    m_BFieldGrid = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
     m_pspace = new PairProduction(m_rng, m_ze);
     m_kspace = new KleinNishina(m_rng);
 
@@ -88,9 +86,8 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-  void IGCascadeSim::ProcessOptions(AnyOption* opt, string& eblmodel,
-				    string& mf_dir, string& opt_depth_dir,
-				    string& output_dir)
+  void IGCascadeSim::ProcessOptions(
+    AnyOption* opt, string& eblmodel, string& mf_dir, string& opt_depth_dir, string& output_dir)
   {
     // Process Options:
     eblmodel      = "EBLModel4msld";
@@ -102,14 +99,10 @@ namespace IGCascade
 
     if(opt->getValue("eblmodel") != NULL) eblmodel = opt->getValue("eblmodel");
     if(opt->getValue("mf_dir") != NULL) mf_dir = opt->getValue("mf_dir");
-    if(opt->getValue("opt_depth_dir") != NULL)
-      opt_depth_dir = opt->getValue("opt_depth_dir");
-    if(opt->getValue("output_dir") != NULL)
-      output_dir = opt->getValue("output_dir");
-    if(opt->getValue("gam_egy_min") != NULL)
-      m_egy_gamma_min = opt->getValue("gam_egy_min");
-    if(opt->getValue("lep_egy_min") != NULL)
-      m_egy_lepton_min = opt->getValue("lep_egy_min");
+    if(opt->getValue("opt_depth_dir") != NULL) opt_depth_dir = opt->getValue("opt_depth_dir");
+    if(opt->getValue("output_dir") != NULL) output_dir = opt->getValue("output_dir");
+    if(opt->getValue("gam_egy_min") != NULL) m_egy_gamma_min = opt->getValue("gam_egy_min");
+    if(opt->getValue("lep_egy_min") != NULL) m_egy_lepton_min = opt->getValue("lep_egy_min");
 
     // Convert to eV:
     m_egy_gamma_min *= 1.0e9*0.99;
@@ -151,8 +144,7 @@ namespace IGCascade
     string filename = output_dir+s_eblmodel+"_"+s_egy+"GeV_z"+s_ze+"_B"+s_Bmag+"_L"+
       s_cellsize+"_"+s_file_num+".root";
 
-    m_secPhotonTree =
-      new TTree("Secondary","egyPrim,egySec,theta,phi,time,thetap,xi,weight");
+    m_secPhotonTree = new TTree("Secondary","egyPrim,egySec,theta,phi,time,thetap,xi,weight");
     m_secPhotonTree->Branch("egyPrim",&m_egyPrim,"egyPrim/D");
     m_secPhotonTree->Branch("egySec",&m_egySec,"egySec/D");
     m_secPhotonTree->Branch("theta",&m_theta,"theta/D");
@@ -170,7 +162,6 @@ namespace IGCascade
   DefineMFfile(const string& mf_dir, const string& s_Bmag,
 	       const string& s_cellsize, const string& s_ze)
   {
-
     string MFfilename=mf_dir+"MagneticGrid_B"+s_Bmag+"_L"+s_cellsize+"_z"+s_ze+".txt";
     return MFfilename;
   }
@@ -237,12 +228,10 @@ namespace IGCascade
 
   */
   {
-
-
     /////// Now integrate it...
-    double dz = 1.0e-5;
+    double dz     = 1.0e-5;
     double zfinal = Double(m_ze);
-    double R_H = Double(PhysConst::CGS_HUBRAD);
+    double R_H    = Double(PhysConst::CGS_HUBRAD);
     double OmegaR = Double(OMEGA_R);
     double OmegaM = Double(PhysConst::OMEGA_M);
     double OmegaL = Double(PhysConst::OMEGA_L);
@@ -265,12 +254,12 @@ namespace IGCascade
       double Q = sqrt(OmegaR*z4 + OmegaM*z3 + OmegaL);
 
       if( (zi + dz) > zfinal) {
-	R_p += (zfinal-zi)/Q;
-	zi = zfinal;
+        R_p += (zfinal-zi)/Q;
+        zi = zfinal;
       }
       else {
-	R_p += dz/Q;
-	zi+=dz;
+        R_p += dz/Q;
+        zi+=dz;
       }
       num_steps++;
     }
@@ -304,34 +293,31 @@ namespace IGCascade
       model.open(ebl_model_file.c_str());
 
       if (!model) {
-	std::cerr << "ERROR: could not open EBL model file: " << ebl_model_file
-		  << std::endl;
-	exit(EXIT_FAILURE);
+        std::cerr << "ERROR: could not open EBL model file: " << ebl_model_file << std::endl;
+        exit(EXIT_FAILURE);
       }
 
       vector<double> lambda_vec;
       vector<double> nuFnu_vec;
       // Set up DIRBR curve...
       while(model) {
-	double lambda_i;
-	double nuFnu_i;
-	model >> lambda_i >> nuFnu_i;
-	if(model) {
-	  lambda_vec.push_back(lambda_i);
-	  nuFnu_vec.push_back(nuFnu_i);
-	}
+        double lambda_i;
+        double nuFnu_i;
+        model >> lambda_i >> nuFnu_i;
+        if(model) {
+          lambda_vec.push_back(lambda_i);
+          nuFnu_vec.push_back(nuFnu_i);
+          }
       }
       model.close();
 
       cout<<"initializing DIRBR..."<<endl;
 
       // Initialize DIRBR:
-      DIRBR_ERR ebl_err=m_ebl->SetDIRBR(lambda_vec.size(), &lambda_vec[0],
-				       &nuFnu_vec[0]);
+      DIRBR_ERR ebl_err=m_ebl->SetDIRBR(lambda_vec.size(), &lambda_vec[0], &nuFnu_vec[0]);
       std::cout << "SetDIRBR returned: " << ebl_err << std::endl;
       ebl_err=m_ebl->TestDIRBRlimits();
       std::cout << "TestDIRBRlimits returned: " << ebl_err << std::endl;
-
 
     } else {
 
@@ -426,9 +412,9 @@ namespace IGCascade
       // Don't bother propagating to z_s = 0 surface, just reject it now.
       //////////////////////////////////////////////////////////////////
       if ( GammaPhoton.m_p4.r0 < m_egy_gamma_min ) {
-	//if(SAVE_LOW_EGY) SaveToLowEnergyFile(GammaPhoton);
-	GammaPhoton.Zero();
-	continue;
+	      //if(SAVE_LOW_EGY) SaveToLowEnergyFile(GammaPhoton);
+	      GammaPhoton.Zero();
+	      continue;
       }
 
       //////////////////////////////////////////////////////////////
@@ -442,12 +428,12 @@ namespace IGCascade
       double redshift = Double(GammaPhoton.m_z_s);
       double tau = GetOpticalDepthVal(egy,redshift);
       if(tau < m_tauCutoff) {
-	PropagatePhotonToObserver(GammaPhoton);
-	if (GammaPhoton.m_p4.r0 >= m_egy_gamma_min)
-	  StoreSecPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
-			 GammaPhoton.m_weight);
-	GammaPhoton.Zero();
-	continue;
+	      PropagatePhotonToObserver(GammaPhoton);
+	      if (GammaPhoton.m_p4.r0 >= m_egy_gamma_min) {
+          StoreSecPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4, GammaPhoton.m_weight);
+        }
+      	GammaPhoton.Zero();
+	      continue;
       } 
       
       //////Otherwise, just propagate IC scattered photon to z_s = 0////////
@@ -455,58 +441,57 @@ namespace IGCascade
       RelParticle* Positron = new RelParticle;
       
       bool pair_prod = 
-	PropagateSecondaryPhoton(GammaPhoton,Electron,Positron);
+      	PropagateSecondaryPhoton(GammaPhoton,Electron,Positron);
       
       if (!pair_prod) {
-	delete Electron;
-	delete Positron;
-	if(GammaPhoton.m_z_s > 1.0e-15) { // Should never happen
-	  cerr<<"\nWARNING: Caught z_s=0 photon with z_s> 1E-15!"<<endl;
-	  cerr<<"(Secondary photon...)"<<endl<<endl;
-	}
-	if (GammaPhoton.m_p4.r0 >= m_egy_gamma_min)
-	  StoreSecPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
-			 GammaPhoton.m_weight);
-	if (m_trk_delay_bool) SaveToTrackTimeDelayFile(GammaPhoton);
-	else {
-	  //if(SAVE_LOW_EGY) SaveToLowEnergyFile(GammaPhoton);
-	}
+        delete Electron;
+        delete Positron;
+        if(GammaPhoton.m_z_s > 1.0e-15) { // Should never happen
+          cerr<<"\nWARNING: Caught z_s=0 photon with z_s> 1E-15!"<<endl;
+          cerr<<"(Secondary photon...)"<<endl<<endl;
+        }
+        if (GammaPhoton.m_p4.r0 >= m_egy_gamma_min)
+          StoreSecPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
+            GammaPhoton.m_weight);
+        if (m_trk_delay_bool) SaveToTrackTimeDelayFile(GammaPhoton);
+        //else {
+          //if(SAVE_LOW_EGY) SaveToLowEnergyFile(GammaPhoton);
+        //}
       }
       else { // Add electrons to stack?
-	cout<<"---Secondary Photon Pair Production Triggered---"<<endl;
-	if(Positron->m_p4.r0 >m_egy_lepton_min) {
-	  m_globalLeptonNum++;
-	  Positron->m_tag = m_globalLeptonNum;
-	  lepton_stack.push(Positron);
-	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Positron);
-	    SaveLepton(Positron);
-	  }
-	}
-	else {
-	  //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Positron);
-	  delete Positron;
-	}
-	if(Electron->m_p4.r0>m_egy_lepton_min) {
-	  m_globalLeptonNum++;
-	  Electron->m_tag = m_globalLeptonNum;
-	  lepton_stack.push(Electron);
-	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Electron);
-	    SaveLepton(Electron);
-	  }
-	}
-	else {
-	  //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Electron);
-	  delete Electron;
-	}
+        cout<<"---Secondary Photon Pair Production Triggered---"<<endl;
+        if(Positron->m_p4.r0 >m_egy_lepton_min) {
+          m_globalLeptonNum++;
+          Positron->m_tag = m_globalLeptonNum;
+          lepton_stack.push(Positron);
+          if (m_trk_leptons_bool) {
+            CreateLeptonTree(Positron);
+            SaveLepton(Positron);
+          }
+        }
+        else {
+      //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Positron);
+          delete Positron;
+        }
+        if(Electron->m_p4.r0>m_egy_lepton_min) {
+          m_globalLeptonNum++;
+          Electron->m_tag = m_globalLeptonNum;
+          lepton_stack.push(Electron);
+          if (m_trk_leptons_bool) {
+            CreateLeptonTree(Electron);
+            SaveLepton(Electron);
+          }
+        }
+        else {
+          //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Electron);
+          delete Electron;
+        }
       }
       if(lepton_stack.size() > stack_max) 
-	stack_max = lepton_stack.size();
-      GammaPhoton.Zero();
+	      stack_max = lepton_stack.size();
+        GammaPhoton.Zero();
       //} // tau greater than tau cutoff, propagate secondary photon
-
-	//} // photon is greater than E_min
+    	//} // photon is greater than E_min
       
     } // End while loop over leptons
       //PhotonList.close();
@@ -560,9 +545,8 @@ namespace IGCascade
     RelParticle* Electron = new RelParticle;
     RelParticle* Positron = new RelParticle;
     bool pair_prod =
-      m_pspace->CheckPairProductionEBL(m_ebl,Double(GammaPhoton.m_p4.r0),
-                                       Double(GammaPhoton.m_z),z_min,z_int,
-                                       tot_lambda_int);
+      m_pspace->CheckPairProductionEBL(
+        m_ebl, Double(GammaPhoton.m_p4.r0), Double(GammaPhoton.m_z), z_min, z_int, tot_lambda_int);
     
     if(!pair_prod) {
       cout<<"NO PAIR PRODUCTION...\n";
@@ -582,59 +566,55 @@ namespace IGCascade
       // crossed, since z_min does not correspond exactly to the
       // z_s=0 surface for computation time issues.
       VEC3D_T delta_z = (z_emit - z_int);
-      bool pair_prod =
-	m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
-				    GammaPhoton.m_z,GammaPhoton.m_z_s,
-				    delta_z);
+      bool pair_prod = m_pspace->UpdateGammaPhoton(
+        GammaPhoton.m_p4,GammaPhoton.m_r4, GammaPhoton.m_z, GammaPhoton.m_z_s, delta_z);
       if( pair_prod ) {
-	// Pair production has legitimately occured and proceed as
-	// usual defining EBL photon interacted with, Leptons, etc.
-	RelParticle EBLPhoton;
-	EBLPhoton.m_p4.r0 =
-	  m_pspace->GetEBLPhotonEgy(m_ebl,tot_lambda_int,
-				    Double(z_int),Double(z_emit),
-				    Double(GammaPhoton.m_p4.r0));
-	m_pspace->UpdateEBLPhoton(GammaPhoton.m_p4,GammaPhoton.m_r4,
-				  GammaPhoton.m_z,GammaPhoton.m_z_s,
-				  EBLPhoton.m_p4,EBLPhoton.m_r4,EBLPhoton.m_z);
+        // Pair production has legitimately occured and proceed as
+        // usual defining EBL photon interacted with, Leptons, etc.
+        RelParticle EBLPhoton;
+        EBLPhoton.m_p4.r0 =
+          m_pspace->GetEBLPhotonEgy(
+            m_ebl, tot_lambda_int, Double(z_int), Double(z_emit), Double(GammaPhoton.m_p4.r0));
+        m_pspace->UpdateEBLPhoton(
+          GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z, GammaPhoton.m_z_s,
+          EBLPhoton.m_p4, EBLPhoton.m_r4, EBLPhoton.m_z);
 
-	////////////////////////////////////////////////////
-	// CREATE AND DEFINE LEPTONS PRODUCED BY PAIRPROD //
-	////////////////////////////////////////////////////
-	DefineLeptons(GammaPhoton,EBLPhoton,Electron,Positron);
-	GammaPhoton.Zero();
+        ////////////////////////////////////////////////////
+        // CREATE AND DEFINE LEPTONS PRODUCED BY PAIRPROD //
+        ////////////////////////////////////////////////////
+        DefineLeptons(GammaPhoton,EBLPhoton,Electron,Positron);
+        GammaPhoton.Zero();
 
-	// Decide whether or not to put the leptons onto the stack...
-	if(Positron->m_p4.r0 > m_egy_lepton_min) {
-	  m_globalLeptonNum++;
-	  Positron->m_tag = m_globalLeptonNum;
-	  lepton_stack.push(Positron);
-	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Positron);
-	    SaveLepton(Positron);
-	  }
-	}
-	else {
-	  //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Positron);
-	  delete Positron;
-	}
-	if(Electron->m_p4.r0 > m_egy_lepton_min) {
-	  m_globalLeptonNum++;
-	  Electron->m_tag = m_globalLeptonNum;
-	  lepton_stack.push(Electron);
-	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Electron);
-	    SaveLepton(Electron);
-	  }
-	}
-	else {
-	  //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Electron);
-	  delete Electron;
-	}
+        // Decide whether or not to put the leptons onto the stack...
+        if(Positron->m_p4.r0 > m_egy_lepton_min) {
+          m_globalLeptonNum++;
+          Positron->m_tag = m_globalLeptonNum;
+          lepton_stack.push(Positron);
+          if (m_trk_leptons_bool) {
+            CreateLeptonTree(Positron);
+            SaveLepton(Positron);
+          }
+        }
+        else {
+          //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Positron);
+          delete Positron;
+        }
+        if(Electron->m_p4.r0 > m_egy_lepton_min) {
+          m_globalLeptonNum++;
+          Electron->m_tag = m_globalLeptonNum;
+          lepton_stack.push(Electron);
+          if (m_trk_leptons_bool) {
+            CreateLeptonTree(Electron);
+            SaveLepton(Electron);
+          }
+        }
+        else {
+          //if(SAVE_LOW_EGY) SaveToLowEnergyFile(*Electron);
+          delete Electron;
+        }
       }
 
     }
-
 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
