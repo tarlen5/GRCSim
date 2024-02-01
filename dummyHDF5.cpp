@@ -16,8 +16,8 @@ std::vector<std::string> datasetNames = {"egyPrim", "egySec", "theta", "phi", "t
 
 
 void To_HDF5(const std::string& filename,
-             const std::vector<std::vector<double>>& data) {
-    try {
+    const std::vector<double>& data) {    
+      try {
 
            // Create or open the specified group
            if (fileExist(filename))
@@ -27,7 +27,8 @@ void To_HDF5(const std::string& filename,
                   DataSet dataset = file.getDataSet(datasetNames[i]);
                   size_t currentSize = dataset.getDimensions()[1];
                   dataset.resize({1,currentSize+1});
-                  dataset.select({0,currentSize},{1,1}).write(data[i]); }
+                   std::vector<double> data_vector={data[i]};
+                  dataset.select({0,currentSize},{1,1}).write(data_vector); }
                  }
            else  {
                              // Create a new file if it doesn't exist
@@ -37,7 +38,8 @@ void To_HDF5(const std::string& filename,
                    props.add(Chunking(std::vector<hsize_t>{2, 2}));
                   for (size_t i = 0; i < datasetNames.size(); ++i) {
                   DataSet dataset = file.createDataSet(datasetNames[i],dataspace,  create_datatype<double>(),props);
-                  dataset.select({0, 0}, {1, 1}).write(data[i]);}
+                   std::vector<double> data_vector={data[i]};
+                  dataset.select({0, 0}, {1, 1}).write(data_vector);}
                  }
          
 
@@ -51,15 +53,15 @@ void To_HDF5(const std::string& filename,
 
 int main() {
     // Example usage
-    std::vector<std::vector<double>> Data = {
-        {3.57e6},
-        {5e5},
-        {55.74},
-        {0.57},
-        {1.4e4},
-        {0.6},
-        {0.778},
-        {0.34}
+    std::vector<double> Data = {
+        93.57e6,
+        5e5,
+        55.74,
+        0.57,
+        1.4e4,
+        0.6,
+        0.778,
+        0.34
     };
     To_HDF5("histograms.h5", Data);
 
