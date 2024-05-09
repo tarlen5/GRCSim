@@ -32,9 +32,9 @@
 
 
 // ROOT INCLUDES:
-#include <TROOT.h>
-#include <TFile.h>
-#include <TTree.h>
+// #include <TROOT.h>
+// #include <TFile.h>
+// #include <TTree.h>
 // #include <TRandom3.h>
 
 #include <iostream>
@@ -119,7 +119,7 @@ namespace IGCascade
     void SaveDirectPhoton(RelParticle& Particle, std::ofstream& photon_list);
     void SaveLepton(RelParticle* Lepton);
     void SaveToTrackTimeDelayFile(RelParticle& Particle);
-
+    void WriteCascadeFile(const string& filename);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Private Data Members///////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,8 +162,8 @@ namespace IGCascade
     KleinNishina*   m_kspace;
 
     // TTree for secondary photons and for tracking leptons:
-    TTree*   m_secPhotonTree;
-    Double_t m_egyPrim, m_egySec, m_theta, m_phi, m_time, m_thetap, m_xi,
+    // TTree*   m_secPhotonTree;
+    double m_egyPrim, m_egySec, m_theta, m_phi, m_time, m_thetap, m_xi,
       m_weight;
 
   };

@@ -142,28 +142,59 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-  string IGCascadeSim::
-  DefineCascadeFile(const string& s_eblmodel,const string& s_egy,
-		    const string& s_Bmag, const string& s_ze,
-		    const string& s_cellsize, const string& s_file_num,
-		    const string& output_dir)
-  {
-    string filename = output_dir+s_eblmodel+"_"+s_egy+"GeV_z"+s_ze+"_B"+s_Bmag+"_L"+
-      s_cellsize+"_"+s_file_num+".root";
+  // string IGCascadeSim::
+  // DefineCascadeFile(const string& s_eblmodel,const string& s_egy,
+	// 	    const string& s_Bmag, const string& s_ze,
+	// 	    const string& s_cellsize, const string& s_file_num,
+	// 	    const string& output_dir)
+  // {
+  //   string filename = output_dir+s_eblmodel+"_"+s_egy+"GeV_z"+s_ze+"_B"+s_Bmag+"_L"+
+  //     s_cellsize+"_"+s_file_num+".root";
 
-    m_secPhotonTree =
-      new TTree("Secondary","egyPrim,egySec,theta,phi,time,thetap,xi,weight");
-    m_secPhotonTree->Branch("egyPrim",&m_egyPrim,"egyPrim/D");
-    m_secPhotonTree->Branch("egySec",&m_egySec,"egySec/D");
-    m_secPhotonTree->Branch("theta",&m_theta,"theta/D");
-    m_secPhotonTree->Branch("phi",&m_phi,"phi/D");
-    m_secPhotonTree->Branch("time",&m_time,"time/D");
-    m_secPhotonTree->Branch("thetap",&m_thetap,"thetap/D");
-    m_secPhotonTree->Branch("xi",&m_xi,"xi/D");
-    m_secPhotonTree->Branch("weight",&m_weight,"weight/D");
+  //   m_secPhotonTree =
+  //     new TTree("Secondary","egyPrim,egySec,theta,phi,time,thetap,xi,weight");
+  //   m_secPhotonTree->Branch("egyPrim",&m_egyPrim,"egyPrim/D");
+  //   m_secPhotonTree->Branch("egySec",&m_egySec,"egySec/D");
+  //   m_secPhotonTree->Branch("theta",&m_theta,"theta/D");
+  //   m_secPhotonTree->Branch("phi",&m_phi,"phi/D");
+  //   m_secPhotonTree->Branch("time",&m_time,"time/D");
+  //   m_secPhotonTree->Branch("thetap",&m_thetap,"thetap/D");
+  //   m_secPhotonTree->Branch("xi",&m_xi,"xi/D");
+  //   m_secPhotonTree->Branch("weight",&m_weight,"weight/D");
+
+  //   return filename;
+  // }
+
+  string IGCascadeSim::
+DefineCascadeFile(const string& s_eblmodel,const string& s_egy,
+                  const string& s_Bmag, const string& s_ze,
+                  const string& s_cellsize, const string& s_file_num,
+                  const string& output_dir)
+{
+    string filename = output_dir + s_eblmodel + "_" + s_egy + "GeV_z" + s_ze + "_B" +
+                      s_Bmag + "_L" + s_cellsize + "_" + s_file_num + ".csv";
+
+    ofstream outfile(filename.c_str());
+
+    // Write header
+    outfile << "egyPrim,egySec,theta,phi,time,thetap,xi,weight\n";
+    outfile.close();
 
     return filename;
-  }
+}
+
+void IGCascadeSim::WriteCascadeFile(const string& filename)
+{
+
+    ofstream outfile(filename);
+
+   // Write data to file
+    outfile << m_egyPrim << "," << m_egySec << "," << m_theta << ","
+            << m_phi << "," << m_time << "," << m_thetap << ","
+            << m_xi << "," << m_weight << "\n";
+    outfile.close();
+
+}
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   string IGCascadeSim::
@@ -187,6 +218,23 @@ namespace IGCascade
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  // string IGCascadeSim::
+  // DefineTrackLeptonFile(const string& s_eblmodel, const string& s_egy,
+	// 		const string& s_Bmag, const string& s_ze,
+	// 		const string& s_cellsize, const string& s_file_num,
+	// 		const string& output_dir)
+  // {
+  //   string filename = output_dir+"TrackLeptons_"+s_eblmodel+"_"+s_egy+"GeV_z"+
+  //     s_ze+"_B"+s_Bmag+"_L"+s_cellsize+"_"+s_file_num+".root";
+
+  //   // Overwrite existing
+  //   TFile* rootfile = new TFile(filename.c_str(),"RECREATE");
+  //   rootfile->Close();
+  //   ofstream ofile(m_track_time_delay_file.c_str()); // Overwrite existing
+  //   ofile.close();
+
+  //   return filename;
+  // }
   string IGCascadeSim::
   DefineTrackLeptonFile(const string& s_eblmodel, const string& s_egy,
 			const string& s_Bmag, const string& s_ze,
@@ -194,12 +242,14 @@ namespace IGCascade
 			const string& output_dir)
   {
     string filename = output_dir+"TrackLeptons_"+s_eblmodel+"_"+s_egy+"GeV_z"+
-      s_ze+"_B"+s_Bmag+"_L"+s_cellsize+"_"+s_file_num+".root";
+      s_ze+"_B"+s_Bmag+"_L"+s_cellsize+"_"+s_file_num+".csv";
 
     // Overwrite existing
-    TFile* rootfile = new TFile(filename.c_str(),"RECREATE");
-    rootfile->Close();
+    ofstream outfile(filename.c_str());
+    // Write header
+    outfile << "redshift,egy,px,py,pz,time,rx,ry,rz\n";
     ofstream ofile(m_track_time_delay_file.c_str()); // Overwrite existing
+    
     ofile.close();
 
     return filename;
@@ -359,6 +409,44 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+  // void IGCascadeSim::RunCascade(const int numIterations)
+  // {
+
+  //   // -----------Print time at beginning-----------
+  //   time_t curr=time(0);
+  //   std::cerr<<"\nStart Time: "<<ctime(&curr)<<std::endl<<std::endl;
+  //   //----------------------------------------------
+
+  //   // Overwrite Existing:
+  //   TFile* rootfilePhotonList = new TFile(m_cascade_file.c_str(),"RECREATE");
+  //   rootfilePhotonList->Close();
+
+  //   m_globalLeptonNum = 0;
+  //   for (int i=1; i<=numIterations; i++) {
+  //     cout<<"-----------------------------------------------------------------";
+  //     cout<<"\nNew Photon Defined, iteration = "<<i<<endl;
+  //     cout<<"  egy: "<<m_egy_cascade<<" TeV"<<endl;
+
+  //     RunSinglePhotonCascade();
+
+  //   } // End loop over iterations
+
+  //   // Saving Tree to rootfile:
+  //   rootfilePhotonList = new TFile(m_cascade_file.c_str(),"UPDATE");
+  //   m_secPhotonTree->Write();
+  //   rootfilePhotonList->Close();
+  //   delete rootfilePhotonList;
+
+  //   //----------Print End Time----------
+  //   double seconds = difftime(time(0),curr);
+  //   std::cout<<"\nSimulation took: "<< (int(seconds)/3600)<< " hr, "<<
+  //     (int(seconds)%3600)/60<<" min, "<< int(seconds)%60<<" sec."<<endl;
+  //   cout<<"seconds: "<<seconds<<endl;
+  //   curr=time(0);
+  //   std::cerr<<"End Time: "<<ctime(&curr)<<std::endl;
+
+  // }
+
   void IGCascadeSim::RunCascade(const int numIterations)
   {
 
@@ -368,8 +456,8 @@ namespace IGCascade
     //----------------------------------------------
 
     // Overwrite Existing:
-    TFile* rootfilePhotonList = new TFile(m_cascade_file.c_str(),"RECREATE");
-    rootfilePhotonList->Close();
+    std::ofstream outfile(m_cascade_file);
+    outfile.close();
 
     m_globalLeptonNum = 0;
     for (int i=1; i<=numIterations; i++) {
@@ -381,11 +469,8 @@ namespace IGCascade
 
     } // End loop over iterations
 
-    // Saving Tree to rootfile:
-    rootfilePhotonList = new TFile(m_cascade_file.c_str(),"UPDATE");
-    m_secPhotonTree->Write();
-    rootfilePhotonList->Close();
-    delete rootfilePhotonList;
+    // Saving to CSV:
+     WriteCascadeFile (m_cascade_file.c_str());
 
     //----------Print End Time----------
     double seconds = difftime(time(0),curr);
@@ -479,7 +564,7 @@ namespace IGCascade
 	  Positron->m_tag = m_globalLeptonNum;
 	  lepton_stack.push(Positron);
 	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Positron);
+	    // CreateLeptonTree(Positron);
 	    SaveLepton(Positron);
 	  }
 	}
@@ -492,7 +577,7 @@ namespace IGCascade
 	  Electron->m_tag = m_globalLeptonNum;
 	  lepton_stack.push(Electron);
 	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Electron);
+	    // CreateLeptonTree(Electron);
 	    SaveLepton(Electron);
 	  }
 	}
@@ -610,7 +695,7 @@ namespace IGCascade
 	  Positron->m_tag = m_globalLeptonNum;
 	  lepton_stack.push(Positron);
 	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Positron);
+	    // CreateLeptonTree(Positron);
 	    SaveLepton(Positron);
 	  }
 	}
@@ -623,7 +708,7 @@ namespace IGCascade
 	  Electron->m_tag = m_globalLeptonNum;
 	  lepton_stack.push(Electron);
 	  if (m_trk_leptons_bool) {
-	    CreateLeptonTree(Electron);
+	    // CreateLeptonTree(Electron);
 	    SaveLepton(Electron);
 	  }
 	}
@@ -691,43 +776,61 @@ namespace IGCascade
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  void IGCascadeSim::CreateLeptonTree(RelParticle* Lepton)
-  {
-    ostringstream oss_q;
-    oss_q << Lepton->m_q;
-    ostringstream oss_tag;
-    oss_tag << Lepton->m_tag;
-    cout<<"  tag: "<<Lepton->m_tag;
-    string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
-    cout<<"...Creating electron tree: "<<treeName<<endl;
-    TTree* elecTree = new TTree(treeName.c_str(),"redshift,egy,px,py,pz,time,rx,ry,rz");
-    //elecTree->SetDirectory(0);
-    elecTree->Branch("redshift",&Lepton->m_tz,"redshift/D");
-    elecTree->Branch("egy",&Lepton->m_tegy,"egy/D");
-    elecTree->Branch("px",&Lepton->m_tpx,"px/D");
-    elecTree->Branch("py",&Lepton->m_tpy,"py/D");
-    elecTree->Branch("pz",&Lepton->m_tpz,"pz/D");
-    elecTree->Branch("time",&Lepton->m_ttime,"time/D");
-    elecTree->Branch("rx",&Lepton->m_trx,"rx/D");
-    elecTree->Branch("ry",&Lepton->m_try,"ry/D");
-    elecTree->Branch("rz",&Lepton->m_trz,"rz/D");
+  // void IGCascadeSim::CreateLeptonTree(RelParticle* Lepton)
+  // {
+  //   ostringstream oss_q;
+  //   oss_q << Lepton->m_q;
+  //   ostringstream oss_tag;
+  //   oss_tag << Lepton->m_tag;
+  //   cout<<"  tag: "<<Lepton->m_tag;
+  //   string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
+  //   cout<<"...Creating electron tree: "<<treeName<<endl;
+  //   TTree* elecTree = new TTree(treeName.c_str(),"redshift,egy,px,py,pz,time,rx,ry,rz");
+  //   //elecTree->SetDirectory(0);
+  //   elecTree->Branch("redshift",&Lepton->m_tz,"redshift/D");
+  //   elecTree->Branch("egy",&Lepton->m_tegy,"egy/D");
+  //   elecTree->Branch("px",&Lepton->m_tpx,"px/D");
+  //   elecTree->Branch("py",&Lepton->m_tpy,"py/D");
+  //   elecTree->Branch("pz",&Lepton->m_tpz,"pz/D");
+  //   elecTree->Branch("time",&Lepton->m_ttime,"time/D");
+  //   elecTree->Branch("rx",&Lepton->m_trx,"rx/D");
+  //   elecTree->Branch("ry",&Lepton->m_try,"ry/D");
+  //   elecTree->Branch("rz",&Lepton->m_trz,"rz/D");
 
-  }
+  // }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  void IGCascadeSim::WriteLeptonToFile(RelParticle* Lepton)
+  // void IGCascadeSim::WriteLeptonToFile(RelParticle* Lepton)
+  // {
+  //   ostringstream oss_q;
+  //   oss_q << Lepton->m_q;
+  //   ostringstream oss_tag;
+  //   oss_tag << Lepton->m_tag;
+  //   string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
+  //   TTree* elecTree = (TTree*)gDirectory->Get(treeName.c_str());
+  //   TFile* rootfile = new TFile(m_save_lepton_file.c_str(),"UPDATE");
+  //   elecTree->Write();
+  //   rootfile->Close();
+  //   delete rootfile;
+  //   delete elecTree;
+  // }
+
+    void IGCascadeSim::WriteLeptonToFile(RelParticle* Lepton)
   {
     ostringstream oss_q;
     oss_q << Lepton->m_q;
     ostringstream oss_tag;
     oss_tag << Lepton->m_tag;
     string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
-    TTree* elecTree = (TTree*)gDirectory->Get(treeName.c_str());
-    TFile* rootfile = new TFile(m_save_lepton_file.c_str(),"UPDATE");
-    elecTree->Write();
-    rootfile->Close();
-    delete rootfile;
-    delete elecTree;
+   
+    ofstream myFile(m_save_lepton_file.c_str());
+        // Write data to file
+    myFile << Lepton->m_tz << "," << Lepton->m_tegy << "," << Lepton->m_tpx << ","
+                << Lepton->m_tpy << "," << Lepton->m_tpz << "," << Lepton->m_ttime << ","
+                << Lepton->m_trx << "," << Lepton->m_try << "," << Lepton->m_trz << "\n";
+    
+    // Close the file
+    myFile.close(); 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -999,7 +1102,8 @@ namespace IGCascade
     m_egyPrim = Double(m_egy_cascade);
     m_egySec = Double(gam_ph_p4.r0);
     m_weight = weight;
-    m_secPhotonTree->Fill();
+    // m_secPhotonTree->Fill();
+    WriteCascadeFile(m_cascade_file.c_str());
 
     //stream<<gam_ph_p4.r0 <<" "<<theta<<" "<<phi<<" "<<
     //gam_ph_r4.r0<<" "<<theta_p<<" "<<xi<<" "<<weight <<std::endl;
@@ -1026,35 +1130,35 @@ namespace IGCascade
     
     // Saves the line:
     //   number_tag q z E px py pz time x y z
-    //
-    //ofstream ofile(m_save_lepton_file.c_str(), std::ios::app);
-    //ofile<<Lepton->m_tag<<" "<<Lepton->m_q<<" "<<Lepton->m_z<<" "<<Lepton->m_p4.r0<<" "<<Lepton->m_p4.r<<" "<<Lepton->m_r4.r0<<" "<<Lepton->m_r4.r<<endl;
-    //ofile.close();
     
-    ostringstream oss_q;
-    oss_q << Lepton->m_q;
-    ostringstream oss_tag;
-    oss_tag << Lepton->m_tag;
-    string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
-    TTree* elecTree = (TTree*)gDirectory->Get(treeName.c_str());
-    //cout<<"  z: "<<Lepton->m_z<<" time: "<<Lepton->m_r4.r0<<endl; 
-    //cout<<"  Filling tree: "<<treeName<<endl;
-    Lepton->m_tz = Double(Lepton->m_z);
-    Lepton->m_tegy = Double(Lepton->m_p4.r0);
-    Lepton->m_tpx = Double(Lepton->m_p4.r.x);
-    Lepton->m_tpy = Double(Lepton->m_p4.r.y);
-    Lepton->m_tpz = Double(Lepton->m_p4.r.z);
-    Lepton->m_ttime = Double(Lepton->m_r4.r0);
-    Lepton->m_trx = Double(Lepton->m_r4.r.x);
-    Lepton->m_try = Double(Lepton->m_r4.r.y);
-    Lepton->m_trz = Double(Lepton->m_r4.r.z);
-    //cout<<"--Saving Lepton..."<<Lepton->m_tegy<<" "<<Lepton->m_tz;
-    //cout<<" "<<Lepton->m_tpx<<" "<<Lepton->m_tpy<<" "<<Lepton->m_tpz;
-    //cout<<" "<<Lepton->m_ttime;
-    //cout<<" "<<Lepton->m_trx<<" "<<Lepton->m_try<<" "<<Lepton->m_trz;
+    ofstream ofile(m_save_lepton_file.c_str(), std::ios::app);
+    ofile<<Lepton->m_tag<<" "<<Lepton->m_q<<" "<<Lepton->m_z<<" "<<Lepton->m_p4.r0<<" "<<Lepton->m_p4.r<<" "<<Lepton->m_r4.r0<<" "<<Lepton->m_r4.r<<endl;
+    ofile.close();
     
-    elecTree->Fill();
-    //cout<<"...Filled."<<endl;
+    // ostringstream oss_q;
+    // oss_q << Lepton->m_q;
+    // ostringstream oss_tag;
+    // oss_tag << Lepton->m_tag;
+    // string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
+    // TTree* elecTree = (TTree*)gDirectory->Get(treeName.c_str());
+    // //cout<<"  z: "<<Lepton->m_z<<" time: "<<Lepton->m_r4.r0<<endl; 
+    // //cout<<"  Filling tree: "<<treeName<<endl;
+    // Lepton->m_tz = Double(Lepton->m_z);
+    // Lepton->m_tegy = Double(Lepton->m_p4.r0);
+    // Lepton->m_tpx = Double(Lepton->m_p4.r.x);
+    // Lepton->m_tpy = Double(Lepton->m_p4.r.y);
+    // Lepton->m_tpz = Double(Lepton->m_p4.r.z);
+    // Lepton->m_ttime = Double(Lepton->m_r4.r0);
+    // Lepton->m_trx = Double(Lepton->m_r4.r.x);
+    // Lepton->m_try = Double(Lepton->m_r4.r.y);
+    // Lepton->m_trz = Double(Lepton->m_r4.r.z);
+    cout<<"--Saving Lepton..."<<Lepton->m_tegy<<" "<<Lepton->m_tz;
+    cout<<" "<<Lepton->m_tpx<<" "<<Lepton->m_tpy<<" "<<Lepton->m_tpz;
+    cout<<" "<<Lepton->m_ttime;
+    cout<<" "<<Lepton->m_trx<<" "<<Lepton->m_try<<" "<<Lepton->m_trz;
+    
+    // elecTree->Fill();
+    cout<<"...Filled."<<endl;
     
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
