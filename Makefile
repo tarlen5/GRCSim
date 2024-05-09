@@ -7,8 +7,8 @@ ECHO=echo
 # -----------------------------------------------------------------------------
 # Root
 # -----------------------------------------------------------------------------
-ROOTCFLAGS = `root-config --cflags`
-ROOTLIBS   = `root-config --libs`
+# ROOTCFLAGS = `root-config --cflags`
+# ROOTLIBS   = `root-config --libs`
 
 #--------------------------------------
 # lib and include directories
@@ -43,7 +43,8 @@ CFLAGS= -g -Wall -O3
 CFLAGS += -I$(QDINC) -I$(INCLUDE) -I$(UTILDIR) -I$(EBLDIR)
 
 # common libraries
-LIBS= $(ROOTLIBS) -lProp -lqd -lpthread -lEBL -lUtility
+# LIBS= $(ROOTLIBS) -lProp -lqd -lpthread -lEBL -lUtility
+LIBS= -lProp -lqd -lpthread -lEBL -lUtility
 LDFLAGS= -L$(LIBLOCAL) -L$(EBLDIR) -L$(UTILDIR) -L$(QDLIB)
 OBJLIBS=libUtility.a libEBL.a
 
@@ -59,7 +60,7 @@ all: $(TARGETS)
 # 	mv $< $(OBJDIR)
 
 run_sim_cascade: run_sim_cascade.o $(LIBLOCAL)libProp.a $(OBJLIBS)
-	$(CPP) $(LDFLAGS) $< $(LIBS) $(ROOTLIBS) -Iinclude/ -o $@
+	$(CPP) $(LDFLAGS) $< $(LIBS)  -Iinclude/ -o $@
 	mv $< $(OBJDIR)
 
 $(LIBLOCAL)libProp.a: $(OBJ)
@@ -80,8 +81,8 @@ clean:
 	$(MAKE) clean -C $(EBLDIR)
 
 $(OBJDIR)%.o: $(SRC)%.cpp
-	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $< -o $@ -Iinclude/
+	$(CPP) $(CFLAGS) -c $< -o $@ -Iinclude/
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $< -Iinclude/
+	$(CPP) $(CFLAGS) -c $< -Iinclude/
 
