@@ -7,6 +7,8 @@ UNAME_S := $(shell uname -s)
 
 # Set compiler and flags based on OS
 ifeq ($(UNAME_S),Darwin)
+    # Note: Relies on variable `MACOS_DEPLOYMENT_TARGET` being set in the environment
+    # export it as needed, e.g., `export MACOS_DEPLOYMENT_TARGET=14.7`
     CXX = clang++ -g -Wall -O3
     CXXFLAGS += $(INCFILES) -Xclang -fopenmp
     LIBS += $(EBLLIB) $(UTILITYLIB) -lomp

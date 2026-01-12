@@ -33,7 +33,8 @@ void InitializeEBL(string& ebl_modelname, DIRBR& ebl)
   ifstream model;
   model.open(ebl_modelname.c_str());
   
-  if (!model) {
+  //if (model == NULL) {
+  if (!model.is_open()) {
     std::cerr << "ERROR: could not open EBL model file: " << ebl_modelname 
         << std::endl;
     exit(EXIT_FAILURE);
@@ -172,8 +173,8 @@ int main(int argc, char** argv) {
     outfile<<zBinsVec[iz]<<" ";
   outfile<<endl;
 
-  cout<<"Calculating optical depth table..."<<endl;
-  cout<<"[tau], [energy TeV], [redshift]"<<endl;
+  std::cout<<"Calculating optical depth table..."<<endl;
+  std::cout<<"[tau], [energy TeV], [redshift]"<<endl;
   for(unsigned iegy = 0; iegy<egyBinsVec.size(); iegy++) {
     double egy = egyBinsVec[iegy];
     outfile<<egy<<" ";
@@ -184,7 +185,7 @@ int main(int argc, char** argv) {
       double redshift = zBinsVec[iz];
       taus[iz] = ebl.OpticalDepth(egy,redshift);
       #pragma omp critical
-      cout<< taus[iz] <<" "<<egy<<" "<<redshift<<endl;
+      std::cout<< taus[iz] <<" "<<egy<<" "<<redshift<<std::endl;
     }
     for(auto tau : taus) outfile<<tau<<" ";
       outfile<<endl;
