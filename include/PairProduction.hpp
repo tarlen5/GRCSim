@@ -32,8 +32,6 @@
 #include<iostream>
 #include<fstream>
 
-#include "TRandom3.h"
-
 #include<qd/dd_real.h>
 
 
@@ -50,7 +48,7 @@ namespace IGCascade
 
     //Overloaded Constructor
     /// \param: RandomNumbers reference
-    PairProduction(TRandom3* _rng, VEC3D_T ze);
+    PairProduction(RandomNumbers* _rng, VEC3D_T ze);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Public Member Functions////////////////////////////
@@ -108,7 +106,7 @@ namespace IGCascade
     //Private Data Members///////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    TRandom3* m_rng;
+    RandomNumbers* m_rng;
 
     //~~~~~~~~VEC3D_T Values ~~~~~~~~~
     VEC3D_T m_dz_time_delay;
@@ -159,7 +157,8 @@ namespace IGCascade
   /// Default class constructor
   inline PairProduction::PairProduction()
   {
-    m_rng = new TRandom3(0);//("random_numbers.seed");
+    //m_rng = new TRandom3(0);//("random_numbers.seed");
+    m_rng = new RandomNumbers(0.0, 1.0);
   }
 
 

@@ -28,13 +28,20 @@
 #include "DIRBR.hpp"
 #include "anyoption.h"
 #include "HighPrecProp.hpp"
+#include "RandomNumbers.hpp"
 
 
 // ROOT INCLUDES:
-#include <TROOT.h>
-#include <TFile.h>
-#include <TTree.h>
-#include <TRandom3.h>
+// #include <TROOT.h>
+// #include <TFile.h>
+// #include <TTree.h>
+// #include <TRandom3.h>
+
+// HDF5 INCLUDES:
+#include <hdf5.h>
+#include <H5Cpp.h>
+
+using namespace H5;
 
 #include <iostream>
 #include <fstream>
@@ -119,6 +126,9 @@ namespace IGCascade
     void SaveLepton(RelParticle* Lepton);
     void SaveToTrackTimeDelayFile(RelParticle& Particle);
 
+    // HDF5 writing functions:
+    void WriteSecPhotonsToHDF5();
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //Private Data Members///////////////////////////////
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -130,6 +140,8 @@ namespace IGCascade
     VEC3D_T m_egy_gamma_min;
     VEC3D_T m_egy_lepton_min;
     bool    m_LOCK;
+    bool    m_seed_provided;
+    uint32_t m_seed_value;
 
     // Cascade parameters
     VEC3D_T  m_egy_cascade;    // TeV
@@ -154,15 +166,24 @@ namespace IGCascade
     Table2D*       m_optDepthTable;
     double         m_tauCutoff;
 
-    TRandom3*       m_rng;
+    // TRandom3*       m_rng;
+    RandomNumbers*  m_rng;
     MagneticGrid*   m_BFieldGrid;
     PairProduction* m_pspace;
     KleinNishina*   m_kspace;
 
-    // TTree for secondary photons and for tracking leptons:
-    TTree*   m_secPhotonTree;
-    Double_t m_egyPrim, m_egySec, m_theta, m_phi, m_time, m_thetap, m_xi,
-      m_weight;
+    // HDF5 structures:
+    struct SecPhoton {
+        double egyPrim, egySec, theta, phi, time, thetap, xi, weight;
+    };
+
+    struct LeptonData {
+        double redshift, egy, px, py, pz, time, rx, ry, rz;
+    };
+
+    // Data storage:
+    std::vector<SecPhoton> m_secPhotons;
+    std::map<std::string, std::vector<LeptonData>> m_leptonData;
 
   };
 

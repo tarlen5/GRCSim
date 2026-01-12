@@ -118,7 +118,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename,
   // **************************************************************************
 
   fFP = fopen(filename.c_str(), "w");
-  if(fFP < 0)
+  if(fFP == NULL)
     {
       std::cerr << "Could not open file " << filename << std::endl
 		<< "fopen: " << strerror(errno) << std::endl;
@@ -385,7 +385,7 @@ EBLModelsFile::EBLModelsFile(const std::string& filename):
   // **************************************************************************
 
   fFP = fopen(filename.c_str(), "r");
-  if(fFP < 0)
+  if(fFP == NULL)
     {
       std::cerr << "Could not open file " << filename << std::endl
 		<< "fopen: " << strerror(errno) << std::endl;

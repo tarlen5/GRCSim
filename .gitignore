@@ -7,3 +7,18 @@
 
 # lib files:
 *.a
+
+# executable
+run_sim_cascade
+
+# Magnetic Grid files:
+MagneticFieldFiles/*
+
+# all ROOT files:
+*.root
+
+# all HDF5 files:
+*.h5
+
+# analysis directory
+analysis/

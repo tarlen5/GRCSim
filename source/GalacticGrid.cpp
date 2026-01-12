@@ -47,7 +47,7 @@ namespace IGCascade
   /// Overloaded class constructor (1)
   /// \param _MagneticField: m_MagneticField
   /// \param _rng: rng
-  MagneticGrid::MagneticGrid(TRandom3 * _rng, VEC3D_T B_mag,
+  MagneticGrid::MagneticGrid(RandomNumbers* _rng, VEC3D_T B_mag,
 			     std::string s_cell_size, std::string filename)
   {
 
@@ -279,11 +279,11 @@ namespace IGCascade
     /*
       Algorithm as follows:
         1) Check if ICoord defined
-	2) If not, open file for reading, if ICoord in file, copy whole file
-	   into MagField map, return approp B value.
-	3) If ICoord not in file, open file for reading, copy whole file into
-	   MagField Map, close for reading, lock immediately, open for writing,
-	   define B value at this ICoord, write map to file, lock/close.
+        2) If not, open file for reading, if ICoord in file, copy whole file
+          into MagField map, return approp B value.
+        3) If ICoord not in file, open file for reading, copy whole file into
+          MagField Map, close for reading, lock immediately, open for writing,
+          define B value at this ICoord, write map to file, lock/close.
     */
 
   {

@@ -52,7 +52,6 @@ namespace PhysConst {
   const VEC3D_T OMEGA_L = 0.7 - OMEGA_R;        // Omega lambda
   const VEC3D_T OMEGA_0 = OMEGA_M+OMEGA_R+OMEGA_L;
   
-  
 }
 
 #endif // PHYSICSCONSTANTS_H

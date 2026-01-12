@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <omp.h>
 
 
 using namespace std;
@@ -32,9 +33,10 @@ void InitializeEBL(string& ebl_modelname, DIRBR& ebl)
   ifstream model;
   model.open(ebl_modelname.c_str());
   
-  if (model == NULL) {
+  //if (model == NULL) {
+  if (!model.is_open()) {
     std::cerr << "ERROR: could not open EBL model file: " << ebl_modelname 
-	      << std::endl;
+        << std::endl;
     exit(EXIT_FAILURE);
   }
   
@@ -99,11 +101,25 @@ int main(int argc, char** argv) {
   char* progname = *argv;
   argc--,argv++;
 
+  // Check for help option
+  if (argc == 1 && (std::string(argv[0]) == "-h" || std::string(argv[0]) == "--help")) {
+    std::cout << "Usage: " << progname << " EBLModel redshift egy_low egy_high [num_threads]\n\n"
+              << "Arguments:\n"
+              << "  EBLModel     : Name of the EBL model file (e.g., EBLModel4msld)\n"
+              << "  redshift     : Maximum redshift value (e.g., 0.3)\n"
+              << "  egy_low      : Minimum energy in TeV (e.g., 0.01)\n"
+              << "  egy_high     : Maximum energy in TeV (e.g., 10.0)\n"
+              << "  num_threads  : Optional number of threads for parallel computation (default: 1)\n\n"
+              << "Example: " << progname << " EBLModel4msld 0.3 0.01 10.0 4\n"
+              << "This generates optDepth_EBLModel4msld_z0.3_0.01TeV_10.0TeV.txt\n";
+    exit(0);
+  }
+
   // Simple get options:
-  if( argc != 4) {
-  cerr<<"ERROR! Please use 4 inputs. Ex: \n  "<<progname<<
-    " EBLModel4msld redshift egy_low [TeV] egy_high [TeV] \n";
-  exit(EXIT_FAILURE);
+  if( argc < 4 || argc > 5) {
+    std::cerr << "ERROR! Requires 4 or 5 arguments. Use -h or --help for usage information.\n"
+              << "Example: " << progname << " EBLModel4msld 0.3 0.01 10.0 [num_threads]\n";
+    exit(EXIT_FAILURE);
   }
   string eblmodel = *argv;
   argv++;
@@ -125,13 +141,19 @@ int main(int argc, char** argv) {
   argv++;
   double egyHi = 0.0;
   ss_ehi >> egyHi;
+
+  int num_threads = 1;
+  if (argc == 5) {
+    string s_threads = *argv;
+    istringstream ss_threads(s_threads);
+    ss_threads >> num_threads;
+  }
+  omp_set_num_threads(num_threads);
   ///////////////////////////////////////////////////////
-    
 
   string outfilename = 
-    "optDepth_"+eblmodel+"_z"+s_z+"_"+s_egyLo+"TeV_"+s_egyHi+"TeV.txt";
+    "optDepth_"+eblmodel+"_z"+s_z+"_"+s_egyLo+"TeV_"+s_egyHi+"TeV_"+to_string(num_threads)+"cores.txt";
   
-
   /////////////////////////////////////////////////////////////
   /////////// Set up Egy, z binning   /////////////////////////
   /////////////////////////////////////////////////////////////
@@ -151,18 +173,22 @@ int main(int argc, char** argv) {
     outfile<<zBinsVec[iz]<<" ";
   outfile<<endl;
 
+  std::cout<<"Calculating optical depth table..."<<endl;
+  std::cout<<"[tau], [energy TeV], [redshift]"<<endl;
   for(unsigned iegy = 0; iegy<egyBinsVec.size(); iegy++) {
     double egy = egyBinsVec[iegy];
     outfile<<egy<<" ";
+    vector<double> taus(zBinsVec.size());
+    
+    #pragma omp parallel for
     for(unsigned iz = 0; iz<zBinsVec.size(); iz++) {
       double redshift = zBinsVec[iz];
-
-      double tau = ebl.OpticalDepth(egy,redshift);      
-      //outfile << tau <<" "<<egy<<" "<<redshift<<endl;
-      outfile<<tau<<" ";
-      cout<< tau <<" "<<egy<<" "<<redshift<<endl;
+      taus[iz] = ebl.OpticalDepth(egy,redshift);
+      #pragma omp critical
+      std::cout<< taus[iz] <<" "<<egy<<" "<<redshift<<std::endl;
     }
-    outfile<<endl;
+    for(auto tau : taus) outfile<<tau<<" ";
+      outfile<<endl;
   }
   outfile.close();
   

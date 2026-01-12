@@ -5,18 +5,20 @@ MAKE=/usr/bin/make
 ECHO=echo
 
 # -----------------------------------------------------------------------------
-# Root
+# HDF5
 # -----------------------------------------------------------------------------
-ROOTCFLAGS = `root-config --cflags`
-ROOTLIBS   = `root-config --libs`
+HDF5_CFLAGS = `pkg-config --cflags hdf5`
+HDF5_LIBS   = `pkg-config --libs hdf5` -lhdf5_cpp
 
 #--------------------------------------
 # lib and include directories
 #--------------------------------------
 # qd/dd directory:
 #QDLIB = qd_dd/build_hammer_2014_Nov_13_2.3.13/lib
+QDLIB = /usr/local/lib/
+QDINC = /usr/local/include/
 UTILDIR = utilities/
-EBLDIR   = ebl/
+EBLDIR  = ebl/
 
 # Archive
 AR=ar
@@ -30,7 +32,7 @@ SRC=source/
 # Compiler
 CC=gcc
 CPP=g++
-CFLAGS= -g -Wall -O3
+CFLAGS= -g -Wall -O3 -std=c++11 $(HDF5_CFLAGS)
 # -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 
 #-----------Use this version if running gprof/gdb-----------
@@ -41,7 +43,7 @@ CFLAGS= -g -Wall -O3
 CFLAGS += -I$(QDINC) -I$(INCLUDE) -I$(UTILDIR) -I$(EBLDIR)
 
 # common libraries
-LIBS= $(ROOTLIBS) -lProp -lqd -lpthread -lEBL -lUtility
+LIBS= $(HDF5_LIBS) -lProp -lqd -lpthread -lEBL -lUtility
 LDFLAGS= -L$(LIBLOCAL) -L$(EBLDIR) -L$(UTILDIR) -L$(QDLIB)
 OBJLIBS=libUtility.a libEBL.a
 
@@ -53,7 +55,7 @@ OBJ = $(subst $(SRC), $(OBJDIR), $(patsubst %.cpp, %.o, $(wildcard $(SRC)*.cpp))
 all: $(TARGETS)
 
 run_sim_cascade: run_sim_cascade.o $(LIBLOCAL)libProp.a $(OBJLIBS)
-	$(CPP) $(LDFLAGS) -o $@ $< $(LIBS)
+	$(CPP) $(LDFLAGS) $< $(LIBS) $(HDF5_LIBS) -Iinclude/ -o $@
 	mv $< $(OBJDIR)
 
 $(LIBLOCAL)libProp.a: $(OBJ)
@@ -74,8 +76,7 @@ clean:
 	$(MAKE) clean -C $(EBLDIR)
 
 $(OBJDIR)%.o: $(SRC)%.cpp
-	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $< -o $@
+	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -o $@ -Iinclude/
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $(ROOTCFLAGS) -c $<
-
+	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -Iinclude/
