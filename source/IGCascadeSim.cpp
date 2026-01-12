@@ -2,22 +2,26 @@
 -------------------------------------------------------------------------------
     \file   IGCascadeSim.cpp
 
-    Class than stores all variables related to intergalactic
+    Class that stores all variables related to intergalactic
     simulations. Also runs all qed processes.
 
     \author   Timothy C. Arlen                      \n
               Department of Physics and Astronomy   \n
               UCLA                                  \n
 	            arlen@astro.ucla.edu                  \n
+              timothyarlen@gmail.com                \n
 
-    \date      May 20, 2012                          \n
+    \date     May 20, 2012                          \n
 
     \revision v1.1  April 19, 2013
               Fairly major revision, by replacing all output to text
               files with all output to ROOT files, using mostly
               TTree.  This also requires rewrites of the intermediate
-              scripts to convert the raw output from teh simulatios
+              scripts to convert the raw output from the simulations
               into the workable rootfiles per model of EBL,z,B,Lcoh.
+    \revision v1.2  Jan 11, 2026
+              Updated to replace ROOT and add HDF5 output functionality. 
+              Also added option to set RNG seed for reproducibility.
 -------------------------------------------------------------------------------
 */
 
@@ -69,10 +73,11 @@ namespace IGCascade
 
     DefineRp();
 
-    int file_num = atoi(file_count.c_str());
-    // m_rng = new TRandom3(0);
-    // m_rng->SetSeed(file_num);
-    m_rng = new RandomNumbers(0.0, 1.0);
+    if(m_seed_provided) {
+        m_rng = new RandomNumbers(0.0, 1.0, m_seed_value);
+    } else {
+        m_rng = new RandomNumbers(0.0, 1.0);
+    }
     m_BFieldGrid = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
     m_pspace = new PairProduction(m_rng, m_ze);
     m_kspace = new KleinNishina(m_rng);
@@ -104,6 +109,14 @@ namespace IGCascade
     if(opt->getValue("gam_egy_min") != NULL) m_egy_gamma_min = opt->getValue("gam_egy_min");
     if(opt->getValue("lep_egy_min") != NULL) m_egy_lepton_min = opt->getValue("lep_egy_min");
 
+    // Seed option:
+    m_seed_provided = false;
+    m_seed_value = 0;
+    if(opt->getValue("seed") != NULL) {
+        m_seed_value = atoi(opt->getValue("seed"));
+        m_seed_provided = true;
+    }
+
     // Convert to eV:
     m_egy_gamma_min *= 1.0e9*0.99;
     m_egy_lepton_min *= 1.0e9;
@@ -129,6 +142,7 @@ namespace IGCascade
     cout<<"   --single_gen:    "<<m_single_gen_bool<<endl;
     cout<<"   --trk_delay:     "<<m_trk_delay_bool<<endl;
     cout<<"   --trk_leptons:   "<<m_trk_leptons_bool<<endl;
+    cout<<"   --seed:          "<< (m_seed_provided ? std::to_string(m_seed_value) : "not provided (unseeded)") <<endl;
     cout<<"-------------------------------------"<<endl<<endl;
 
   }
@@ -142,17 +156,9 @@ namespace IGCascade
 		    const string& output_dir)
   {
     string filename = output_dir+s_eblmodel+"_"+s_egy+"GeV_z"+s_ze+"_B"+s_Bmag+"_L"+
-      s_cellsize+"_"+s_file_num+".root";
+      s_cellsize+"_"+s_file_num+".h5";
 
-    m_secPhotonTree = new TTree("Secondary","egyPrim,egySec,theta,phi,time,thetap,xi,weight");
-    m_secPhotonTree->Branch("egyPrim",&m_egyPrim,"egyPrim/D");
-    m_secPhotonTree->Branch("egySec",&m_egySec,"egySec/D");
-    m_secPhotonTree->Branch("theta",&m_theta,"theta/D");
-    m_secPhotonTree->Branch("phi",&m_phi,"phi/D");
-    m_secPhotonTree->Branch("time",&m_time,"time/D");
-    m_secPhotonTree->Branch("thetap",&m_thetap,"thetap/D");
-    m_secPhotonTree->Branch("xi",&m_xi,"xi/D");
-    m_secPhotonTree->Branch("weight",&m_weight,"weight/D");
+    // HDF5 dataset will be created when first writing
 
     return filename;
   }
@@ -163,6 +169,19 @@ namespace IGCascade
 	       const string& s_cellsize, const string& s_ze)
   {
     string MFfilename=mf_dir+"MagneticGrid_B"+s_Bmag+"_L"+s_cellsize+"_z"+s_ze+".txt";
+
+    // Ensure the directory exists
+    string dir = mf_dir;
+    if (!dir.empty() && dir.back() == '/') dir.pop_back();
+    system(("mkdir -p " + dir).c_str());
+
+    // Create the file if it does not exist
+    std::ifstream check(MFfilename.c_str());
+    if (!check.good()) {
+      std::ofstream create(MFfilename.c_str());
+      create.close();
+      cout << "Creating magnetic field file: " << MFfilename << endl;
+    }
     return MFfilename;
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -185,11 +204,9 @@ namespace IGCascade
 			const string& output_dir)
   {
     string filename = output_dir+"TrackLeptons_"+s_eblmodel+"_"+s_egy+"GeV_z"+
-      s_ze+"_B"+s_Bmag+"_L"+s_cellsize+"_"+s_file_num+".root";
+      s_ze+"_B"+s_Bmag+"_L"+s_cellsize+"_"+s_file_num+".h5";
 
-    // Overwrite existing
-    TFile* rootfile = new TFile(filename.c_str(),"RECREATE");
-    rootfile->Close();
+    // HDF5 file will be created when first writing
     ofstream ofile(m_track_time_delay_file.c_str()); // Overwrite existing
     ofile.close();
 
@@ -353,9 +370,7 @@ namespace IGCascade
     std::cerr<<"\nStart Time: "<<ctime(&curr)<<std::endl<<std::endl;
     //----------------------------------------------
 
-    // Overwrite Existing:
-    TFile* rootfilePhotonList = new TFile(m_cascade_file.c_str(),"RECREATE");
-    rootfilePhotonList->Close();
+    // Overwrite Existing: (HDF5 will create new file)
 
     m_globalLeptonNum = 0;
     for (int i=1; i<=numIterations; i++) {
@@ -367,11 +382,8 @@ namespace IGCascade
 
     } // End loop over iterations
 
-    // Saving Tree to rootfile:
-    rootfilePhotonList = new TFile(m_cascade_file.c_str(),"UPDATE");
-    m_secPhotonTree->Write();
-    rootfilePhotonList->Close();
-    delete rootfilePhotonList;
+    // Saving data to HDF5 file:
+    WriteSecPhotonsToHDF5();
 
     //----------Print End Time----------
     double seconds = difftime(time(0),curr);
@@ -679,18 +691,8 @@ namespace IGCascade
     oss_tag << Lepton->m_tag;
     cout<<"  tag: "<<Lepton->m_tag;
     string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
-    cout<<"...Creating electron tree: "<<treeName<<endl;
-    TTree* elecTree = new TTree(treeName.c_str(),"redshift,egy,px,py,pz,time,rx,ry,rz");
-    //elecTree->SetDirectory(0);
-    elecTree->Branch("redshift",&Lepton->m_tz,"redshift/D");
-    elecTree->Branch("egy",&Lepton->m_tegy,"egy/D");
-    elecTree->Branch("px",&Lepton->m_tpx,"px/D");
-    elecTree->Branch("py",&Lepton->m_tpy,"py/D");
-    elecTree->Branch("pz",&Lepton->m_tpz,"pz/D");
-    elecTree->Branch("time",&Lepton->m_ttime,"time/D");
-    elecTree->Branch("rx",&Lepton->m_trx,"rx/D");
-    elecTree->Branch("ry",&Lepton->m_try,"ry/D");
-    elecTree->Branch("rz",&Lepton->m_trz,"rz/D");
+    cout<<"...Initializing lepton data vector: "<<treeName<<endl;
+    m_leptonData[treeName] = std::vector<LeptonData>();
 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -702,12 +704,49 @@ namespace IGCascade
     ostringstream oss_tag;
     oss_tag << Lepton->m_tag;
     string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
-    TTree* elecTree = (TTree*)gDirectory->Get(treeName.c_str());
-    TFile* rootfile = new TFile(m_save_lepton_file.c_str(),"UPDATE");
-    elecTree->Write();
-    rootfile->Close();
-    delete rootfile;
-    delete elecTree;
+    
+    auto& data = m_leptonData[treeName];
+    if (data.empty()) return;
+
+    try {
+      // Open or create HDF5 file
+      H5File file;
+      if (H5File::isHdf5(m_save_lepton_file)) {
+        file.openFile(m_save_lepton_file, H5F_ACC_RDWR);
+      } else {
+        file = H5File(m_save_lepton_file, H5F_ACC_TRUNC);
+      }
+
+      // Define compound datatype for LeptonData
+      CompType leptonType(sizeof(LeptonData));
+      leptonType.insertMember("redshift", HOFFSET(LeptonData, redshift), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("egy", HOFFSET(LeptonData, egy), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("px", HOFFSET(LeptonData, px), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("py", HOFFSET(LeptonData, py), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("pz", HOFFSET(LeptonData, pz), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("time", HOFFSET(LeptonData, time), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("rx", HOFFSET(LeptonData, rx), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("ry", HOFFSET(LeptonData, ry), PredType::NATIVE_DOUBLE);
+      leptonType.insertMember("rz", HOFFSET(LeptonData, rz), PredType::NATIVE_DOUBLE);
+
+      // Create dataspace
+      hsize_t dims[1] = {data.size()};
+      DataSpace dataspace(1, dims);
+
+      // Create dataset
+      DataSet dataset = file.createDataSet(treeName, leptonType, dataspace);
+
+      // Write data
+      dataset.write(data.data(), leptonType);
+
+      file.close();
+    } catch (FileIException& error) {
+      error.printErrorStack();
+    } catch (DataSetIException& error) {
+      error.printErrorStack();
+    } catch (DataSpaceIException& error) {
+      error.printErrorStack();
+    }
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -755,24 +794,12 @@ namespace IGCascade
 			   RelParticle* Positron)
   {
 
-    //#ifdef DEBUG
-    //cout<<"Propagating SECONDARY photon through EBL...";
-    //#endif
     if (m_single_gen_bool) {
       PropagatePhotonToObserver(GammaPhoton);
       return false;
     }
     double z_min = GetMinZ(GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z);
     VEC3D_T z_emit = GammaPhoton.m_z;
-
-    //if (FORCE_SINGLE_GEN) {
-    //VEC3D_T delta_z = (z_emit - z_min);
-    //bool pair_prod = m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4,
-    //						   GammaPhoton.m_r4,
-    //				  GammaPhoton.m_z,GammaPhoton.m_z_s,
-    //				  delta_z);
-    //return false;
-    //}
 
     double tot_lambda_int = 0.0;
     VEC3D_T z_int = "0.0";
@@ -861,7 +888,6 @@ namespace IGCascade
     VEC3D_T zi = gam_ph_z - z_step/2.0;  // Midway between z[0] & z[1].
     int steps = 0;
     // integrate using simple simpson's midpoint method
-    //std::cout<<"m_R_0: "<<m_R_0<<" R2: "<<R2<<std::endl;
     while(R_test < R2) {  // integrate until you reach the distance of R2.
       zi -= z_step;
       z1 = (1.0 + zi);
@@ -881,15 +907,8 @@ namespace IGCascade
   void IGCascadeSim::PropagateLepton(stack<RelParticle*>& lepton_stack, 
 				     RelParticle& GammaPhoton)
   {
-
-    //#ifdef DEBUG
-    //#endif
-
     RelParticle* Lepton = lepton_stack.top();
     lepton_stack.pop();
-    //cout<<"Propagating Lepton, at z = "<<Lepton->m_z_s<<" egy: "<<
-    //Lepton->m_p4.r0<<endl;
-    //cout<<"Propagating Lepton, tag = "<<Lepton->m_tag<<" egy: "<<Lepton->m_p4.r0<<endl;
 
     VEC3D_T Ecmb_e = m_egy_cmb*(1.0+Lepton->m_z);
     VEC3D_T PL=m_kspace->PropagationLengthCMBandIR(m_ebl, Ecmb_e,Lepton->m_p4,
@@ -939,15 +958,7 @@ namespace IGCascade
     if(GammaPhoton.m_z_s > 1.0e-15) { // Should never happen
       cerr<<"\nWARNING: Caught z_s=0 photon with z_s > 1E-15!\n"<<endl;
       cerr<<"z_s: "<<GammaPhoton.m_z_s<<" egy: "<<GammaPhoton.m_p4.r0<<endl;
-    }
-    
-    //if (GammaPhoton.m_p4.r0 >= m_egy_gamma_min) {
-      //WritePhotonToFile(PhotonList, GammaPhoton.m_p4, 
-      //		GammaPhoton.m_r4, GammaPhoton.m_weight);
-    //}
-    // else 
-    //if(SAVE_LOW_EGY) SaveToLowEnergyFile(GammaPhoton);
-    
+    }    
 
   }
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -959,27 +970,28 @@ namespace IGCascade
     //VEC3D_T EPS = 1.0E-25;
     Vec3D e_r = gam_ph_r4.r/gam_ph_r4.r.Norm();
     Vec3D e_p = gam_ph_p4.r/gam_ph_p4.r.Norm();
-    m_theta   = 0.0;
-    m_phi     = 0.0;
+    double theta = 0.0;
+    double phi = 0.0;
     //VEC3D_T DE = "1.0e-25";
     // To account for the case of zero interactions:
     if(fabs(e_r.x) > m_DE || fabs(e_r.y) > m_DE ) {
-      m_theta = Double(atan2(sqrt(e_r.x*e_r.x + e_r.y*e_r.y),e_r.z));
-      m_phi = Double(atan2(e_r.y,e_r.x));
+      theta = Double(atan2(sqrt(e_r.x*e_r.x + e_r.y*e_r.y),e_r.z));
+      phi = Double(atan2(e_r.y,e_r.x));
     }
-    m_thetap  = 0.0;
-    double phi_p   = 0.0;
+    double thetap = 0.0;
+    double phi_p = 0.0;
     if(fabs(e_p.x) > m_DE || fabs(e_p.y) > m_DE) {
       phi_p= Double(atan2(e_p.y,e_p.x));
-      m_thetap = Double(atan2(sqrt(e_p.x*e_p.x + e_p.y*e_p.y),e_p.z));
+      thetap = Double(atan2(sqrt(e_p.x*e_p.x + e_p.y*e_p.y),e_p.z));
     }
-    m_xi = m_phi - phi_p;
+    double xi = phi - phi_p;
 
-    m_time = Double(gam_ph_r4.r0);
-    m_egyPrim = Double(m_egy_cascade);
-    m_egySec = Double(gam_ph_p4.r0);
-    m_weight = weight;
-    m_secPhotonTree->Fill();
+    double time = Double(gam_ph_r4.r0);
+    double egyPrim = Double(m_egy_cascade);
+    double egySec = Double(gam_ph_p4.r0);
+    double w = weight;
+    SecPhoton sp = {egyPrim, egySec, theta, phi, time, thetap, xi, w};
+    m_secPhotons.push_back(sp);
 
     //stream<<gam_ph_p4.r0 <<" "<<theta<<" "<<phi<<" "<<
     //gam_ph_r4.r0<<" "<<theta_p<<" "<<xi<<" "<<weight <<std::endl;
@@ -1001,6 +1013,47 @@ namespace IGCascade
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
 
+  void IGCascadeSim::WriteSecPhotonsToHDF5()
+  {
+    if (m_secPhotons.empty()) return;
+
+    try {
+      // Create HDF5 file
+      H5File file(m_cascade_file, H5F_ACC_TRUNC);
+
+      // Define compound datatype for SecPhoton
+      CompType secPhotonType(sizeof(SecPhoton));
+      secPhotonType.insertMember("egyPrim", HOFFSET(SecPhoton, egyPrim), PredType::NATIVE_DOUBLE);
+      secPhotonType.insertMember("egySec", HOFFSET(SecPhoton, egySec), PredType::NATIVE_DOUBLE);
+      secPhotonType.insertMember("theta", HOFFSET(SecPhoton, theta), PredType::NATIVE_DOUBLE);
+      secPhotonType.insertMember("phi", HOFFSET(SecPhoton, phi), PredType::NATIVE_DOUBLE);
+      secPhotonType.insertMember("time", HOFFSET(SecPhoton, time), PredType::NATIVE_DOUBLE);
+      secPhotonType.insertMember("thetap", HOFFSET(SecPhoton, thetap), PredType::NATIVE_DOUBLE);
+      secPhotonType.insertMember("xi", HOFFSET(SecPhoton, xi), PredType::NATIVE_DOUBLE);
+      secPhotonType.insertMember("weight", HOFFSET(SecPhoton, weight), PredType::NATIVE_DOUBLE);
+
+      // Create dataspace
+      hsize_t dims[1] = {m_secPhotons.size()};
+      DataSpace dataspace(1, dims);
+
+      // Create dataset
+      DataSet dataset = file.createDataSet("Secondary", secPhotonType, dataspace);
+
+      // Write data
+      dataset.write(m_secPhotons.data(), secPhotonType);
+
+      file.close();
+    } catch (FileIException& error) {
+      error.printErrorStack();
+    } catch (DataSetIException& error) {
+      error.printErrorStack();
+    } catch (DataSpaceIException& error) {
+      error.printErrorStack();
+    }
+  }
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+
+
   void IGCascadeSim::SaveLepton(RelParticle* Lepton)
   {
     
@@ -1016,7 +1069,6 @@ namespace IGCascade
     ostringstream oss_tag;
     oss_tag << Lepton->m_tag;
     string treeName = "electron_"+oss_tag.str()+"_q"+oss_q.str();
-    TTree* elecTree = (TTree*)gDirectory->Get(treeName.c_str());
     //cout<<"  z: "<<Lepton->m_z<<" time: "<<Lepton->m_r4.r0<<endl; 
     //cout<<"  Filling tree: "<<treeName<<endl;
     Lepton->m_tz = Double(Lepton->m_z);
@@ -1033,7 +1085,9 @@ namespace IGCascade
     //cout<<" "<<Lepton->m_ttime;
     //cout<<" "<<Lepton->m_trx<<" "<<Lepton->m_try<<" "<<Lepton->m_trz;
     
-    elecTree->Fill();
+    LeptonData ld = {Lepton->m_tz, Lepton->m_tegy, Lepton->m_tpx, Lepton->m_tpy, Lepton->m_tpz, Lepton->m_ttime, Lepton->m_trx, Lepton->m_try, Lepton->m_trz};
+    m_leptonData[treeName].push_back(ld);
+    
     //cout<<"...Filled."<<endl;
     
   }

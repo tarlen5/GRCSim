@@ -57,6 +57,7 @@ AnyOption* DefineOptions(int argc, char* argv[], const string& progname)
   opt->addUsage(" --output_dir    (cwd)      Directory to output files.");
   opt->addUsage(" --gam_egy_min    0.1 min energy [GeV] to track gammas.");
   opt->addUsage(" --lep_egy_min    75. min energy [GeV] to track leptons.");
+  opt->addUsage(" --seed           <uint32_t> Random number seed for reproducibility.");
 
   opt->addUsage(" --mf_no_lock    No locking of mf files, so cosmic variance is not preserved in simulation. ");
   opt->addUsage(" --single_gen    Forces single generation of cascade.");
@@ -69,6 +70,9 @@ AnyOption* DefineOptions(int argc, char* argv[], const string& progname)
   opt->setOption("mf_dir");
   opt->setOption("opt_depth_dir");
   opt->setOption("output_dir");
+  opt->setOption("gam_egy_min");
+  opt->setOption("lep_egy_min");
+  opt->setOption("seed");
   opt->setFlag("mf_no_lock");
   opt->setFlag("single_gen");
   opt->setFlag("trk_delay");

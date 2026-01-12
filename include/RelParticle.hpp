@@ -32,7 +32,6 @@
 #include<cmath>
 
 #include<qd/dd_real.h>
-#include <TROOT.h>
 
 #include "Vec3D.hpp"
 #include "Vec4D.hpp"
@@ -117,15 +116,15 @@ namespace IGCascade
 
     //////////////////////////////////////////////////////////
     //////////// 9 Branches for Track Lepton Tree ////////////
-    Double_t m_tz;
-    Double_t m_tegy;
-    Double_t m_tpx;
-    Double_t m_tpy;
-    Double_t m_tpz;
-    Double_t m_ttime;
-    Double_t m_trx;
-    Double_t m_try;
-    Double_t m_trz;
+    double m_tz;
+    double m_tegy;
+    double m_tpx;
+    double m_tpy;
+    double m_tpz;
+    double m_ttime;
+    double m_trx;
+    double m_try;
+    double m_trz;
 
 
   private:

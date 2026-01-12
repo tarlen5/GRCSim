@@ -16,3 +16,9 @@ MagneticFieldFiles/*
 
 # all ROOT files:
 *.root
+
+# all HDF5 files:
+*.h5
+
+# analysis directory
+analysis/
