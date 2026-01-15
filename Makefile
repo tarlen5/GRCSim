@@ -55,10 +55,10 @@ OBJ = $(subst $(SRC), $(OBJDIR), $(patsubst %.cpp, %.o, $(wildcard $(SRC)*.cpp))
 all: $(TARGETS)
 
 run_sim_cascade: run_sim_cascade.o $(LIBLOCAL)libProp.a $(OBJLIBS)
-	$(CPP) $(LDFLAGS) $< $(LIBS) $(HDF5_LIBS) -Iinclude/ -o $@
+	$(CPP) $(LDFLAGS) $< $(LIBS) $(HDF5_LIBS) -I$(INCLUDE) -o $@
 	mv $< $(OBJDIR)
 
-$(LIBLOCAL)libProp.a: $(OBJ)
+$(LIBLOCAL)libProp.a: $(LIBLOCAL) $(OBJ)
 	$(AR) -rc $(LIBLOCAL)libProp.a $(OBJ)
 
 libUtility.a:
@@ -68,15 +68,20 @@ libEBL.a:
 	$(MAKE) -C $(EBLDIR)
 
 $(OBJDIR):
-	mkdir $(OBJDIR)
+	mkdir -p $(OBJDIR)
+
+$(LIBLOCAL):
+	mkdir -p $(LIBLOCAL)
+
 clean:
-	$(RM) -r lib/*.a $(TARGETS) *~ *.o
+	$(RM) -r $(LIBLOCAL)*.a $(TARGETS) *~ *.o
 	$(RM) -rf $(OBJDIR)
 	$(MAKE) clean -C $(UTILDIR)
 	$(MAKE) clean -C $(EBLDIR)
 
 $(OBJDIR)%.o: $(SRC)%.cpp
-	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -o $@ -Iinclude/
+	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -o $@ -I$(INCLUDE)
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -Iinclude/
+	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -I$(INCLUDE)
+	
