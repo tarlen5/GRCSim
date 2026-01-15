@@ -7,7 +7,7 @@ Monte Carlo simulation of gamma-ray initiated electromagnetic cascades in interg
 
 Relies on two external dependencies:
 
-1. The qd library, which can be obtained here: http://crd-legacy.lbl.gov/~dhbailey/mpdist/. To install the qd library, download the `.tar.gz` file from the above webpage and perform the following steps:
+1. The qd library, which can be obtained from [this repository](https://github.com/BL-highprecision/QD). To install the qd library, read the instructions to set up autoconfig on your system, then perform the following steps:
     ```
     ./configure
     make
@@ -17,7 +17,6 @@ Relies on two external dependencies:
   - `QDLIB=/usr/local/lib` (or wherever the file `libqd.so` is located after install)
   - `QDINC=/usr/local/include` (or wherever the file `qd/dd_real.h` is located after install)
 
-~~2. The cern ROOT library, which can be obtained here: http://root.cern.ch/drupal/content/downloading-root. As of 18 Oct 2023, installing the most recent version of ROOT (6.28.06).~~
 2. The HDF5 library for storing data, which can be installed on most operating systems easily.
 
 
