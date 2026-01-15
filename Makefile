@@ -55,7 +55,7 @@ OBJ = $(subst $(SRC), $(OBJDIR), $(patsubst %.cpp, %.o, $(wildcard $(SRC)*.cpp))
 all: $(TARGETS)
 
 run_sim_cascade: run_sim_cascade.o $(LIBLOCAL)libProp.a $(OBJLIBS)
-	$(CPP) $(LDFLAGS) $< $(LIBS) $(HDF5_LIBS) -Iinclude/ -o $@
+	$(CPP) $(LDFLAGS) $< $(LIBS) $(HDF5_LIBS) -I$(INCLUDE) -o $@
 	mv $< $(OBJDIR)
 
 $(LIBLOCAL)libProp.a: $(LIBLOCAL) $(OBJ)
@@ -80,7 +80,8 @@ clean:
 	$(MAKE) clean -C $(EBLDIR)
 
 $(OBJDIR)%.o: $(SRC)%.cpp
-	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -o $@ -Iinclude/
+	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -o $@ -I$(INCLUDE)
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -Iinclude/
+	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -I$(INCLUDE)
+	
