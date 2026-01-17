@@ -2,40 +2,39 @@
 
 /*! \file vec4D.cpp
   vec4D class implementation file
-  
+
   \author   Stephen Fegan             \n
             UCLA                      \n
-	    sfegan@astro.ucla.edu     \n
+      sfegan@astro.ucla.edu     \n
 
   \author   Vladimir Vassiliev        \n
             UCLA                      \n
-	    vvv@astro.ucla.edu        \n
-  
+      vvv@astro.ucla.edu        \n
+
   \author	Yusef Shafi
-			UCLA
-		yshafi@ucla.edu
-		
+      UCLA
+    yshafi@ucla.edu
+
   \date     07/25/2006
   \version  1.2
   \note
-			We change all doubles to double-double precision
-			using dd lib. We also add a new boost function that
-			takes a velocity four vector.
+      We change all doubles to double-double precision
+      using dd lib. We also add a new boost function that
+      takes a velocity four vector.
 */
 
 /*! \example exmp_vec4D.cpp
     This is an example of how to use this class
  */
 
-//#include<qd/dd.h>
+// #include<qd/dd.h>
 
 #include "Vec4D.hpp"
 
 using namespace IGCascade;
 
 /// Print vector components and vector norm in square
-void Vec4D::Dump(std::ostream& stream) const
-{
+void Vec4D::Dump(std::ostream &stream) const {
   stream << std::endl;
   stream << " .T:   " << r0 << std::endl;
   stream << " .X:   " << r.x << std::endl;
@@ -44,19 +43,16 @@ void Vec4D::Dump(std::ostream& stream) const
   stream << "Norm2: " << Norm2() << std::endl;
 }
 
-
-//Original Dump Short
-//void Vec4D::DumpShort(std::ostream& stream) const
+// Original Dump Short
+// void Vec4D::DumpShort(std::ostream& stream) const
 //{
-//  stream << "( " << r0 << ", " << r.x << ", " << r.y << ", " << r.z << " )";
-//}
+//   stream << "( " << r0 << ", " << r.x << ", " << r.y << ", " << r.z << " )";
+// }
 
-//New Dump Short 6/30
-void Vec4D::DumpShort(std::ostream& stream) const
-{
+// New Dump Short 6/30
+void Vec4D::DumpShort(std::ostream &stream) const {
   stream << r0 << ", " << r.x << ", " << r.y << ", " << r.z;
 }
-
 
 /*
 #ifdef TESTMAIN
@@ -75,8 +71,8 @@ int main()
 
   std::cout << "a:" << a << " b:" << b << std::endl;
   std::cout << "a.Norm2():" << a.Norm2() << "  "
-	    << "b.Norm2():" << b.Norm2() << std::endl << std::endl;
-  
+      << "b.Norm2():" << b.Norm2() << std::endl << std::endl;
+
   std::cout << "a+=b: " << (a+=b) << std::endl;
   std::cout << "a:" << a << " b:" << b << std::endl << std::endl;
 
@@ -126,77 +122,93 @@ int main()
 
   std::cout << "c=b=a=():" << (c=b=a=Vec4D()) << std::endl;
   std::cout << "a:" << a << " b:" << b << " c:" << c << std::endl << std::endl;
-  
-  std::cout << "c=b=(a=())+(1,2,0,0)):" 
-	    << (c=b=(a=Vec4D())+Vec4D(1,2,0,0)) << std::endl;
+
+  std::cout << "c=b=(a=())+(1,2,0,0)):"
+      << (c=b=(a=Vec4D())+Vec4D(1,2,0,0)) << std::endl;
   std::cout << "a:" << a << " b:" << b << " c:" << c << std::endl << std::endl;
 
   std::cout << "a=(1,1,0,0):" << (a=Vec4D(1,1,0,0)) << std::endl;
   std::cout << "b=(1,0,-1,0):" << (b=Vec4D(1,0,-1,0)) << std::endl;
   std::cout << "c=a+b:" << (c=a+b) << std::endl;
   std::cout << "a:" << a << " b:" << b << " c:" << c << std::endl << std::endl;
-  
+
   std::cout << "c=a-b:" << (c=a-b) << std::endl;
   std::cout << "a:" << a << " b:" << b << " c:" << c << std::endl << std::endl;
- 
+
   std::cout << "a*b:" << (a*b) << std::endl;
   std::cout << "a:" << a << " b:" << b << " c:" << c << std::endl << std::endl;
 
-  std::cout << "(3,4,5,6)*(10,0,0,0): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(0,20,0,0): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(0,0,30,0): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(0,0,0,40): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(10,20,0,0): " << (Vec4D(3,4,5,6)*Vec4D(10,20,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(10,0,30,0): " << (Vec4D(3,4,5,6)*Vec4D(10,0,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(10,0,0,40): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)*(0,20,30,0): " << (Vec4D(3,4,5,6)*Vec4D(0,20,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(0,20,0,40): " << (Vec4D(3,4,5,6)*Vec4D(0,20,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)*(0,0,30,40): " << (Vec4D(3,4,5,6)*Vec4D(0,0,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)*(10,20,30,0): " << (Vec4D(3,4,5,6)*Vec4D(10,20,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)*(10,20,0,40): " << (Vec4D(3,4,5,6)*Vec4D(10,20,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)*(10,0,30,40): " << (Vec4D(3,4,5,6)*Vec4D(10,0,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)*(0,20,30,40): " << (Vec4D(3,4,5,6)*Vec4D(0,20,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)*(10,20,30,40): " << (Vec4D(3,4,5,6)*Vec4D(10,20,30,40)) << std::endl;
+  std::cout << "(3,4,5,6)*(10,0,0,0): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) <<
+std::endl; std::cout << "(3,4,5,6)*(0,20,0,0): " <<
+(Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) << std::endl; std::cout <<
+"(3,4,5,6)*(0,0,30,0): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) << std::endl;
+  std::cout << "(3,4,5,6)*(0,0,0,40): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,0)) <<
+std::endl; std::cout << "(3,4,5,6)*(10,20,0,0): " <<
+(Vec4D(3,4,5,6)*Vec4D(10,20,0,0)) << std::endl; std::cout <<
+"(3,4,5,6)*(10,0,30,0): " << (Vec4D(3,4,5,6)*Vec4D(10,0,30,0)) << std::endl;
+  std::cout << "(3,4,5,6)*(10,0,0,40): " << (Vec4D(3,4,5,6)*Vec4D(10,0,0,40)) <<
+std::endl; std::cout << "(3,4,5,6)*(0,20,30,0): " <<
+(Vec4D(3,4,5,6)*Vec4D(0,20,30,0)) << std::endl; std::cout <<
+"(3,4,5,6)*(0,20,0,40): " << (Vec4D(3,4,5,6)*Vec4D(0,20,0,40)) << std::endl;
+  std::cout << "(3,4,5,6)*(0,0,30,40): " << (Vec4D(3,4,5,6)*Vec4D(0,0,30,40)) <<
+std::endl; std::cout << "(3,4,5,6)*(10,20,30,0): " <<
+(Vec4D(3,4,5,6)*Vec4D(10,20,30,0)) << std::endl; std::cout <<
+"(3,4,5,6)*(10,20,0,40): " << (Vec4D(3,4,5,6)*Vec4D(10,20,0,40)) << std::endl;
+  std::cout << "(3,4,5,6)*(10,0,30,40): " << (Vec4D(3,4,5,6)*Vec4D(10,0,30,40))
+<< std::endl; std::cout << "(3,4,5,6)*(0,20,30,40): " <<
+(Vec4D(3,4,5,6)*Vec4D(0,20,30,40)) << std::endl; std::cout <<
+"(3,4,5,6)*(10,20,30,40): " << (Vec4D(3,4,5,6)*Vec4D(10,20,30,40)) << std::endl;
   std::cout << std::endl;
 
-  std::cout << "(3,4,5,6)+(10,0,0,0): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(0,20,0,0): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(0,0,30,0): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(0,0,0,40): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(10,20,0,0): " << (Vec4D(3,4,5,6)+Vec4D(10,20,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(10,0,30,0): " << (Vec4D(3,4,5,6)+Vec4D(10,0,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(10,0,0,40): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)+(0,20,30,0): " << (Vec4D(3,4,5,6)+Vec4D(0,20,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(0,20,0,40): " << (Vec4D(3,4,5,6)+Vec4D(0,20,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)+(0,0,30,40): " << (Vec4D(3,4,5,6)+Vec4D(0,0,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)+(10,20,30,0): " << (Vec4D(3,4,5,6)+Vec4D(10,20,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)+(10,20,0,40): " << (Vec4D(3,4,5,6)+Vec4D(10,20,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)+(10,0,30,40): " << (Vec4D(3,4,5,6)+Vec4D(10,0,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)+(0,20,30,40): " << (Vec4D(3,4,5,6)+Vec4D(0,20,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)+(10,20,30,40): " << (Vec4D(3,4,5,6)+Vec4D(10,20,30,40)) << std::endl;
+  std::cout << "(3,4,5,6)+(10,0,0,0): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) <<
+std::endl; std::cout << "(3,4,5,6)+(0,20,0,0): " <<
+(Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) << std::endl; std::cout <<
+"(3,4,5,6)+(0,0,30,0): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) << std::endl;
+  std::cout << "(3,4,5,6)+(0,0,0,40): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,0)) <<
+std::endl; std::cout << "(3,4,5,6)+(10,20,0,0): " <<
+(Vec4D(3,4,5,6)+Vec4D(10,20,0,0)) << std::endl; std::cout <<
+"(3,4,5,6)+(10,0,30,0): " << (Vec4D(3,4,5,6)+Vec4D(10,0,30,0)) << std::endl;
+  std::cout << "(3,4,5,6)+(10,0,0,40): " << (Vec4D(3,4,5,6)+Vec4D(10,0,0,40)) <<
+std::endl; std::cout << "(3,4,5,6)+(0,20,30,0): " <<
+(Vec4D(3,4,5,6)+Vec4D(0,20,30,0)) << std::endl; std::cout <<
+"(3,4,5,6)+(0,20,0,40): " << (Vec4D(3,4,5,6)+Vec4D(0,20,0,40)) << std::endl;
+  std::cout << "(3,4,5,6)+(0,0,30,40): " << (Vec4D(3,4,5,6)+Vec4D(0,0,30,40)) <<
+std::endl; std::cout << "(3,4,5,6)+(10,20,30,0): " <<
+(Vec4D(3,4,5,6)+Vec4D(10,20,30,0)) << std::endl; std::cout <<
+"(3,4,5,6)+(10,20,0,40): " << (Vec4D(3,4,5,6)+Vec4D(10,20,0,40)) << std::endl;
+  std::cout << "(3,4,5,6)+(10,0,30,40): " << (Vec4D(3,4,5,6)+Vec4D(10,0,30,40))
+<< std::endl; std::cout << "(3,4,5,6)+(0,20,30,40): " <<
+(Vec4D(3,4,5,6)+Vec4D(0,20,30,40)) << std::endl; std::cout <<
+"(3,4,5,6)+(10,20,30,40): " << (Vec4D(3,4,5,6)+Vec4D(10,20,30,40)) << std::endl;
   std::cout << std::endl;
 
-  std::cout << "(3,4,5,6)-(10,0,0,0): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(0,20,0,0): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(0,0,30,0): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(0,0,0,40): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(10,20,0,0): " << (Vec4D(3,4,5,6)-Vec4D(10,20,0,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(10,0,30,0): " << (Vec4D(3,4,5,6)-Vec4D(10,0,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(10,0,0,40): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)-(0,20,30,0): " << (Vec4D(3,4,5,6)-Vec4D(0,20,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(0,20,0,40): " << (Vec4D(3,4,5,6)-Vec4D(0,20,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)-(0,0,30,40): " << (Vec4D(3,4,5,6)-Vec4D(0,0,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)-(10,20,30,0): " << (Vec4D(3,4,5,6)-Vec4D(10,20,30,0)) << std::endl;
-  std::cout << "(3,4,5,6)-(10,20,0,40): " << (Vec4D(3,4,5,6)-Vec4D(10,20,0,40)) << std::endl;
-  std::cout << "(3,4,5,6)-(10,0,30,40): " << (Vec4D(3,4,5,6)-Vec4D(10,0,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)-(0,20,30,40): " << (Vec4D(3,4,5,6)-Vec4D(0,20,30,40)) << std::endl;
-  std::cout << "(3,4,5,6)-(10,20,30,40): " << (Vec4D(3,4,5,6)-Vec4D(10,20,30,40)) << std::endl;
+  std::cout << "(3,4,5,6)-(10,0,0,0): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) <<
+std::endl; std::cout << "(3,4,5,6)-(0,20,0,0): " <<
+(Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) << std::endl; std::cout <<
+"(3,4,5,6)-(0,0,30,0): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) << std::endl;
+  std::cout << "(3,4,5,6)-(0,0,0,40): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,0)) <<
+std::endl; std::cout << "(3,4,5,6)-(10,20,0,0): " <<
+(Vec4D(3,4,5,6)-Vec4D(10,20,0,0)) << std::endl; std::cout <<
+"(3,4,5,6)-(10,0,30,0): " << (Vec4D(3,4,5,6)-Vec4D(10,0,30,0)) << std::endl;
+  std::cout << "(3,4,5,6)-(10,0,0,40): " << (Vec4D(3,4,5,6)-Vec4D(10,0,0,40)) <<
+std::endl; std::cout << "(3,4,5,6)-(0,20,30,0): " <<
+(Vec4D(3,4,5,6)-Vec4D(0,20,30,0)) << std::endl; std::cout <<
+"(3,4,5,6)-(0,20,0,40): " << (Vec4D(3,4,5,6)-Vec4D(0,20,0,40)) << std::endl;
+  std::cout << "(3,4,5,6)-(0,0,30,40): " << (Vec4D(3,4,5,6)-Vec4D(0,0,30,40)) <<
+std::endl; std::cout << "(3,4,5,6)-(10,20,30,0): " <<
+(Vec4D(3,4,5,6)-Vec4D(10,20,30,0)) << std::endl; std::cout <<
+"(3,4,5,6)-(10,20,0,40): " << (Vec4D(3,4,5,6)-Vec4D(10,20,0,40)) << std::endl;
+  std::cout << "(3,4,5,6)-(10,0,30,40): " << (Vec4D(3,4,5,6)-Vec4D(10,0,30,40))
+<< std::endl; std::cout << "(3,4,5,6)-(0,20,30,40): " <<
+(Vec4D(3,4,5,6)-Vec4D(0,20,30,40)) << std::endl; std::cout <<
+"(3,4,5,6)-(10,20,30,40): " << (Vec4D(3,4,5,6)-Vec4D(10,20,30,40)) << std::endl;
   std::cout << std::endl;
 
   std::cout << "-(3,-4,5,-6): " << (-Vec4D(3,-4,5,-6)) << std::endl;
   std::cout << "1.5*(3,4,5,6): " << (1.5*Vec4D(3,4,5,6)) << std::endl;
   std::cout << "(3,4,5,6)*1.5: " << (Vec4D(3,4,5,6)*1.5) << std::endl;
-  std::cout << "(3,4,5,6)/1.5: " << (Vec4D(3,4,5,6)/1.5) << std::endl << std::endl;
+  std::cout << "(3,4,5,6)/1.5: " << (Vec4D(3,4,5,6)/1.5) << std::endl <<
+std::endl;
 
   std::cout << "std::istringstream s(\"(10,11,12,13)\"); s >> a;" << std::endl;
   std::istringstream s("(10,11,12,13)");
