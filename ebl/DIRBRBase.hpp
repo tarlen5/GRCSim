@@ -89,8 +89,10 @@ public:
   virtual double Distance(double &) = 0;
   virtual DIRBR_ERR SetDIRBR(int, double *, double *) = 0; //!< set DIRBR model
   virtual DIRBR_ERR TestDIRBRlimits(void) = 0; //!< test existing direct limits
-  virtual inline void SetCosmology(const double OmegaM, const double OmegaR,
-                                   const double OmegaL, const double Hubble_h) {
+  virtual inline void SetCosmology(
+      const double OmegaM, const double OmegaR, const double OmegaL,
+      const double Hubble_h
+  ) {
     m_OmegaM = OmegaM;
     m_OmegaR = OmegaR;
     m_OmegaL = OmegaL;

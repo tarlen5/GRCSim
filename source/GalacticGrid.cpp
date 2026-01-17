@@ -2,7 +2,7 @@
 -------------------------------------------------------------------------------
   \file     GalacticGrid.cpp
             Propagates charged leptons and photons
-      through cosmological magnetic fields.
+            through cosmological magnetic fields.
 
   \author   Timothy C. Arlen                     \n
             Department of Physics and Astronomy  \n
@@ -10,24 +10,24 @@
             arlen@astro.ucla.edu                 \n
 
   \author   Yusef Shafi                          \n
-            UCLA	                         \n
-      yshafi@ucla.edu	                 \n
-
+            UCLA	                               \n
+            yshafi@ucla.edu	                     \n
   \author   Stephen Fegan                        \n
             UCLA                                 \n
-      sfegan@astro.ucla.edu                \n
+            sfegan@astro.ucla.edu                \n
 
-  \date     03/14/2008
+  \date   03/14/2008
 
-  \version  1.1
+  \version 1.1
 
-  \revision 04/24/2008 - Added Magnetic Field Propagation in Expanding universe
-                         in PropagateMagFieldExpansion() function.
+  \revision
+      04/24/2008 - Added Magnetic Field Propagation in Expanding universe
+                   in PropagateMagFieldExpansion() function.
       02/06/2009 - Completely changed the way I determined if
                    propagation would take electron to a new cell.
 
-  \note     1) IMPORTANT:
-            This function only works properly for
+  \note
+      1) IMPORTANT: This function only works properly for
         - cell_size >= 0.1 Mpc, and for
         - B >= 10E-10
         - Electron Energy > 0.1 TeV
@@ -46,30 +46,28 @@ namespace IGCascade {
 /// Overloaded class constructor (1)
 /// \param _MagneticField: m_MagneticField
 /// \param _rng: rng
-MagneticGrid::MagneticGrid(RandomNumbers *_rng, VEC3D_T B_mag,
-                           std::string s_cell_size, std::string filename) {
+MagneticGrid::MagneticGrid(
+    RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
+    std::string filename
+) {
 
   // public member:
   m_DE = "1.0E-25";
-
-  // Field _MagneticField;
-  // m_MagneticField = _MagneticField;
-
   m_rng = _rng;
 
   // cellsize defined in units of Mpc but converted to cm
   std::istringstream(s_cell_size) >> m_cellsize; // [Mpc]
-  // MpcToCm = 3.086E+24;                         // [cm/Mpc]
+  // MpcToCm = 3.086E+24;                        // [cm/Mpc]
   m_cellsize = m_cellsize * Double(MPC_TO_CM); // [cm]
   m_bmag = B_mag;                              // [gauss]
   m_sfilename = filename;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void MagneticGrid::PropagateBFieldRedshift(RelParticle &Photon,
-                                           RelParticle *&Lepton, Vec3D &n_eo,
-                                           VEC3D_T &PL, VEC3D_T &delta_z,
-                                           const bool LOCK)
+void MagneticGrid::PropagateBFieldRedshift(
+    RelParticle &Photon, RelParticle *&Lepton, Vec3D &n_eo, VEC3D_T &PL,
+    VEC3D_T &delta_z, const bool LOCK
+)
 /* Designed to work with the KleinNishina class. A propagation
    length has been determined and the IC scattered photon and
    lepton are computed, then the lepton and photon are translated
@@ -79,8 +77,7 @@ void MagneticGrid::PropagateBFieldRedshift(RelParticle &Photon,
 
      Photon - The photon which will be rotated and translated
 
-     Lepton - The lepton which will be rotated and
-        translated
+     Lepton - The lepton which will be rotated and translated
 
      n_eo - Lepton direction before IC scat with photon.
 
@@ -140,8 +137,10 @@ void MagneticGrid::PropagateBFieldRedshift(RelParticle &Photon,
 
     if ((Lepton->m_z_s - delta_zs) >= m_DE) { // z_s = 0 surface not crossed
 
-      PropagateConstantMF(Photon, Lepton, m_bmag, PL, r_new, delta_time, n_eo,
-                          delta_z, delta_zs, e_b);
+      PropagateConstantMF(
+          Photon, Lepton, m_bmag, PL, r_new, delta_time, n_eo, delta_z,
+          delta_zs, e_b
+      );
       PL_remain -= PL;
 
     } else { // z_s = 0 surface crossed
@@ -168,8 +167,10 @@ void MagneticGrid::PropagateBFieldRedshift(RelParticle &Photon,
 
       delta_z = GetLeptonDelta_z(PL, Lepton);
 
-      PropagateConstantMF(Photon, Lepton, m_bmag, PL, r_new, delta_time, n_eo,
-                          delta_z, delta_zs, e_b);
+      PropagateConstantMF(
+          Photon, Lepton, m_bmag, PL, r_new, delta_time, n_eo, delta_z,
+          delta_zs, e_b
+      );
       PL_remain = "0.0";
     }
 
@@ -177,8 +178,9 @@ void MagneticGrid::PropagateBFieldRedshift(RelParticle &Photon,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Vec3D MagneticGrid::UpdatePosition(RelParticle *&Lepton, VEC3D_T &PL,
-                                   Vec3D &n_eo, Vec3D &e_b)
+Vec3D MagneticGrid::UpdatePosition(
+    RelParticle *&Lepton, VEC3D_T &PL, Vec3D &n_eo, Vec3D &e_b
+)
 /*!
   Computes the new position of Lepton if propagated a distance PL.
     IMPORTANT: does not change any of Lepton's values or PL.

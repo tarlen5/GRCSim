@@ -183,8 +183,9 @@ inline RelParticle::RelParticle(Vec4D &_r4, Vec4D &_p4, VEC3D_T _z, int _q) {
 /// \param _p0: Energy  [eV]
 /// \param _m0: rest mass [eV]
 /// \param _n: direction
-inline RelParticle::RelParticle(VEC3D_T _p0, VEC3D_T _m0, Vec4D &_r4,
-                                Vec3D &_n) {
+inline RelParticle::RelParticle(
+    VEC3D_T _p0, VEC3D_T _m0, Vec4D &_r4, Vec3D &_n
+) {
   m_r4 = _r4;
   m_m0 = _m0;
   // m_p4 = Vec4D(_p0, sqrt(_p0*_p0 - m_m0*m_m0)*_n);

@@ -77,10 +77,13 @@ public:
   // TO BE MADE PRIVATE (only here for testing)
   VEC3D_T RelativisticKinematics(Vec4D &P_e, Vec4D &P_p);
   VEC3D_T PropagationLengthBB(VEC3D_T Ebb, Vec4D &P_e, Vec4D &P_p);
-  VEC3D_T PropagationLengthCMBandIR(DIRBRBase *ebl_model, VEC3D_T Ebb,
-                                    Vec4D &P_e, Vec4D &P_p);
-  bool PropagationLengthStar(StructStar &star, Vec4D &P_e, Vec4D &R_e,
-                             Vec4D &P_p, Vec4D &R_p, VEC3D_T &pl);
+  VEC3D_T PropagationLengthCMBandIR(
+      DIRBRBase *ebl_model, VEC3D_T Ebb, Vec4D &P_e, Vec4D &P_p
+  );
+  bool PropagationLengthStar(
+      StructStar &star, Vec4D &P_e, Vec4D &R_e, Vec4D &P_p, Vec4D &R_p,
+      VEC3D_T &pl
+  );
   // Dump Function to get info out
   // void Dump(std::ostream& stream = std::cout) const;
 

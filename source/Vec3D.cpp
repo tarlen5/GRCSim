@@ -167,9 +167,11 @@ Vec3D &Vec3D::operator&=(const Vec3D &r) {
     VEC3D_T coshalftheta = cos_half_r1 * cos_half_r2 -
                            sin_half_r1 * sin_half_r2 * (r1_hat * r2_hat);
 
-    Vec3D axis(r1_hat * sin_half_r1 * cos_half_r2 +
-               r2_hat * sin_half_r2 * cos_half_r1 -
-               (r1_hat ^ r2_hat) * sin_half_r1 * sin_half_r2);
+    Vec3D axis(
+        r1_hat * sin_half_r1 * cos_half_r2 +
+        r2_hat * sin_half_r2 * cos_half_r1 -
+        (r1_hat ^ r2_hat) * sin_half_r1 * sin_half_r2
+    );
 
     VEC3D_T sinhalftheta = axis.Norm();
 

@@ -140,11 +140,10 @@ void PairProduction::DefineIntegrationParameters(VEC3D_T ze) {
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-bool PairProduction::CheckPairProductionEBL(DIRBRBase *ebl_model,
-                                            const double gam_ph_egy,
-                                            const VEC3D_T z_o,
-                                            const double z_min, VEC3D_T &z_int,
-                                            double &TotalLambdaInt)
+bool PairProduction::CheckPairProductionEBL(
+    DIRBRBase *ebl_model, const double gam_ph_egy, const VEC3D_T z_o,
+    const double z_min, VEC3D_T &z_int, double &TotalLambdaInt
+)
 /*!
   Checks if pair production occurs through ebl_model with a gamma photon of
   gam_ph_egy and starting redshift of z_o, by throwing a random number.
@@ -165,8 +164,9 @@ bool PairProduction::CheckPairProductionEBL(DIRBRBase *ebl_model,
   double lnchi = log(chi);
   const double tauFinal = -lnchi;
 
-  return IntegrateToTau(ebl_model, gam_ph_egy, z_o, z_min, tauFinal, z_int,
-                        TotalLambdaInt);
+  return IntegrateToTau(
+      ebl_model, gam_ph_egy, z_o, z_min, tauFinal, z_int, TotalLambdaInt
+  );
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -178,10 +178,11 @@ bool PairProduction::CheckPairProductionEBL(DIRBRBase *ebl_model,
 //}
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-bool PairProduction::IntegrateToTau(DIRBRBase *ebl_model,
-                                    const double gam_ph_egy, const VEC3D_T z_o,
-                                    const double z_min, const double tauFinal,
-                                    VEC3D_T &z_int, double &TotalLambdaInt)
+bool PairProduction::IntegrateToTau(
+    DIRBRBase *ebl_model, const double gam_ph_egy, const VEC3D_T z_o,
+    const double z_min, const double tauFinal, VEC3D_T &z_int,
+    double &TotalLambdaInt
+)
 /*
   Function that does the heavy lifting of the tau (Optical Depth)
   integration.
@@ -213,7 +214,8 @@ bins. (ADDED 4/16/2013)
   double nJtoeV_d = Double(PhysConst::nJ_TO_eV);
   double tau_const = Double(
       3.0 * PhysConst::CGS_THOM_CS * 1.0E-4 * gam_ph_egy * 4.0 * VEC3D_PI /
-      (8.0 * PhysConst::HUB_CONST * me_eV_d * me_eV_d * (1.0 + z_o)));
+      (8.0 * PhysConst::HUB_CONST * me_eV_d * me_eV_d * (1.0 + z_o))
+  );
   double DimlessTotalLambdaInt = 0.0;
   TotalLambdaInt = 0.0;
   double Q = 0.0;
@@ -230,8 +232,9 @@ bins. (ADDED 4/16/2013)
     double z2 = z1 * z1;
     double z3 = z1 * z2;
     double z4 = z1 * z3;
-    Q = sqrt(m_OmegaR_d * z4 + m_OmegaM_d * z3 + m_OmegaL_d +
-             (1.0 - m_Omega0_d) * z2);
+    Q = sqrt(
+        m_OmegaR_d * z4 + m_OmegaM_d * z3 + m_OmegaL_d + (1.0 - m_Omega0_d) * z2
+    );
 
     double dirbr_temp = 1.0;
     DimlessTotalLambdaInt = 0.0;
@@ -272,9 +275,10 @@ bins. (ADDED 4/16/2013)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-bool PairProduction::UpdateGammaPhoton(Vec4D &gam_ph_p4, Vec4D &gam_ph_r4,
-                                       VEC3D_T &gam_ph_z, VEC3D_T &gam_ph_z_s,
-                                       VEC3D_T &delta_z_step)
+bool PairProduction::UpdateGammaPhoton(
+    Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z, VEC3D_T &gam_ph_z_s,
+    VEC3D_T &delta_z_step
+)
 /*!  Updates Gamma's .r4, .z, .z_s, and .p4
 
   \param
@@ -314,8 +318,10 @@ delta_z_step - redshift difference that photon took on this step.
     VEC3D_T Delta_time = "0.0";
     VEC3D_T deltaz_s = "0.0";
 
-    NonRadialPhotonPropagation(gam_ph_p4, gam_ph_r4, gam_ph_z, gam_ph_z_s,
-                               delta_z, L_prop, deltaz_s, Delta_time);
+    NonRadialPhotonPropagation(
+        gam_ph_p4, gam_ph_r4, gam_ph_z, gam_ph_z_s, delta_z, L_prop, deltaz_s,
+        Delta_time
+    );
 
     // If z_s = 0 surface crossed:
     if ((gam_ph_z_s - deltaz_s) < -m_DE) {
@@ -327,8 +333,10 @@ delta_z_step - redshift difference that photon took on this step.
 
         delta_z = (delta_z_L + delta_z_R) / 2.0;
 
-        NonRadialPhotonPropagation(gam_ph_p4, gam_ph_r4, gam_ph_z, gam_ph_z_s,
-                                   delta_z, L_prop, deltaz_s, Delta_time);
+        NonRadialPhotonPropagation(
+            gam_ph_p4, gam_ph_r4, gam_ph_z, gam_ph_z_s, delta_z, L_prop,
+            deltaz_s, Delta_time
+        );
 
         if ((gam_ph_z_s - deltaz_s) > 0.0)
           delta_z_L = delta_z;
@@ -356,10 +364,10 @@ delta_z_step - redshift difference that photon took on this step.
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-VEC3D_T PairProduction::GetEBLPhotonEgy(DIRBRBase *ebl_model,
-                                        const double TotalLambdaInt,
-                                        const double z_int, const double z_o,
-                                        const double gam_ph_egy)
+VEC3D_T PairProduction::GetEBLPhotonEgy(
+    DIRBRBase *ebl_model, const double TotalLambdaInt, const double z_int,
+    const double z_o, const double gam_ph_egy
+)
 /*!
   Main purpose is to define the energy of the EBL Photon which interacts
   with the energetic Gamma Photon, by performing innermost integral of
@@ -435,9 +443,10 @@ VEC3D_T PairProduction::GetEBLPhotonEgy(DIRBRBase *ebl_model,
       std::cout << "m_q_vec[i] after adjustment = " << m_q_vec[i] << std::endl
                 << std::endl;
     } else {
-      LambdaInt += ((m_q_vec[i] * m_F_vec[i] * dirbr +
-                     m_q_vec[i + 1] * m_F_vec[i + 1] * dirbr_next) *
-                    m_dlog_q / 2.0);
+      LambdaInt +=
+          ((m_q_vec[i] * m_F_vec[i] * dirbr +
+            m_q_vec[i + 1] * m_F_vec[i + 1] * dirbr_next) *
+           m_dlog_q / 2.0);
       i++;
 
       EBL_lambda = EBL_lambda_next;
@@ -455,10 +464,10 @@ VEC3D_T PairProduction::GetEBLPhotonEgy(DIRBRBase *ebl_model,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void PairProduction::UpdateEBLPhoton(Vec4D &gam_ph_p4, Vec4D &gam_ph_r4,
-                                     VEC3D_T &gam_ph_z, VEC3D_T &gam_ph_z_s,
-                                     Vec4D &bg_ph_p4, Vec4D &bg_ph_r4,
-                                     VEC3D_T &bg_ph_z)
+void PairProduction::UpdateEBLPhoton(
+    Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z, VEC3D_T &gam_ph_z_s,
+    Vec4D &bg_ph_p4, Vec4D &bg_ph_r4, VEC3D_T &bg_ph_z
+)
 /*! Routine defines the EBL 3 momentum, by calling the ImpactAngle()
   function and rotating into the frame where direction of gamma
   photon is along z_axis.
@@ -557,8 +566,9 @@ ray and background photon in the lab reference frame.
   VEC3D_T z = etaplus / etaminus;
   VEC3D_T zinv = etaminus / etaplus;
 
-  VEC3D_T G = (g1 * log(z) - g2 + PolyLog1(zinv) - PolyLog1(z) +
-               log(zinv) * log(q / D4));
+  VEC3D_T G =
+      (g1 * log(z) - g2 + PolyLog1(zinv) - PolyLog1(z) + log(zinv) * log(q / D4)
+      );
 
   VEC3D_T DEps = (VEC3D_T("1.E-12")) * G; // Gives us 12 s.f. accuracy
 
@@ -602,8 +612,9 @@ ray and background photon in the lab reference frame.
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-bool PairProduction::RelativisticKinematics(Vec4D &gam_ph_p4, Vec4D &bg_ph_p4,
-                                            Vec4D &elec_p4, Vec4D &pos_p4)
+bool PairProduction::RelativisticKinematics(
+    Vec4D &gam_ph_p4, Vec4D &bg_ph_p4, Vec4D &elec_p4, Vec4D &pos_p4
+)
 /*! Computes relativistic kinematics of pair production of electron
   and positron by two incident photons. Scattering angle is
   sampled utilizing full qed cross-section.
@@ -787,10 +798,11 @@ VEC3D_T PairProduction::Scattering(VEC3D_T x)
       j1 = ((D1 - y) * (D1 + y) + x * y * y) / (D1 + lambda * y);
 
     f1 = h1 * j1 / sqrt((D1 - y) * (D1 + y) + x * y * y);
-    f2 = exp(h2 * (j2 - (y + D1) / D2 *
-                            (x * (D1 - y + x * y) /
-                                 (x * y * y + (D1 - y) * (D1 + y)) +
-                             D1)));
+    f2 =
+        exp(h2 * (j2 - (y + D1) / D2 *
+                           (x * (D1 - y + x * y) /
+                                (x * y * y + (D1 - y) * (D1 + y)) +
+                            D1)));
 
     eps = f1 - f2;
 

@@ -97,8 +97,10 @@ public:
   // Default constructor
   inline MagneticGrid();
 
-  MagneticGrid(RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
-               std::string sfilename);
+  MagneticGrid(
+      RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
+      std::string sfilename
+  );
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Member Functions///////////////////////////////////
@@ -113,12 +115,13 @@ public:
   void ReadFieldMap(std::ifstream &infile);
   int LockAttempt(const char *filename, int *fd, std::string rwtype);
 
-  void PropagateBFieldRedshift(RelParticle &Photon, RelParticle *&Lepton,
-                               Vec3D &n_eo, VEC3D_T &PL, VEC3D_T &delta_z,
-                               const bool LOCK = false);
+  void PropagateBFieldRedshift(
+      RelParticle &Photon, RelParticle *&Lepton, Vec3D &n_eo, VEC3D_T &PL,
+      VEC3D_T &delta_z, const bool LOCK = false
+  );
 
-  Vec3D UpdatePosition(RelParticle *&Lepton, VEC3D_T &PL, Vec3D &n_eo,
-                       Vec3D &e_b);
+  Vec3D
+  UpdatePosition(RelParticle *&Lepton, VEC3D_T &PL, Vec3D &n_eo, Vec3D &e_b);
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Public Data Members////////////////////////////////

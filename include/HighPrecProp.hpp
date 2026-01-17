@@ -35,10 +35,10 @@ using PhysConst::OMEGA_L;
 using PhysConst::OMEGA_M;
 using PhysConst::OMEGA_R;
 
-inline void NonRadialPhotonPropagation(Vec4D gam_ph_p4, Vec4D gam_ph_r4,
-                                       VEC3D_T gam_ph_z, VEC3D_T gam_ph_z_s,
-                                       VEC3D_T delta_z, VEC3D_T &L_prop,
-                                       VEC3D_T &deltaz_s, VEC3D_T &Delta_time)
+inline void NonRadialPhotonPropagation(
+    Vec4D gam_ph_p4, Vec4D gam_ph_r4, VEC3D_T gam_ph_z, VEC3D_T gam_ph_z_s,
+    VEC3D_T delta_z, VEC3D_T &L_prop, VEC3D_T &deltaz_s, VEC3D_T &Delta_time
+)
 /*!
   For a non-radially propagating photon, calculates updated dynamical
   parameters to fourth order accuracy.
@@ -109,8 +109,8 @@ inline void NonRadialPhotonPropagation(Vec4D gam_ph_p4, Vec4D gam_ph_r4,
   Vec3D e_L = gam_ph_p4.r / gam_ph_p4.r.Norm();
   VEC3D_T L_prop_s =
       L_prop * (2.0 * reH * e_L + L_prop) /
-      (sqrt(reH * reH + 2.0 * L_prop * reH * e_L + L_prop * L_prop) +
-       reH.Norm());
+      (sqrt(reH * reH + 2.0 * L_prop * reH * e_L + L_prop * L_prop) + reH.Norm()
+      );
   VEC3D_T L_prop_s2 = L_prop_s * L_prop_s;
   VEC3D_T L_prop_s3 = L_prop_s * L_prop_s2;
   VEC3D_T L_prop_s4 = L_prop_s * L_prop_s3;
@@ -230,8 +230,9 @@ inline VEC3D_T GetLeptonDelta_z(VEC3D_T &PL, RelParticle *&Lepton)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-inline VEC3D_T GetPhotonDelta_zs(VEC3D_T &PL, RelParticle *&Lepton,
-                                 Vec3D &r_new, VEC3D_T &delta_time)
+inline VEC3D_T GetPhotonDelta_zs(
+    VEC3D_T &PL, RelParticle *&Lepton, Vec3D &r_new, VEC3D_T &delta_time
+)
 /*!
   Calculates delta_zs of a radial PHOTON AND time_delay given prop length
   PL.
@@ -395,10 +396,11 @@ inline VEC3D_T GetPhotonDelta_zs(VEC3D_T &PL, RelParticle *&Lepton,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-inline void PropagateConstantMF(RelParticle &Photon, RelParticle *&Lepton,
-                                const VEC3D_T &mf_magnitude, VEC3D_T &PL,
-                                Vec3D &r_new, VEC3D_T &time_delay, Vec3D &n_eo,
-                                VEC3D_T &delta_z, VEC3D_T &delta_zs, Vec3D &e_b)
+inline void PropagateConstantMF(
+    RelParticle &Photon, RelParticle *&Lepton, const VEC3D_T &mf_magnitude,
+    VEC3D_T &PL, Vec3D &r_new, VEC3D_T &time_delay, Vec3D &n_eo,
+    VEC3D_T &delta_z, VEC3D_T &delta_zs, Vec3D &e_b
+)
 /*
   Updates all Lepton/Photon parameters, with these input parameters.
 

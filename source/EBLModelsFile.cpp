@@ -67,15 +67,14 @@ EBLModelsFile::~EBLModelsFile() {
 // ****************************************************************************
 // ****************************************************************************
 
-EBLModelsFile::EBLModelsFile(const std::string &filename,
-                             unsigned num_ebl_param, const double *ebl_lambda,
-                             unsigned num_agn_param,
-                             const char **agn_param_names,
-                             unsigned num_match_param,
-                             const char **match_param_names,
-                             const std::string &vhe_dataset_name,
-                             unsigned vhe_num_data, const double *vhe_e,
-                             const double *vhe_i, const double *vhe_di)
+EBLModelsFile::EBLModelsFile(
+    const std::string &filename, unsigned num_ebl_param,
+    const double *ebl_lambda, unsigned num_agn_param,
+    const char **agn_param_names, unsigned num_match_param,
+    const char **match_param_names, const std::string &vhe_dataset_name,
+    unsigned vhe_num_data, const double *vhe_e, const double *vhe_i,
+    const double *vhe_di
+)
     : fFileName(filename), fFP(), fWritable(true), fSeekPos(0),
       fEBLNumParameters(num_ebl_param), fEBLLambda(), fEBLParameters(0),
       fEBLTau01(), fEBLTau1(), fEBLTau10(), fEBLIStars(), fEBLIDust(),
@@ -195,8 +194,10 @@ EBLModelsFile::EBLModelsFile(const std::string &filename,
   }
 }
 
-void EBLModelsFile::setEBLModel(const double *param, double tau01, double tau1,
-                                double tau10, double i_stars, double i_dust) {
+void EBLModelsFile::setEBLModel(
+    const double *param, double tau01, double tau1, double tau10,
+    double i_stars, double i_dust
+) {
   assert(fWritable);
 
   std::copy(param, param + fEBLNumParameters, fEBLParameters);
@@ -268,8 +269,9 @@ void EBLModelsFile::writeEBLModel() {
   }
 }
 
-void EBLModelsFile::setAcceptableAGNModel(const double *param,
-                                          const float *match_param) {
+void EBLModelsFile::setAcceptableAGNModel(
+    const double *param, const float *match_param
+) {
   assert(fWritable);
 
   // Find the model using the lookup table (std::set -- a binary search tree)
@@ -315,8 +317,9 @@ void EBLModelsFile::setAcceptableAGNModel(const double *param,
   std::cerr << std::endl;
 #endif
 
-  fAcceptableModels.push_back(new ModelMatch(
-      model->fModelIndex, fAcceptableNumParameters, match_param));
+  fAcceptableModels.push_back(
+      new ModelMatch(model->fModelIndex, fAcceptableNumParameters, match_param)
+  );
   fAcceptableModelsNum++;
 }
 
@@ -362,8 +365,10 @@ EBLModelsFile::EBLModelsFile(const std::string &filename)
     exit(EXIT_FAILURE);
   }
 
-  assert((magic.c[0] == 'E') && (magic.c[1] == 'B') && (magic.c[2] == 'L') &&
-         (magic.c[3] == '\0'));
+  assert(
+      (magic.c[0] == 'E') && (magic.c[1] == 'B') && (magic.c[2] == 'L') &&
+      (magic.c[3] == '\0')
+  );
 
   // --------------------------------------------------------------------------
   // 2) Read and test the VERSION number
@@ -467,11 +472,13 @@ EBLModelsFile::EBLModelsFile(const std::string &filename)
     }
 
     // SKIP the EBL model information
-    if (fseek(fFP,
-              sizeof(double) * fEBLNumParameters + sizeof(fEBLTau01) +
-                  sizeof(fEBLTau1) + sizeof(fEBLTau10) + sizeof(fEBLIStars) +
-                  sizeof(fEBLIDust),
-              SEEK_CUR) < 0) {
+    if (fseek(
+            fFP,
+            sizeof(double) * fEBLNumParameters + sizeof(fEBLTau01) +
+                sizeof(fEBLTau1) + sizeof(fEBLTau10) + sizeof(fEBLIStars) +
+                sizeof(fEBLIDust),
+            SEEK_CUR
+        ) < 0) {
       perror("fseek [2]");
       exit(EXIT_FAILURE);
     }
@@ -485,10 +492,12 @@ EBLModelsFile::EBLModelsFile(const std::string &filename)
 
     num_acceptable_models += num_acceptable;
 
-    if (fseek(fFP,
-              num_acceptable *
-                  (sizeof(unsigned) + fAcceptableNumParameters * sizeof(float)),
-              SEEK_CUR) < 0) {
+    if (fseek(
+            fFP,
+            num_acceptable *
+                (sizeof(unsigned) + fAcceptableNumParameters * sizeof(float)),
+            SEEK_CUR
+        ) < 0) {
       perror("fseek [3]");
       exit(EXIT_FAILURE);
     }
@@ -536,10 +545,12 @@ bool EBLModelsFile::readNextEBLModel() {
     }
   }
 
-  if (fseek(fFP,
-            num_agn_to_skip *
-                (sizeof(unsigned) + sizeof(double) * fAGNNumParameters),
-            SEEK_CUR) < 0) {
+  if (fseek(
+          fFP,
+          num_agn_to_skip *
+              (sizeof(unsigned) + sizeof(double) * fAGNNumParameters),
+          SEEK_CUR
+      ) < 0) {
     perror("fseek [5]");
     exit(EXIT_FAILURE);
   }
@@ -573,9 +584,9 @@ bool EBLModelsFile::readNextEBLModel() {
   return true;
 }
 
-bool EBLModelsFile::nextAcceptableAGNModel(unsigned &param_index,
-                                           const double *&param,
-                                           const float *&match_param) {
+bool EBLModelsFile::nextAcceptableAGNModel(
+    unsigned &param_index, const double *&param, const float *&match_param
+) {
   if (fNextAcceptableModel == fAcceptableModels.end()) return false;
   param_index = (*fNextAcceptableModel)->fModelIndex;
   assert(param_index < fAGNNumModels);

@@ -60,8 +60,10 @@ void InitializeEBL(string &ebl_modelname, DIRBR &ebl) {
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void DefineBinning(vector<double> &egyBinsVec, vector<double> &zBinsVec,
-                   double egyMin, double egyMax, double redshift) {
+void DefineBinning(
+    vector<double> &egyBinsVec, vector<double> &zBinsVec, double egyMin,
+    double egyMax, double redshift
+) {
 
   // double egyMin = 0.01;   // TeV
   // double egyMax = 10.0;  // TeV

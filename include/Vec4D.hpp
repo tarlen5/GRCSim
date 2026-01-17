@@ -45,8 +45,10 @@ public:
   inline Vec4D();                      //!< default constructor
   inline Vec4D(const Vec4D &v);        //!< copy constructor
   inline Vec4D(VEC3D_T _r0, Vec3D _r); //!< constructor
-  inline Vec4D(VEC3D_T _r0, VEC3D_T r1, VEC3D_T r2,
-               VEC3D_T r3); //!< constructor
+  inline Vec4D(
+      VEC3D_T _r0, VEC3D_T r1, VEC3D_T r2,
+      VEC3D_T r3
+  ); //!< constructor
 
   inline VEC3D_T Norm2() const; //!< calculates scalar product with itself
 
@@ -168,8 +170,10 @@ inline bool Vec4D::Boost(const Vec3D &boost) {
   }
 
   VEC3D_T par = (r * e_boost);
-  Vec4D t(gamma * (r0 - (boost * r)),
-          gamma * (par * e_boost - r0 * boost) + r - par * e_boost);
+  Vec4D t(
+      gamma * (r0 - (boost * r)),
+      gamma * (par * e_boost - r0 * boost) + r - par * e_boost
+  );
 
   *this = t;
 
@@ -217,8 +221,10 @@ inline bool Vec4D::Boost4D(const Vec4D &boost4D) {
 
   // change the boosting specifics by factoring to preserve precision
   VEC3D_T par = (r * e_boost);
-  Vec4D t(gamma * r0 - (boost4D.r) * r,
-          r - par * e_boost + gamma * (par * e_boost) - (boost4D.r) * r0);
+  Vec4D t(
+      gamma * r0 - (boost4D.r) * r,
+      r - par * e_boost + gamma * (par * e_boost) - (boost4D.r) * r0
+  );
 
   /*VEC3D_T _n2 = t.Norm2();
   std::cout << _n2;

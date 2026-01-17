@@ -168,8 +168,9 @@ bool AnyOption::alloc() {
 }
 
 bool AnyOption::doubleOptStorage() {
-  options = (const char **)realloc(options, ((2 * max_options) + 1) *
-                                                sizeof(const char *));
+  options = (const char **)realloc(
+      options, ((2 * max_options) + 1) * sizeof(const char *)
+  );
   optiontype =
       (int *)realloc(optiontype, ((2 * max_options) + 1) * sizeof(int));
   optionindex =
@@ -206,8 +207,9 @@ bool AnyOption::doubleCharStorage() {
 }
 
 bool AnyOption::doubleUsageStorage() {
-  usage = (const char **)realloc(usage, ((2 * max_usage_lines) + 1) *
-                                            sizeof(const char *));
+  usage = (const char **)realloc(
+      usage, ((2 * max_usage_lines) + 1) * sizeof(const char *)
+  );
   if (usage == NULL) return false;
   for (int i = max_usage_lines; i < 2 * max_usage_lines; i++)
     usage[i] = NULL;

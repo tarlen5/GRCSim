@@ -49,21 +49,27 @@ public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Public Member Functions////////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  bool CheckPairProductionEBL(DIRBRBase *ebl_model, const double gam_ph_egy,
-                              const VEC3D_T z_o, const double z_min,
-                              VEC3D_T &z_int, double &TotalLambdaInt);
+  bool CheckPairProductionEBL(
+      DIRBRBase *ebl_model, const double gam_ph_egy, const VEC3D_T z_o,
+      const double z_min, VEC3D_T &z_int, double &TotalLambdaInt
+  );
   // void GetOpticalDepth(DIRBRBase* ebl_model,const double gam_ph_egy,
   //			 const VEC3D_T z_o, VEC3D_T& z_int);
-  bool UpdateGammaPhoton(Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z,
-                         VEC3D_T &gam_ph_z_s, VEC3D_T &delta_z_step);
-  VEC3D_T GetEBLPhotonEgy(DIRBRBase *ebl_model, const double TotalLambdaInt,
-                          const double z_int, const double z_o,
-                          const double gam_ph_egy);
-  void UpdateEBLPhoton(Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z,
-                       VEC3D_T &gam_ph_z_s, Vec4D &bg_ph_p4, Vec4D &bg_ph_r4,
-                       VEC3D_T &bg_ph_z);
-  bool RelativisticKinematics(Vec4D &gam_ph_p4, Vec4D &bg_ph_p4, Vec4D &elec_p4,
-                              Vec4D &pos_p4);
+  bool UpdateGammaPhoton(
+      Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z,
+      VEC3D_T &gam_ph_z_s, VEC3D_T &delta_z_step
+  );
+  VEC3D_T GetEBLPhotonEgy(
+      DIRBRBase *ebl_model, const double TotalLambdaInt, const double z_int,
+      const double z_o, const double gam_ph_egy
+  );
+  void UpdateEBLPhoton(
+      Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z,
+      VEC3D_T &gam_ph_z_s, Vec4D &bg_ph_p4, Vec4D &bg_ph_r4, VEC3D_T &bg_ph_z
+  );
+  bool RelativisticKinematics(
+      Vec4D &gam_ph_p4, Vec4D &bg_ph_p4, Vec4D &elec_p4, Vec4D &pos_p4
+  );
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Public Data Members////////////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,10 +89,11 @@ private:
   void DefineNumericConst(void);
   void DefineIntegrationParameters(VEC3D_T ze);
 
-  bool IntegrateToTau(DIRBRBase *ebl_model, const double gam_ph_egy,
-                      const VEC3D_T z_o, const double z_min,
-                      const double tauFinal, VEC3D_T &z_int,
-                      double &TotalLambdaInt);
+  bool IntegrateToTau(
+      DIRBRBase *ebl_model, const double gam_ph_egy, const VEC3D_T z_o,
+      const double z_min, const double tauFinal, VEC3D_T &z_int,
+      double &TotalLambdaInt
+  );
 
   VEC3D_T Scattering(VEC3D_T x);
   VEC3D_T PolyLog1(VEC3D_T x);

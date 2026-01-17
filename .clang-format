@@ -6,3 +6,4 @@ ColumnLimit: 80
 BreakBeforeBraces: Attach
 AllowShortIfStatementsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: true
+AlignAfterOpenBracket: BlockIndent

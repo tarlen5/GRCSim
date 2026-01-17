@@ -179,8 +179,8 @@ VEC3D_T KleinNishina::Scattering(VEC3D_T x)
 
   while (fabs(y - y_) > m_DE * fabs(y)) {
     z = x * y;
-    G = (IncompleteTotalCrossSection(z, x) -
-         3.0 * y * y * (1.0 - y) / (1.0 + z)) /
+    G = (IncompleteTotalCrossSection(z, x) - 3.0 * y * y * (1.0 - y) / (1.0 + z)
+        ) /
         KN_;
     y_ = y;
 
@@ -266,9 +266,10 @@ VEC3D_T KleinNishina::IncompleteTotalCrossSection(VEC3D_T z, VEC3D_T x)
 //          converted to anything desired.                                  //
 /////////////////////////////////////////////////////////////////////////////
 
-bool KleinNishina::PropagationLengthStar(StructStar &star, Vec4D &P_lep,
-                                         Vec4D &R_e, Vec4D &P_p, Vec4D &R_p,
-                                         VEC3D_T &pl)
+bool KleinNishina::PropagationLengthStar(
+    StructStar &star, Vec4D &P_lep, Vec4D &R_e, Vec4D &P_p, Vec4D &R_p,
+    VEC3D_T &pl
+)
 /*!
   Routine samples propagation length of a particle in
   a gas of stellar photons and samples parameters
@@ -585,9 +586,9 @@ VEC3D_T KleinNishina::PropagationLengthBB(VEC3D_T Ebb, Vec4D &P_lep, Vec4D &P_p)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-VEC3D_T KleinNishina::PropagationLengthCMBandIR(DIRBRBase *ebl_model,
-                                                VEC3D_T Ebb, Vec4D &P_lep,
-                                                Vec4D &P_p)
+VEC3D_T KleinNishina::PropagationLengthCMBandIR(
+    DIRBRBase *ebl_model, VEC3D_T Ebb, Vec4D &P_lep, Vec4D &P_p
+)
 /*!
   Same as PropagationLengthBB() except it adds the IR Energy Density of
   the ebl spectrum to sample the Propagation Length and energy of

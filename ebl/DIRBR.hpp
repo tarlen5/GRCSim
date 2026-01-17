@@ -54,9 +54,11 @@ public:
   //@{
   DIRBR_ERR TestDIRBRlimits(void);             //!< test existing direct limits
   double OpticalDepthPowerLaw(double, double); //!< find opt depth
-  virtual double OpticalDepth(double &E,
-                              double &z); //!< find opt depth for E, z
-  virtual double Distance(double &z);     //!< find distance to redshift z
+  virtual double OpticalDepth(
+      double &E,
+      double &z
+  );                                  //!< find opt depth for E, z
+  virtual double Distance(double &z); //!< find distance to redshift z
   //@}
 
 protected:

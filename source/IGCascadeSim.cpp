@@ -34,27 +34,31 @@ using PhysConst::OMEGA_R;
 
 namespace IGCascade {
 
-IGCascadeSim::IGCascadeSim(const string &egy, const string &redshift,
-                           const string &mag_field, const string &coh_len,
-                           const string &file_count, AnyOption *opt) {
+IGCascadeSim::IGCascadeSim(
+    const string &egy, const string &redshift, const string &mag_field,
+    const string &coh_len, const string &file_count, AnyOption *opt
+) {
 
   string eblmodel, mf_dir, opt_depth_dir, output_dir;
   ProcessOptions(opt, eblmodel, mf_dir, opt_depth_dir, output_dir);
 
   string ebl_model_file = eblmodel + ".dat";
   InitializeEBL(ebl_model_file);
-  m_cascade_file = DefineCascadeFile(eblmodel, egy, mag_field, redshift,
-                                     coh_len, file_count, output_dir);
+  m_cascade_file = DefineCascadeFile(
+      eblmodel, egy, mag_field, redshift, coh_len, file_count, output_dir
+  );
   string MFfilename = DefineMFfile(mf_dir, mag_field, coh_len, redshift);
   string optDepthFile = DefineOptDepthTable(opt_depth_dir, eblmodel, redshift);
 
   if (m_trk_leptons_bool)
     m_save_lepton_file = DefineTrackLeptonFile(
-        eblmodel, egy, mag_field, redshift, coh_len, file_count, output_dir);
+        eblmodel, egy, mag_field, redshift, coh_len, file_count, output_dir
+    );
 
   if (m_trk_delay_bool)
     m_track_time_delay_file = DefineTrackTimeDelayFile(
-        eblmodel, egy, mag_field, redshift, coh_len, file_count);
+        eblmodel, egy, mag_field, redshift, coh_len, file_count
+    );
 
   // Process Inputs to class:
   m_egy_cascade = egy.c_str();
@@ -85,9 +89,10 @@ IGCascadeSim::IGCascadeSim(const string &egy, const string &redshift,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void IGCascadeSim::ProcessOptions(AnyOption *opt, string &eblmodel,
-                                  string &mf_dir, string &opt_depth_dir,
-                                  string &output_dir) {
+void IGCascadeSim::ProcessOptions(
+    AnyOption *opt, string &eblmodel, string &mf_dir, string &opt_depth_dir,
+    string &output_dir
+) {
   // Process Options:
   eblmodel = "EBLModel4msld";
   mf_dir = "MagneticFieldFiles/";
@@ -148,12 +153,11 @@ void IGCascadeSim::ProcessOptions(AnyOption *opt, string &eblmodel,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string IGCascadeSim::DefineCascadeFile(const string &s_eblmodel,
-                                       const string &s_egy,
-                                       const string &s_Bmag, const string &s_ze,
-                                       const string &s_cellsize,
-                                       const string &s_file_num,
-                                       const string &output_dir) {
+string IGCascadeSim::DefineCascadeFile(
+    const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
+    const string &s_ze, const string &s_cellsize, const string &s_file_num,
+    const string &output_dir
+) {
   string filename = output_dir + s_eblmodel + "_" + s_egy + "GeV_z" + s_ze +
                     "_B" + s_Bmag + "_L" + s_cellsize + "_" + s_file_num +
                     ".h5";
@@ -164,9 +168,10 @@ string IGCascadeSim::DefineCascadeFile(const string &s_eblmodel,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string IGCascadeSim::DefineMFfile(const string &mf_dir, const string &s_Bmag,
-                                  const string &s_cellsize,
-                                  const string &s_ze) {
+string IGCascadeSim::DefineMFfile(
+    const string &mf_dir, const string &s_Bmag, const string &s_cellsize,
+    const string &s_ze
+) {
   string MFfilename = mf_dir + "MagneticGrid_B" + s_Bmag + "_L" + s_cellsize +
                       "_z" + s_ze + ".txt";
 
@@ -186,11 +191,10 @@ string IGCascadeSim::DefineMFfile(const string &mf_dir, const string &s_Bmag,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string IGCascadeSim::DefineLowEgyFile(const string &s_eblmodel,
-                                      const string &s_egy, const string &s_Bmag,
-                                      const string &s_ze,
-                                      const string &s_cellsize,
-                                      const string &s_file_num) {
+string IGCascadeSim::DefineLowEgyFile(
+    const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
+    const string &s_ze, const string &s_cellsize, const string &s_file_num
+) {
   string filename = "LowEgy_" + s_eblmodel + "_" + s_egy + "GeV_z" + s_ze +
                     "_B" + s_Bmag + "_L" + s_cellsize + "_" + s_file_num +
                     ".txt";
@@ -201,7 +205,8 @@ string IGCascadeSim::DefineLowEgyFile(const string &s_eblmodel,
 string IGCascadeSim::DefineTrackLeptonFile(
     const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
     const string &s_ze, const string &s_cellsize, const string &s_file_num,
-    const string &output_dir) {
+    const string &output_dir
+) {
   string filename = output_dir + "TrackLeptons_" + s_eblmodel + "_" + s_egy +
                     "GeV_z" + s_ze + "_B" + s_Bmag + "_L" + s_cellsize + "_" +
                     s_file_num + ".h5";
@@ -216,7 +221,8 @@ string IGCascadeSim::DefineTrackLeptonFile(
 
 string IGCascadeSim::DefineTrackTimeDelayFile(
     const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
-    const string &s_ze, const string &s_cellsize, const string &s_file_num) {
+    const string &s_ze, const string &s_cellsize, const string &s_file_num
+) {
   string filename = "TrackTimeDelay_" + s_eblmodel + "_" + s_egy + "GeV_B" +
                     s_Bmag + "_z" + s_ze + "_L" + s_cellsize + "_" +
                     s_file_num + ".txt";
@@ -340,9 +346,9 @@ void IGCascadeSim::InitializeEBL(const string &ebl_model_file) {
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string IGCascadeSim::DefineOptDepthTable(const string &opt_depth_dir,
-                                         const string &s_eblmodel,
-                                         const string &s_ze) {
+string IGCascadeSim::DefineOptDepthTable(
+    const string &opt_depth_dir, const string &s_eblmodel, const string &s_ze
+) {
   string optDepthFile = opt_depth_dir;
   optDepthFile += "optDepth_" + s_eblmodel + "_z" + s_ze + "_0.01TeV_1TeV.txt";
 
@@ -431,8 +437,9 @@ void IGCascadeSim::RunSinglePhotonCascade(void) {
     if (tau < m_tauCutoff) {
       PropagatePhotonToObserver(GammaPhoton);
       if (GammaPhoton.m_p4.r0 >= m_egy_gamma_min) {
-        StoreSecPhoton(GammaPhoton.m_p4, GammaPhoton.m_r4,
-                       GammaPhoton.m_weight);
+        StoreSecPhoton(
+            GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_weight
+        );
       }
       GammaPhoton.Zero();
       continue;
@@ -452,8 +459,9 @@ void IGCascadeSim::RunSinglePhotonCascade(void) {
         cerr << "(Secondary photon...)" << endl << endl;
       }
       if (GammaPhoton.m_p4.r0 >= m_egy_gamma_min)
-        StoreSecPhoton(GammaPhoton.m_p4, GammaPhoton.m_r4,
-                       GammaPhoton.m_weight);
+        StoreSecPhoton(
+            GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_weight
+        );
       if (m_trk_delay_bool) SaveToTrackTimeDelayFile(GammaPhoton);
       // else {
       // if(SAVE_LOW_EGY) SaveToLowEnergyFile(GammaPhoton);
@@ -520,8 +528,9 @@ void IGCascadeSim::CreateDirectGamma(RelParticle &GammaPhoton) {
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void IGCascadeSim::PropagateDirectPhoton(RelParticle &GammaPhoton,
-                                         stack<RelParticle *> &lepton_stack)
+void IGCascadeSim::PropagateDirectPhoton(
+    RelParticle &GammaPhoton, stack<RelParticle *> &lepton_stack
+)
 /*!
   At the end of this function, the Electron and Positron are
   created at the interaction redshift, IF a pair production event
@@ -538,7 +547,8 @@ void IGCascadeSim::PropagateDirectPhoton(RelParticle &GammaPhoton,
   RelParticle *Positron = new RelParticle;
   bool pair_prod = m_pspace->CheckPairProductionEBL(
       m_ebl, Double(GammaPhoton.m_p4.r0), Double(GammaPhoton.m_z), z_min, z_int,
-      tot_lambda_int);
+      tot_lambda_int
+  );
 
   if (!pair_prod) {
     cout << "NO PAIR PRODUCTION...\n";
@@ -559,17 +569,20 @@ void IGCascadeSim::PropagateDirectPhoton(RelParticle &GammaPhoton,
     VEC3D_T delta_z = (z_emit - z_int);
     bool pair_prod = m_pspace->UpdateGammaPhoton(
         GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z, GammaPhoton.m_z_s,
-        delta_z);
+        delta_z
+    );
     if (pair_prod) {
       // Pair production has legitimately occured and proceed as
       // usual defining EBL photon interacted with, Leptons, etc.
       RelParticle EBLPhoton;
       EBLPhoton.m_p4.r0 = m_pspace->GetEBLPhotonEgy(
           m_ebl, tot_lambda_int, Double(z_int), Double(z_emit),
-          Double(GammaPhoton.m_p4.r0));
-      m_pspace->UpdateEBLPhoton(GammaPhoton.m_p4, GammaPhoton.m_r4,
-                                GammaPhoton.m_z, GammaPhoton.m_z_s,
-                                EBLPhoton.m_p4, EBLPhoton.m_r4, EBLPhoton.m_z);
+          Double(GammaPhoton.m_p4.r0)
+      );
+      m_pspace->UpdateEBLPhoton(
+          GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z,
+          GammaPhoton.m_z_s, EBLPhoton.m_p4, EBLPhoton.m_r4, EBLPhoton.m_z
+      );
 
       ////////////////////////////////////////////////////
       // CREATE AND DEFINE LEPTONS PRODUCED BY PAIRPROD //
@@ -607,9 +620,10 @@ void IGCascadeSim::PropagateDirectPhoton(RelParticle &GammaPhoton,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void IGCascadeSim::DefineLeptons(RelParticle &GammaPhoton,
-                                 RelParticle &EBLPhoton, RelParticle *Electron,
-                                 RelParticle *Positron)
+void IGCascadeSim::DefineLeptons(
+    RelParticle &GammaPhoton, RelParticle &EBLPhoton, RelParticle *Electron,
+    RelParticle *Positron
+)
 /*!
   Uses GammaPhoton and EBLPhoton to define Electron and Positron
   in the lab frame.
@@ -649,7 +663,8 @@ void IGCascadeSim::DefineLeptons(RelParticle &GammaPhoton,
   /////////////////////////////////////////
 
   bool RelKinematics = m_pspace->RelativisticKinematics(
-      GammaPhoton.m_p4, EBLPhoton.m_p4, Electron->m_p4, Positron->m_p4);
+      GammaPhoton.m_p4, EBLPhoton.m_p4, Electron->m_p4, Positron->m_p4
+  );
 
   if (!RelKinematics)
     std::cerr << std::endl << "ERROR: RelativisticKinematics failed...\n\n";
@@ -689,24 +704,33 @@ void IGCascadeSim::WriteLeptonToFile(RelParticle *Lepton) {
 
     // Define compound datatype for LeptonData
     CompType leptonType(sizeof(LeptonData));
-    leptonType.insertMember("redshift", HOFFSET(LeptonData, redshift),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("egy", HOFFSET(LeptonData, egy),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("px", HOFFSET(LeptonData, px),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("py", HOFFSET(LeptonData, py),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("pz", HOFFSET(LeptonData, pz),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("time", HOFFSET(LeptonData, time),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("rx", HOFFSET(LeptonData, rx),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("ry", HOFFSET(LeptonData, ry),
-                            PredType::NATIVE_DOUBLE);
-    leptonType.insertMember("rz", HOFFSET(LeptonData, rz),
-                            PredType::NATIVE_DOUBLE);
+    leptonType.insertMember(
+        "redshift", HOFFSET(LeptonData, redshift), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "egy", HOFFSET(LeptonData, egy), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "px", HOFFSET(LeptonData, px), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "py", HOFFSET(LeptonData, py), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "pz", HOFFSET(LeptonData, pz), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "time", HOFFSET(LeptonData, time), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "rx", HOFFSET(LeptonData, rx), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "ry", HOFFSET(LeptonData, ry), PredType::NATIVE_DOUBLE
+    );
+    leptonType.insertMember(
+        "rz", HOFFSET(LeptonData, rz), PredType::NATIVE_DOUBLE
+    );
 
     // Create dataspace
     hsize_t dims[1] = {data.size()};
@@ -754,15 +778,17 @@ void IGCascadeSim::PropagatePhotonToObserver(RelParticle &GammaPhoton) {
   double z_min = GetMinZ(GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z);
   VEC3D_T z_emit = GammaPhoton.m_z;
   VEC3D_T delta_z = (z_emit - z_min);
-  // bool pair_prod =
-  m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4, GammaPhoton.m_r4,
-                              GammaPhoton.m_z, GammaPhoton.m_z_s, delta_z);
+
+  m_pspace->UpdateGammaPhoton(
+      GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z, GammaPhoton.m_z_s,
+      delta_z
+  );
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-bool IGCascadeSim::PropagateSecondaryPhoton(RelParticle &GammaPhoton,
-                                            RelParticle *Electron,
-                                            RelParticle *Positron) {
+bool IGCascadeSim::PropagateSecondaryPhoton(
+    RelParticle &GammaPhoton, RelParticle *Electron, RelParticle *Positron
+) {
 
   if (m_single_gen_bool) {
     PropagatePhotonToObserver(GammaPhoton);
@@ -775,7 +801,8 @@ bool IGCascadeSim::PropagateSecondaryPhoton(RelParticle &GammaPhoton,
   VEC3D_T z_int = "0.0";
   bool pair_prod = m_pspace->CheckPairProductionEBL(
       m_ebl, Double(GammaPhoton.m_p4.r0), Double(z_emit), z_min, z_int,
-      tot_lambda_int);
+      tot_lambda_int
+  );
   // At this point, either z_min is reached so that no pair
   // production will occur, or z_int is reached at which pair
   // production happens. Either way, propagate gamma photon over
@@ -785,19 +812,22 @@ bool IGCascadeSim::PropagateSecondaryPhoton(RelParticle &GammaPhoton,
   // cout<<"egy: "<<GammaPhoton.m_p4.r0<<" zs: "<<GammaPhoton.m_z_s<<endl;
 
   VEC3D_T delta_z = (z_emit - z_int);
-  pair_prod =
-      m_pspace->UpdateGammaPhoton(GammaPhoton.m_p4, GammaPhoton.m_r4,
-                                  GammaPhoton.m_z, GammaPhoton.m_z_s, delta_z);
+  pair_prod = m_pspace->UpdateGammaPhoton(
+      GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z, GammaPhoton.m_z_s,
+      delta_z
+  );
   if (!pair_prod) return false;
   // Otherwise, pair production has occured and proceed as usual
   // defining EBL photon interacted with, Leptons, etc.
   RelParticle EBLPhoton;
-  EBLPhoton.m_p4.r0 =
-      m_pspace->GetEBLPhotonEgy(m_ebl, tot_lambda_int, Double(z_int),
-                                Double(z_emit), Double(GammaPhoton.m_p4.r0));
-  m_pspace->UpdateEBLPhoton(GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z,
-                            GammaPhoton.m_z_s, EBLPhoton.m_p4, EBLPhoton.m_r4,
-                            EBLPhoton.m_z);
+  EBLPhoton.m_p4.r0 = m_pspace->GetEBLPhotonEgy(
+      m_ebl, tot_lambda_int, Double(z_int), Double(z_emit),
+      Double(GammaPhoton.m_p4.r0)
+  );
+  m_pspace->UpdateEBLPhoton(
+      GammaPhoton.m_p4, GammaPhoton.m_r4, GammaPhoton.m_z, GammaPhoton.m_z_s,
+      EBLPhoton.m_p4, EBLPhoton.m_r4, EBLPhoton.m_z
+  );
 
   // CREATE AND DEFINE LEPTONS PRODUCED BY PAIRPROD
   DefineLeptons(GammaPhoton, EBLPhoton, Electron, Positron);
@@ -806,8 +836,9 @@ bool IGCascadeSim::PropagateSecondaryPhoton(RelParticle &GammaPhoton,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-double IGCascadeSim::GetMinZ(const Vec4D &gam_ph_p4, const Vec4D &gam_ph_r4,
-                             const VEC3D_T &gam_ph_z)
+double IGCascadeSim::GetMinZ(
+    const Vec4D &gam_ph_p4, const Vec4D &gam_ph_r4, const VEC3D_T &gam_ph_z
+)
 /*!
   Quick routine to compute z_min, the change in redshift (not
   change in z_s, change in z) to get to the z_s = 0 surface.
@@ -842,8 +873,10 @@ double IGCascadeSim::GetMinZ(const Vec4D &gam_ph_p4, const Vec4D &gam_ph_r4,
 
   // Overestimate z_min:
   VEC3D_T z1 = (1.0 + gam_ph_z);
-  VEC3D_T Q_hp = sqrt(OMEGA_R * z1 * z1 * z1 * z1 + OMEGA_M * z1 * z1 * z1 +
-                      OMEGA_L + (1.0 - OMEGA_0) * z1 * z1);
+  VEC3D_T Q_hp = sqrt(
+      OMEGA_R * z1 * z1 * z1 * z1 + OMEGA_M * z1 * z1 * z1 + OMEGA_L +
+      (1.0 - OMEGA_0) * z1 * z1
+  );
   // gives us z_min; must be smaller than z1 - DeltaZ.
   VEC3D_T DeltaZ = R2 / PhysConst::CGS_HUBRAD * Q_hp;
   VEC3D_T z_min = gam_ph_z - DeltaZ;
@@ -857,8 +890,10 @@ double IGCascadeSim::GetMinZ(const Vec4D &gam_ph_p4, const Vec4D &gam_ph_r4,
   while (R_test < R2) { // integrate until you reach the distance of R2.
     zi -= z_step;
     z1 = (1.0 + zi);
-    Q_hp = sqrt(OMEGA_R * z1 * z1 * z1 * z1 + OMEGA_M * z1 * z1 * z1 + OMEGA_L +
-                (1.0 - OMEGA_0) * z1 * z1);
+    Q_hp = sqrt(
+        OMEGA_R * z1 * z1 * z1 * z1 + OMEGA_M * z1 * z1 * z1 + OMEGA_L +
+        (1.0 - OMEGA_0) * z1 * z1
+    );
 
     R_test += PhysConst::CGS_HUBRAD / Q_hp * z_step;
     steps++;
@@ -868,14 +903,17 @@ double IGCascadeSim::GetMinZ(const Vec4D &gam_ph_p4, const Vec4D &gam_ph_r4,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void IGCascadeSim::PropagateLepton(stack<RelParticle *> &lepton_stack,
-                                   RelParticle &GammaPhoton) {
+void IGCascadeSim::PropagateLepton(
+    stack<RelParticle *> &lepton_stack, RelParticle &GammaPhoton
+) {
   RelParticle *Lepton = lepton_stack.top();
   lepton_stack.pop();
 
   VEC3D_T Ecmb_e = m_egy_cmb * (1.0 + Lepton->m_z);
-  VEC3D_T PL = m_kspace->PropagationLengthCMBandIR(m_ebl, Ecmb_e, Lepton->m_p4,
-                                                   GammaPhoton.m_p4); // [cm]
+  VEC3D_T PL = m_kspace->PropagationLengthCMBandIR(
+      m_ebl, Ecmb_e, Lepton->m_p4,
+      GammaPhoton.m_p4
+  ); // [cm]
 
   GammaPhoton.m_weight = Lepton->m_weight;
 
@@ -886,8 +924,9 @@ void IGCascadeSim::PropagateLepton(stack<RelParticle *> &lepton_stack,
   Vec3D n_e = Lepton->m_p4.r / Lepton->m_p4.r.Norm();
   m_kspace->RelativisticKinematics(Lepton->m_p4, GammaPhoton.m_p4);
 
-  m_BFieldGrid->PropagateBFieldRedshift(GammaPhoton, Lepton, n_e, PL, delta_z,
-                                        m_LOCK);
+  m_BFieldGrid->PropagateBFieldRedshift(
+      GammaPhoton, Lepton, n_e, PL, delta_z, m_LOCK
+  );
 
   // NOTE: added to keep track of gamma_photon's emitted z_s
   GammaPhoton.m_z_s_int = Lepton->m_z_s;
@@ -912,8 +951,9 @@ void IGCascadeSim::PropagateLepton(stack<RelParticle *> &lepton_stack,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void IGCascadeSim::SaveDirectPhoton(RelParticle &GammaPhoton,
-                                    ofstream &PhotonList) {
+void IGCascadeSim::SaveDirectPhoton(
+    RelParticle &GammaPhoton, ofstream &PhotonList
+) {
 
   if (GammaPhoton.m_z_s > 1.0e-15) { // Should never happen
     cerr << "\nWARNING: Caught z_s=0 photon with z_s > 1E-15!\n" << endl;
@@ -923,8 +963,9 @@ void IGCascadeSim::SaveDirectPhoton(RelParticle &GammaPhoton,
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void IGCascadeSim::StoreSecPhoton(Vec4D &gam_ph_p4, Vec4D &gam_ph_r4,
-                                  const double &weight) {
+void IGCascadeSim::StoreSecPhoton(
+    Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, const double &weight
+) {
 
   // VEC3D_T EPS = 1.0E-25;
   Vec3D e_r = gam_ph_r4.r / gam_ph_r4.r.Norm();
@@ -976,22 +1017,30 @@ void IGCascadeSim::WriteSecPhotonsToHDF5() {
 
     // Define compound datatype for SecPhoton
     CompType secPhotonType(sizeof(SecPhoton));
-    secPhotonType.insertMember("egyPrim", HOFFSET(SecPhoton, egyPrim),
-                               PredType::NATIVE_DOUBLE);
-    secPhotonType.insertMember("egySec", HOFFSET(SecPhoton, egySec),
-                               PredType::NATIVE_DOUBLE);
-    secPhotonType.insertMember("theta", HOFFSET(SecPhoton, theta),
-                               PredType::NATIVE_DOUBLE);
-    secPhotonType.insertMember("phi", HOFFSET(SecPhoton, phi),
-                               PredType::NATIVE_DOUBLE);
-    secPhotonType.insertMember("time", HOFFSET(SecPhoton, time),
-                               PredType::NATIVE_DOUBLE);
-    secPhotonType.insertMember("thetap", HOFFSET(SecPhoton, thetap),
-                               PredType::NATIVE_DOUBLE);
-    secPhotonType.insertMember("xi", HOFFSET(SecPhoton, xi),
-                               PredType::NATIVE_DOUBLE);
-    secPhotonType.insertMember("weight", HOFFSET(SecPhoton, weight),
-                               PredType::NATIVE_DOUBLE);
+    secPhotonType.insertMember(
+        "egyPrim", HOFFSET(SecPhoton, egyPrim), PredType::NATIVE_DOUBLE
+    );
+    secPhotonType.insertMember(
+        "egySec", HOFFSET(SecPhoton, egySec), PredType::NATIVE_DOUBLE
+    );
+    secPhotonType.insertMember(
+        "theta", HOFFSET(SecPhoton, theta), PredType::NATIVE_DOUBLE
+    );
+    secPhotonType.insertMember(
+        "phi", HOFFSET(SecPhoton, phi), PredType::NATIVE_DOUBLE
+    );
+    secPhotonType.insertMember(
+        "time", HOFFSET(SecPhoton, time), PredType::NATIVE_DOUBLE
+    );
+    secPhotonType.insertMember(
+        "thetap", HOFFSET(SecPhoton, thetap), PredType::NATIVE_DOUBLE
+    );
+    secPhotonType.insertMember(
+        "xi", HOFFSET(SecPhoton, xi), PredType::NATIVE_DOUBLE
+    );
+    secPhotonType.insertMember(
+        "weight", HOFFSET(SecPhoton, weight), PredType::NATIVE_DOUBLE
+    );
 
     // Create dataspace
     hsize_t dims[1] = {m_secPhotons.size()};

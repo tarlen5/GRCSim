@@ -53,13 +53,15 @@ AnyOption *DefineOptions(int argc, char *argv[], const string &progname) {
   opt->addUsage(" -h  --help      Prints this help ");
   opt->addUsage(" --eblmodel      EBLModel4msld        EBLModel name.");
   opt->addUsage(
-      " --mf_dir        MagneticFieldFiles/  magnetic field files dir.");
+      " --mf_dir        MagneticFieldFiles/  magnetic field files dir."
+  );
   opt->addUsage(" --opt_depth_dir OptDepthFiles/       opt depth files dir.");
   opt->addUsage(" --output_dir    (cwd)      Directory to output files.");
   opt->addUsage(" --gam_egy_min    0.1 min energy [GeV] to track gammas.");
   opt->addUsage(" --lep_egy_min    75. min energy [GeV] to track leptons.");
   opt->addUsage(
-      " --seed           <uint32_t> Random number seed for reproducibility.");
+      " --seed           <uint32_t> Random number seed for reproducibility."
+  );
 
   opt->addUsage(" --mf_no_lock    No locking of mf files, so cosmic variance "
                 "is not preserved in simulation. ");
@@ -125,7 +127,8 @@ int main(int argc, char **argv) {
   cout << "  iterations: " << iterations << endl;
 
   IGCascade::IGCascadeSim *my_sim = new IGCascade::IGCascadeSim(
-      egy, redshift, mag_field, coh_len, file_count, opt);
+      egy, redshift, mag_field, coh_len, file_count, opt
+  );
 
   int num_iterations = atoi(iterations.c_str());
   my_sim->RunCascade(num_iterations);

@@ -119,15 +119,19 @@ public:
   // OUTPUT member functions
   // **************************************************************************
 
-  EBLModelsFile(const std::string &filename, unsigned num_ebl_param,
-                const double *ebl_lambda, unsigned num_agn_param,
-                const char **agn_param_names, unsigned num_match_param,
-                const char **match_param_names,
-                const std::string &vhe_dataset_name, unsigned vhe_num_data,
-                const double *vhe_e, const double *vhe_i, const double *vhe_di);
+  EBLModelsFile(
+      const std::string &filename, unsigned num_ebl_param,
+      const double *ebl_lambda, unsigned num_agn_param,
+      const char **agn_param_names, unsigned num_match_param,
+      const char **match_param_names, const std::string &vhe_dataset_name,
+      unsigned vhe_num_data, const double *vhe_e, const double *vhe_i,
+      const double *vhe_di
+  );
 
-  void setEBLModel(const double *param, double tau01, double tau1, double tau10,
-                   double i_stars, double i_dust);
+  void setEBLModel(
+      const double *param, double tau01, double tau1, double tau10,
+      double i_stars, double i_dust
+  );
 
   void writeEBLModel();
 
@@ -139,8 +143,9 @@ public:
 
   EBLModelsFile(const std::string &filename);
   bool readNextEBLModel();
-  bool nextAcceptableAGNModel(unsigned &param_index, const double *&param,
-                              const float *&match_param);
+  bool nextAcceptableAGNModel(
+      unsigned &param_index, const double *&param, const float *&match_param
+  );
 
   // **************************************************************************
   // ACCESSORS

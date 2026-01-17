@@ -679,8 +679,10 @@ double DIRBR::Distance(double &RedShift) {
     double z3 = (1. + z) * z2;
     double z4 = (1. + z) * z3;
 
-    double W = sqrt(m_OmegaR * z4 + m_OmegaM * z3 + m_OmegaL +
-                    (1. - m_OmegaR - m_OmegaM - m_OmegaL) * z2);
+    double W = sqrt(
+        m_OmegaR * z4 + m_OmegaM * z3 + m_OmegaL +
+        (1. - m_OmegaR - m_OmegaM - m_OmegaL) * z2
+    );
 
     if (dz < RedShift - z) {
       d += 1.0 / W * dz;
