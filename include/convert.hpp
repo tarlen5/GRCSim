@@ -1,4 +1,4 @@
-/*! 
+/*!
 
   \file   convert.hpp
           Converts type VEC3D_T (a quad double or double double

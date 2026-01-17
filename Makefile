@@ -79,6 +79,10 @@ clean:
 	$(MAKE) clean -C $(UTILDIR)
 	$(MAKE) clean -C $(EBLDIR)
 
+# Clang-format target
+format:
+	find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" | xargs clang-format -i
+
 $(OBJDIR)%.o: $(SRC)%.cpp
 	$(CPP) $(CFLAGS) $(HDF5_CFLAGS) -c $< -o $@ -I$(INCLUDE)
 

@@ -45,7 +45,8 @@ public:
   inline Vec4D();                      //!< default constructor
   inline Vec4D(const Vec4D &v);        //!< copy constructor
   inline Vec4D(VEC3D_T _r0, Vec3D _r); //!< constructor
-  inline Vec4D(VEC3D_T _r0, VEC3D_T r1, VEC3D_T r2, VEC3D_T r3); //!< constructor
+  inline Vec4D(VEC3D_T _r0, VEC3D_T r1, VEC3D_T r2,
+               VEC3D_T r3); //!< constructor
 
   inline VEC3D_T Norm2() const; //!< calculates scalar product with itself
 

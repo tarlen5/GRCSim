@@ -107,7 +107,7 @@ public:
   VEC3D_T m_elec_time; // another temporary needed variable, to
                        // track time delay due exclusively to
                        // electrons
-  int m_q; // Charge in units of |e| (i.e. electron has q = -1)
+  int m_q;             // Charge in units of |e| (i.e. electron has q = -1)
   int m_tag;
   double m_weight; // weight of each particle (bc small tr prob correction)
 
