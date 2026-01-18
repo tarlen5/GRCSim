@@ -1,4 +1,5 @@
 #include <random>
+#include <optional>
 
 #ifndef RANDOMNUMBERS_H
 #define RANDOMNUMBERS_H
@@ -11,45 +12,37 @@ private:
   double range_hi;
 
   random_device *rd;
-  // mt19937 generator(rd());
   mt19937 *generator;
-  // uniform_real_distribution<double> uniform_dist(range_lo, range_hi);
   uniform_real_distribution<double> *uniform_dist;
+  std::optional<uint32_t> seed; // Stores the seed if set
 
 public:
   RandomNumbers() {
-    /*
-        Default Constructor
-    */
     range_lo = 0.0;
     range_hi = 1.0;
 
     rd = nullptr;
     generator = nullptr;
     uniform_dist = nullptr;
+    seed = std::nullopt;
   }
   RandomNumbers(double _range_lo, double _range_hi) {
-    /*
-        Constructor without seed, by default seeds from random device (standard
-       way)
-    */
     range_lo = _range_lo;
     range_hi = _range_hi;
 
     rd = new random_device();
     generator = new mt19937((*rd)());
     uniform_dist = new uniform_real_distribution<double>(range_lo, range_hi);
+    seed = std::nullopt;
   }
   RandomNumbers(double _range_lo, double _range_hi, uint32_t _seed) {
-    /*
-        Constructor with seed, for reproducibility
-    */
     range_lo = _range_lo;
     range_hi = _range_hi;
 
     rd = nullptr;
     generator = new mt19937(_seed);
     uniform_dist = new uniform_real_distribution<double>(range_lo, range_hi);
+    seed = _seed;
   }
   ~RandomNumbers() {
     delete rd;
@@ -58,6 +51,8 @@ public:
   }
 
   double Uniform() { return (*uniform_dist)(*generator); }
+
+  std::optional<uint32_t> GetSeed() const { return seed; }
 };
 
 #endif // RANDOMNUMBERS_H

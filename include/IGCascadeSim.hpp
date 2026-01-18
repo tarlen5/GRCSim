@@ -167,7 +167,7 @@ private:
   double m_tauCutoff;
 
   RandomNumbers *m_rng;
-  MagneticGrid *m_BFieldGrid;
+  MagneticGrid *m_BFieldPropagator;
   PairProduction *m_pspace;
   KleinNishina *m_kspace;
 

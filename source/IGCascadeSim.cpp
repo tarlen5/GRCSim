@@ -78,7 +78,10 @@ IGCascadeSim::IGCascadeSim(
   } else {
     m_rng = new RandomNumbers(0.0, 1.0);
   }
-  m_BFieldGrid = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
+  
+  // m_BFieldGrid = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
+  m_BFieldPropagator = new MagneticGrid(
+    m_rng, m_bmag, m_cellsize, MFfilename);
   m_pspace = new PairProduction(m_rng, m_ze);
   m_kspace = new KleinNishina(m_rng);
 
@@ -924,7 +927,7 @@ void IGCascadeSim::PropagateLepton(
   Vec3D n_e = Lepton->m_p4.r / Lepton->m_p4.r.Norm();
   m_kspace->RelativisticKinematics(Lepton->m_p4, GammaPhoton.m_p4);
 
-  m_BFieldGrid->PropagateBFieldRedshift(
+  m_BFieldPropagator->PropagateBFieldRedshift(
       GammaPhoton, Lepton, n_e, PL, delta_z, m_LOCK
   );
 
@@ -937,7 +940,7 @@ void IGCascadeSim::PropagateLepton(
   if (m_trk_delay_bool) GammaPhoton.m_elec_time = Lepton->m_r4.r0;
 
   if (Lepton->m_p4.r0 > m_egy_lepton_min &&
-      Lepton->m_z_s > m_BFieldGrid->m_DE) {
+      Lepton->m_z_s > m_BFieldPropagator->m_DE) {
     lepton_stack.push(Lepton);
     if (m_trk_leptons_bool) SaveLepton(Lepton);
   } else {
