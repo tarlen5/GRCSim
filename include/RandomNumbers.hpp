@@ -14,7 +14,8 @@ private:
   random_device *rd;
   mt19937 *generator;
   uniform_real_distribution<double> *uniform_dist;
-  std::optional<uint32_t> seed; // Stores the seed if set
+  uint32_t seed;          // Stores the seed value
+  bool is_seed_set;       // True if seed is set
 
 public:
   RandomNumbers() {
@@ -24,7 +25,8 @@ public:
     rd = nullptr;
     generator = nullptr;
     uniform_dist = nullptr;
-    seed = std::nullopt;
+    seed = 0;
+    is_seed_set = false;
   }
   RandomNumbers(double _range_lo, double _range_hi) {
     range_lo = _range_lo;
@@ -33,7 +35,8 @@ public:
     rd = new random_device();
     generator = new mt19937((*rd)());
     uniform_dist = new uniform_real_distribution<double>(range_lo, range_hi);
-    seed = std::nullopt;
+    seed = 0;
+    is_seed_set = false;
   }
   RandomNumbers(double _range_lo, double _range_hi, uint32_t _seed) {
     range_lo = _range_lo;
@@ -43,6 +46,7 @@ public:
     generator = new mt19937(_seed);
     uniform_dist = new uniform_real_distribution<double>(range_lo, range_hi);
     seed = _seed;
+    is_seed_set = true;
   }
   ~RandomNumbers() {
     delete rd;
@@ -52,7 +56,8 @@ public:
 
   double Uniform() { return (*uniform_dist)(*generator); }
 
-  std::optional<uint32_t> GetSeed() const { return seed; }
+  uint32_t GetSeed() const { return seed; }
+  bool IsSeedSet() const { return is_seed_set; }
 };
 
 #endif // RANDOMNUMBERS_H
