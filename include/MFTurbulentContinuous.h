@@ -1,6 +1,6 @@
 /*!
-  \file    MFTurbulentContinous.h
-           Header file for MFTurbulentContinous.cpp
+  \file    MFTurbulentContinuous.h
+           Header file for MFTurbulentContinuous.cpp
 
   \author  Tim Arlen
            timothyarlen@gmail.com
@@ -15,8 +15,8 @@
 
 */
 
-#ifndef IGCASCADE_MFTURBULENTCONTINOUS_H
-#define IGCASCADE_MFTURBULENTCONTINOUS_H
+#ifndef IGCASCADE_MFTURBULENTCONTINUOUS_H
+#define IGCASCADE_MFTURBULENTCONTINUOUS_H
 
 #include <cstdint>
 #include <random>
@@ -31,12 +31,12 @@
 
 namespace IGCascade {
 
-class MFTurbulentContinous {
+class MFTurbulentContinuous {
 public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Constructors///////////////////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  MFTurbulentContinous(RandomNumbers *rng, VEC3D_T b_mag, VEC3D_T coh_len);
+  MFTurbulentContinuous(RandomNumbers *rng, VEC3D_T b_mag, VEC3D_T coh_len);
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Member Functions///////////////////////////////////
@@ -75,4 +75,4 @@ private:
 };
 } // namespace IGCascade
 
-#endif // IGCASCADE_MFTURBULENTCONTINOUS_H
+#endif // IGCASCADE_MFTURBULENTCONTINUOUS_H

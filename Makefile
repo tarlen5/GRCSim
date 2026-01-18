@@ -36,8 +36,8 @@ CFLAGS= -g -Wall -O3 -std=c++11 $(HDF5_CFLAGS)
 # -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 
 #-----------Use this version if running gprof/gdb-----------
-#CPP=g++ -pg
-#CFLAGS= -Wall -O0 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+# CPP=g++ -pg
+# CFLAGS= -g -Wall -O0 -std=c++11 $(HDF5_CFLAGS)
 #-----------------------------------------------------------
 
 CFLAGS += -I$(QDINC) -I$(INCLUDE) -I$(UTILDIR) -I$(EBLDIR)

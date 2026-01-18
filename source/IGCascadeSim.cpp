@@ -79,8 +79,11 @@ IGCascadeSim::IGCascadeSim(
     m_rng = new RandomNumbers(0.0, 1.0);
   }
 
-  // m_BFieldGrid = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
-  m_BFieldPropagator = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
+  VEC3D_T numeric_coh_len = coh_len.c_str();
+  // m_BFieldPropagator = new MagneticGrid(m_rng, m_bmag, m_cellsize,
+  // MFfilename);
+  m_BFieldPropagator =
+      new MFTurbulentContinuous(m_rng, m_bmag, numeric_coh_len);
   m_pspace = new PairProduction(m_rng, m_ze);
   m_kspace = new KleinNishina(m_rng);
 
@@ -407,11 +410,31 @@ void IGCascadeSim::RunSinglePhotonCascade(void) {
   PropagateDirectPhoton(GammaPhoton, lepton_stack);
 
   stack_max = lepton_stack.size();
+  cout << "Propagating " << lepton_stack.size() << " Leptons on stack..."
+       << endl;
+
+  unsigned int counter = 0;
   while (!lepton_stack.empty()) {
 
-    // cout<<"Propagating lepton..."<<endl;
+    if (counter % 500 == 0) {
+      cout << "  Lepton stack energies and redshifts (at iteration " << counter
+           << "):" << endl;
+      stack<RelParticle *> tmp_stack(lepton_stack);
+      while (!tmp_stack.empty()) {
+        RelParticle *lepton = tmp_stack.top();
+        tmp_stack.pop();
+        cout << "    Energy: " << lepton->m_p4.r0 << "  z_s: " << lepton->m_z_s
+             << endl;
+      }
+      static clock_t last_time = clock();
+      clock_t current_time = clock();
+      double elapsed = double(current_time - last_time) / CLOCKS_PER_SEC;
+      cout << "    CPU time since last report: " << elapsed << " sec" << endl;
+      last_time = current_time;
+    }
+    counter++;
+
     PropagateLepton(lepton_stack, GammaPhoton);
-    // cout<<"Finished..."<<endl;
 
     // cout<<"  IC scattered photon created with egy: "<<GammaPhoton.m_p4.r0<<
     //" z_s: "<<GammaPhoton.m_z_s<<endl;
@@ -926,9 +949,14 @@ void IGCascadeSim::PropagateLepton(
   Vec3D n_e = Lepton->m_p4.r / Lepton->m_p4.r.Norm();
   m_kspace->RelativisticKinematics(Lepton->m_p4, GammaPhoton.m_p4);
 
+  // m_BFieldPropagator->PropagateBFieldRedshift(
+  //     GammaPhoton, Lepton, n_e, PL, delta_z, m_LOCK
+  // );
+  // cout<<"  Propagating lepton through B-Field..."<<endl;
   m_BFieldPropagator->PropagateBFieldRedshift(
-      GammaPhoton, Lepton, n_e, PL, delta_z, m_LOCK
+      GammaPhoton, Lepton, n_e, PL, delta_z
   );
+  // cout<<"  Finished propagating lepton through B-Field."<<endl;
 
   // NOTE: added to keep track of gamma_photon's emitted z_s
   GammaPhoton.m_z_s_int = Lepton->m_z_s;

@@ -11,14 +11,19 @@
 -------------------------------------------------------------------------------
 */
 
-#include "MFTurbulentContinous.h"
+#include "MFTurbulentContinuous.h"
 
 namespace IGCascade {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-MFTurbulentContinous::MFTurbulentContinous(
+MFTurbulentContinuous::MFTurbulentContinuous(
     RandomNumbers *rng, VEC3D_T b_mag, VEC3D_T coh_len
 ) {
+
+  std::cout << "Initializing MFTurbulentContinuous with B = " << Double(b_mag)
+            << " G, Coherence Length = " << Double(coh_len) << " Mpc."
+            << std::endl;
+
   m_rng = rng;
   m_bmag = b_mag;      // [gauss]
   m_coh_len = coh_len; // [Mpc]
@@ -45,7 +50,7 @@ MFTurbulentContinous::MFTurbulentContinous(
   m_noise_z.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
 }
 
-void MFTurbulentContinous::PropagateBFieldRedshift(
+void MFTurbulentContinuous::PropagateBFieldRedshift(
     RelParticle &photon, RelParticle *&lepton, Vec3D &n_eo,
     VEC3D_T &prop_length, VEC3D_T &delta_z
 )
@@ -76,6 +81,31 @@ position and the rest of the propagation length is done in that new field, etc.
 */
 {
 
+  // Safety checks
+  if (!lepton) {
+    std::cerr << "Error: lepton pointer is null!" << std::endl;
+    std::abort();
+  }
+  // Example checks for lepton members (customize as needed)
+  // If m_r4 or m_p4 are pointers, check them too:
+  // if (!lepton->m_r4) { ... }
+  // if (!lepton->m_p4) { ... }
+  /*
+  break source/MFTurbulentContinuous.cpp:134
+  set args 3000 1e-17 1 0.14 1 10
+  */
+
+  // Check for zero-length direction vector before normalization
+  Vec3D test_b_field = GetMagneticFieldDirectionAtPosition(lepton->m_r4.r);
+  if (test_b_field.Norm() == 0.0) {
+    std::cerr
+        << "Error: Magnetic field direction vector has zero length at position "
+        << lepton->m_r4.r << std::endl;
+    std::abort();
+  }
+
+  // cout<<"  Starting lepton propagation through turbulent MF..."<<endl;
+
   VEC3D_T prop_length_remaining = prop_length;
   VEC3D_T coherence_length_cm = PhysConst::MPC_TO_CM * m_coh_len;
 
@@ -98,6 +128,11 @@ position and the rest of the propagation length is done in that new field, etc.
     // including deflection by magnetic field, and then check if it would
     // cross z=0 surface.
     Vec3D b_field_dir = GetMagneticFieldDirectionAtPosition(lepton->m_r4.r);
+    // std::cout << "    b_field_dir at position " << lepton->m_r4.r
+    //       << " = (" << b_field_dir.x << ", "
+    //       << b_field_dir.y << ", "
+    //       << b_field_dir.z << "), Norm = "
+    //       << b_field_dir.Norm() << std::endl;
     Vec3D r_new_if_propagated = GetUpdatedPositionWithMFDeflection(
         lepton, prop_length_next_step, n_eo, b_field_dir
     );
@@ -112,6 +147,7 @@ position and the rest of the propagation length is done in that new field, etc.
     // If z_s = 0 surface NOT crossed, do normal propagation and updating:
     if ((lepton->m_z_s - delta_zs) >= "0.0") {
 
+      // Here is where the seg fault occurs. Why?
       PropagateConstantMF(
           photon, lepton, m_bmag, prop_length_next_step, r_new_if_propagated,
           delta_time, n_eo, delta_z, delta_zs, b_field_dir
@@ -157,9 +193,11 @@ position and the rest of the propagation length is done in that new field, etc.
     }
 
   } // end while prop length remaining > 0
+
+  // cout<<"  Finished lepton propagation through turbulent MF."<<endl;
 }
 
-Vec3D MFTurbulentContinous::GetUpdatedPositionWithMFDeflection(
+Vec3D MFTurbulentContinuous::GetUpdatedPositionWithMFDeflection(
     RelParticle *&lepton, VEC3D_T &prop_length_step, const Vec3D &n_eo,
     const Vec3D &b_field_dir
 ) {
@@ -185,12 +223,23 @@ Vec3D MFTurbulentContinous::GetUpdatedPositionWithMFDeflection(
   return r_new;
 }
 
-Vec3D MFTurbulentContinous::GetMagneticFieldDirectionAtPosition(
+Vec3D MFTurbulentContinuous::GetMagneticFieldDirectionAtPosition(
     const Vec3D &position
 ) {
   float x = static_cast<float>(Double(position.x));
   float y = static_cast<float>(Double(position.y));
   float z = static_cast<float>(Double(position.z));
+
+  // Convert position to Mpc units:
+  x /= static_cast<float>(Double(PhysConst::MPC_TO_CM));
+  y /= static_cast<float>(Double(PhysConst::MPC_TO_CM));
+  z /= static_cast<float>(Double(PhysConst::MPC_TO_CM));
+
+  // Add a small epsilon offset (in Mpc) if x or y are exactly zero
+  const float epsilon = 1e-6;
+  if (x < epsilon) x = epsilon;
+  if (y < epsilon) y = epsilon;
+  if (z < epsilon) z = epsilon;
 
   float bx = m_noise_x.GetNoise(x, y, z);
   float by = m_noise_y.GetNoise(x, y, z);
