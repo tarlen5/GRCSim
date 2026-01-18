@@ -78,10 +78,9 @@ IGCascadeSim::IGCascadeSim(
   } else {
     m_rng = new RandomNumbers(0.0, 1.0);
   }
-  
+
   // m_BFieldGrid = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
-  m_BFieldPropagator = new MagneticGrid(
-    m_rng, m_bmag, m_cellsize, MFfilename);
+  m_BFieldPropagator = new MagneticGrid(m_rng, m_bmag, m_cellsize, MFfilename);
   m_pspace = new PairProduction(m_rng, m_ze);
   m_kspace = new KleinNishina(m_rng);
 

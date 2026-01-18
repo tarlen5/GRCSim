@@ -1,5 +1,4 @@
 #include <random>
-#include <optional>
 
 #ifndef RANDOMNUMBERS_H
 #define RANDOMNUMBERS_H
@@ -14,8 +13,8 @@ private:
   random_device *rd;
   mt19937 *generator;
   uniform_real_distribution<double> *uniform_dist;
-  uint32_t seed;          // Stores the seed value
-  bool is_seed_set;       // True if seed is set
+  uint32_t seed;    // Stores the seed value
+  bool is_seed_set; // True if seed is set
 
 public:
   RandomNumbers() {
