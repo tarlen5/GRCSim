@@ -67,7 +67,7 @@ private:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   RandomNumbers *m_rng;
   VEC3D_T m_bmag;    // B_magnitude [gauss]
-  VEC3D_T m_coh_len; // Coherence Length [cm]
+  VEC3D_T m_coh_len; // Coherence Length [Mpc]
   uint32_t m_seed;   // Seed for noise generation
 
   // Noise generators for each component

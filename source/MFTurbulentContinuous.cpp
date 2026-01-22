@@ -11,6 +11,8 @@
 -------------------------------------------------------------------------------
 */
 
+#include <cmath>
+
 #include "MFTurbulentContinuous.h"
 
 namespace IGCascade {
@@ -86,14 +88,6 @@ position and the rest of the propagation length is done in that new field, etc.
     std::cerr << "Error: lepton pointer is null!" << std::endl;
     std::abort();
   }
-  // Example checks for lepton members (customize as needed)
-  // If m_r4 or m_p4 are pointers, check them too:
-  // if (!lepton->m_r4) { ... }
-  // if (!lepton->m_p4) { ... }
-  /*
-  break source/MFTurbulentContinuous.cpp:134
-  set args 3000 1e-17 1 0.14 1 10
-  */
 
   // Check for zero-length direction vector before normalization
   Vec3D test_b_field = GetMagneticFieldDirectionAtPosition(lepton->m_r4.r);
@@ -103,8 +97,6 @@ position and the rest of the propagation length is done in that new field, etc.
         << lepton->m_r4.r << std::endl;
     std::abort();
   }
-
-  // cout<<"  Starting lepton propagation through turbulent MF..."<<endl;
 
   VEC3D_T prop_length_remaining = prop_length;
   VEC3D_T coherence_length_cm = PhysConst::MPC_TO_CM * m_coh_len;
@@ -128,11 +120,6 @@ position and the rest of the propagation length is done in that new field, etc.
     // including deflection by magnetic field, and then check if it would
     // cross z=0 surface.
     Vec3D b_field_dir = GetMagneticFieldDirectionAtPosition(lepton->m_r4.r);
-    // std::cout << "    b_field_dir at position " << lepton->m_r4.r
-    //       << " = (" << b_field_dir.x << ", "
-    //       << b_field_dir.y << ", "
-    //       << b_field_dir.z << "), Norm = "
-    //       << b_field_dir.Norm() << std::endl;
     Vec3D r_new_if_propagated = GetUpdatedPositionWithMFDeflection(
         lepton, prop_length_next_step, n_eo, b_field_dir
     );
@@ -147,7 +134,6 @@ position and the rest of the propagation length is done in that new field, etc.
     // If z_s = 0 surface NOT crossed, do normal propagation and updating:
     if ((lepton->m_z_s - delta_zs) >= "0.0") {
 
-      // Here is where the seg fault occurs. Why?
       PropagateConstantMF(
           photon, lepton, m_bmag, prop_length_next_step, r_new_if_propagated,
           delta_time, n_eo, delta_z, delta_zs, b_field_dir
@@ -193,8 +179,6 @@ position and the rest of the propagation length is done in that new field, etc.
     }
 
   } // end while prop length remaining > 0
-
-  // cout<<"  Finished lepton propagation through turbulent MF."<<endl;
 }
 
 Vec3D MFTurbulentContinuous::GetUpdatedPositionWithMFDeflection(
@@ -241,12 +225,14 @@ Vec3D MFTurbulentContinuous::GetMagneticFieldDirectionAtPosition(
   if (y < epsilon) y = epsilon;
   if (z < epsilon) z = epsilon;
 
-  float bx = m_noise_x.GetNoise(x, y, z);
-  float by = m_noise_y.GetNoise(x, y, z);
-  float bz = m_noise_z.GetNoise(x, y, z);
+  float nx = m_noise_x.GetNoise(x, y, z);
+  float ny = m_noise_y.GetNoise(x, y, z);
 
-  Vec3D b_vec(bx, by, bz);
-  Vec3D b_field_dir = (b_vec / b_vec.Norm());
+  // Generate direction using spherical coordinates for continuity
+  float theta = (nx + 1.0f) * 0.5f * M_PI; // 0 to pi
+  float phi = ny * 2.0f * M_PI;            // -2pi to 2pi
+
+  Vec3D b_field_dir(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 
   return b_field_dir;
 }

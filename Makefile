@@ -28,6 +28,7 @@ INCLUDE=include/
 LIBLOCAL=lib/
 OBJDIR=objdir/
 SRC=source/
+TESTDIR=tests/
 
 # Compiler
 CC=gcc
@@ -47,12 +48,16 @@ LIBS= $(HDF5_LIBS) -lProp -lqd -lpthread -lEBL -lUtility
 LDFLAGS= -L$(LIBLOCAL) -L$(EBLDIR) -L$(UTILDIR) -L$(QDLIB)
 OBJLIBS=libUtility.a libEBL.a
 
-TARGETS = $(OBJDIR) $(OBJLIBS) run_sim_cascade
+TESTS = $(TESTDIR)/test_MFTurbulentContinuous
+TARGETS = $(OBJDIR) $(OBJLIBS) run_sim_cascade $(TESTS)
 OBJ = $(subst $(SRC), $(OBJDIR), $(patsubst %.cpp, %.o, $(wildcard $(SRC)*.cpp)))
 
 .PHONY: $(OBJLIBS)
 
 all: $(TARGETS)
+
+$(TESTDIR)/test_MFTurbulentContinuous: $(TESTDIR)/test_MFTurbulentContinuous.cpp $(LIBLOCAL)libProp.a $(OBJLIBS)
+	$(CPP) $(CFLAGS) -I$(INCLUDE) -I$(SRC) -o $@ $< $(LDFLAGS) $(LIBS)
 
 run_sim_cascade: run_sim_cascade.o $(LIBLOCAL)libProp.a $(OBJLIBS)
 	$(CPP) $(LDFLAGS) $< $(LIBS) $(HDF5_LIBS) -I$(INCLUDE) -o $@
