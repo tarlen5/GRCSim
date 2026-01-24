@@ -41,9 +41,7 @@ Before the simulation is able to run, it needs access to two input files:
 
 <h2>TODO</h2>
 
-* Implement the Intergalactic Magnetic Field in a more realistsic way.
-  1. Currently it uses a "GalacticGrid" class which models the Magnetic Field as constant within a 3D cell with edge length=coherence length of the magnetic field. The values are stored within a `MagneticFieldFiles/` directory which is a text file of the cell coordinates and magnetic field direction. Possibly an sqlite database solution for the magnetic field files would be better when running on a culster, rather than storing them as text files.
-  2. Alternatively, maybe the whole 3D grid needs to be re-thought with another implementation.
-  3. Companion analysis code which re-weights arrival photons according to a flexible, general Lorentz-boosed model of source produciton gamma rays.
+  1. Companion analysis code which re-weights arrival photons according to a flexible, general Lorentz-boosed model of source produciton gamma rays.
+  2. Modular magnetic field propagator to easily switch between Grid-based (GalacticGrid) and MFTurbulenceContinuous class.
 
 
