@@ -97,8 +97,8 @@ IGCascadeSim::IGCascadeSim(
   cout << "Using opt depth file: " << optDepthFile << endl;
 
   // Pause and wait for user input before continuing
-  std::cout << "Press Enter to continue..." << std::endl;
-  std::cin.get();
+  // std::cout << "Press Enter to continue..." << std::endl;
+  // std::cin.get();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
