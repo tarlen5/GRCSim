@@ -23,7 +23,9 @@
 */
 
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
+#include <libgen.h>
 #include <sstream>
 #include <string>
 
@@ -37,34 +39,43 @@ AnyOption *DefineOptions(int argc, char *argv[], const string &progname) {
   AnyOption *opt = new AnyOption();
 
   /* 1. SET THE USAGE/HELP   */
-  opt->addUsage("Usage:\n");
-  string usageHelp = "  " + progname +
-                     " energy Bmag Lcoh ze num_gammas file_num" +
-                     " [Options]\n";
+  string usageHelp = "Usage:";
   opt->addUsage(usageHelp.c_str());
+  // cout<<"progname: "<<progname<<endl;
+  // string command =
+  //     "  run_sim_cascade energy Bmag Lcoh ze num_gammas file_num [Options]";
+  string command =
+      ("  " + progname + " energy Bmag Lcoh ze file_num iterations [Options]\n"
+      );
+  opt->addUsage(command.c_str());
   opt->addUsage("energy     - [GeV] energy of photon at OBSERVER redshift.");
   opt->addUsage("Bmag       - [gauss] magnetic field magnitude.");
   opt->addUsage("Lcoh       - [Mpc] coherence length of magnetic field.");
   opt->addUsage("ze         - redshift at source point.");
   opt->addUsage("file_num   - file number tag.");
-  opt->addUsage("iterations - number of photons to simulate in this run.\n");
+  opt->addUsage("iterations - number of photons to simulate in this run.");
   // opt->addUsage( "Usage: " );
-  opt->addUsage("Options:");
+  opt->addUsage("\nOptions:");
   opt->addUsage(" -h  --help      Prints this help ");
   opt->addUsage(" --eblmodel      EBLModel4msld        EBLModel name.");
+  opt->addUsage(" --opt_depth_dir OptDepthFiles/       opt depth files dir.");
+  opt->addUsage(" --output_dir    (cwd)      Directory to output files.");
+
+  // IGMFPropagator specific options:
   opt->addUsage(
       " --mf_dir        MagneticFieldFiles/  magnetic field files dir."
   );
-  opt->addUsage(" --opt_depth_dir OptDepthFiles/       opt depth files dir.");
-  opt->addUsage(" --output_dir    (cwd)      Directory to output files.");
-  opt->addUsage(" --gam_egy_min    0.1 min energy [GeV] to track gammas.");
-  opt->addUsage(" --lep_egy_min    75. min energy [GeV] to track leptons.");
-  opt->addUsage(
-      " --seed           <uint32_t> Random number seed for reproducibility."
-  );
-
   opt->addUsage(" --mf_no_lock    No locking of mf files, so cosmic variance "
                 "is not preserved in simulation. ");
+  opt->addUsage(" --use_mf_grid  Use MagneticGrid class for grid-based "
+                "magnetic field propagation. ");
+
+  opt->addUsage(" --gam_egy_min   0.1 min energy [GeV] to track gammas.");
+  opt->addUsage(" --lep_egy_min   75. min energy [GeV] to track leptons.");
+  opt->addUsage(
+      " --seed          <uint32_t> Random number seed for reproducibility."
+  );
+
   opt->addUsage(" --single_gen    Forces single generation of cascade.");
   opt->addUsage(" --trk_delay     Track time delay throughout cascade.");
   opt->addUsage(" --trk_leptons   Tracks all leptons throughout cascade.");
@@ -72,13 +83,14 @@ AnyOption *DefineOptions(int argc, char *argv[], const string &progname) {
   /* 2. SET THE OPTION STRINGS/CHARACTERS */
   opt->setFlag("help", 'h');
   opt->setOption("eblmodel");
-  opt->setOption("mf_dir");
   opt->setOption("opt_depth_dir");
   opt->setOption("output_dir");
+  opt->setOption("mf_dir");
+  opt->setFlag("mf_no_lock");
+  opt->setFlag("use_mf_grid");
   opt->setOption("gam_egy_min");
   opt->setOption("lep_egy_min");
   opt->setOption("seed");
-  opt->setFlag("mf_no_lock");
   opt->setFlag("single_gen");
   opt->setFlag("trk_delay");
   opt->setFlag("trk_leptons");

@@ -46,27 +46,66 @@ namespace IGCascade {
 /// Overloaded class constructor (1)
 /// \param _MagneticField: m_MagneticField
 /// \param _rng: rng
+// MagneticGrid(
+//     RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
+//     std::string sfilename
+// );
+
 MagneticGrid::MagneticGrid(
-    RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
-    std::string filename
-) {
+    RandomNumbers *_rng, const std::string &B_mag,
+    const std::string &s_cell_size, const std::string &redshift,
+    const std::string &mf_dir, const bool use_file_lock
+)
+    : IGMFPropagator(_rng, B_mag.c_str()) {
 
   // public member:
   m_DE = "1.0E-25";
   m_rng = _rng;
+  m_use_file_lock = use_file_lock;
 
   // cellsize defined in units of Mpc but converted to cm
   std::istringstream(s_cell_size) >> m_cellsize; // [Mpc]
   // MpcToCm = 3.086E+24;                        // [cm/Mpc]
   m_cellsize = m_cellsize * Double(MPC_TO_CM); // [cm]
-  m_bmag = B_mag;                              // [gauss]
-  m_sfilename = filename;
+  m_bmag = B_mag.c_str();                      // [gauss]
+
+  m_sfilename = DefineMFfile(mf_dir, B_mag, s_cell_size, redshift);
+
+  std::cout << "Initializing MagneticGrid with B = " << Double(m_bmag)
+            << " G, Coherence Length = " << s_cell_size << " Mpc "
+            << "Magnetic Field File: " << m_sfilename
+            << " and lock: " << m_use_file_lock << std::endl;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Private Methods:
+///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+std::string MagneticGrid::DefineMFfile(
+    const std::string &mf_dir, const std::string &s_Bmag,
+    const std::string &s_cellsize, const std::string &redshift
+) {
+  std::string MFfilename = mf_dir + "MagneticGrid_B" + s_Bmag + "_L" +
+                           s_cellsize + "_z" + redshift + ".txt";
+
+  // Ensure the directory exists
+  std::string dir = mf_dir;
+  if (!dir.empty() && dir.back() == '/') dir.pop_back();
+  system(("mkdir -p " + dir).c_str());
+
+  // Create the file if it does not exist
+  std::ifstream check(MFfilename.c_str());
+  if (!check.good()) {
+    std::ofstream create(MFfilename.c_str());
+    create.close();
+    std::cout << "Creating magnetic field file: " << MFfilename << std::endl;
+  }
+  return MFfilename;
+}
+
 void MagneticGrid::PropagateBFieldRedshift(
     RelParticle &Photon, RelParticle *&Lepton, Vec3D &n_eo, VEC3D_T &PL,
-    VEC3D_T &delta_z, const bool LOCK
+    VEC3D_T &delta_z
 )
 /* Designed to work with the KleinNishina class. A propagation
    length has been determined and the IC scattered photon and
@@ -86,8 +125,6 @@ void MagneticGrid::PropagateBFieldRedshift(
      delta_z - change in redshift of the lepton over the
                distance of the propagation length.
 
-     LOCK - if 'true', use CheckMagneticField_Lock; default value is 'false'.
-
      IMPORTANT: assumes delta_z is always a positive quantity.
 
     \note: returns void, but updates photon/lepton 4-position and
@@ -105,7 +142,7 @@ void MagneticGrid::PropagateBFieldRedshift(
     ICoord c_cur = CheckCurrentCell(Lepton->m_r4.r);
 
     Vec3D e_b(0., 0., 0.);
-    if (LOCK)
+    if (m_use_file_lock)
       e_b = CheckMagneticField_Lock(c_cur);
     else
       e_b = CheckMagneticField(c_cur);
@@ -464,15 +501,16 @@ int MagneticGrid::LockAttempt(const char *filename, int *fd, std::string rwtype)
 
   const int WAIT_TIME = 10; // 10 musec
   struct flock lck;
+  unsigned int TRYNUM_DISP = 10;
 
   if (rwtype == "read") { // read_write = TRUE for read lock
     *fd = open(filename, O_RDONLY);
     lck.l_type = F_RDLCK;
-    std::cerr << "Read lock attempted." << std::endl;
+    // std::cerr << "Read lock attempted." << std::endl;
   } else if (rwtype == "write") {
     *fd = open(filename, O_WRONLY);
     lck.l_type = F_WRLCK;
-    std::cerr << "Write lock attempted." << std::endl;
+    // std::cerr << "Write lock attempted." << std::endl;
   } else {
     std::cerr << "Invalid Lock Type: " << rwtype << std::endl;
     exit(EXIT_FAILURE);
@@ -493,12 +531,14 @@ int MagneticGrid::LockAttempt(const char *filename, int *fd, std::string rwtype)
   //   Check them to see what the problem was if needed! (or online)
   ///////////////////////////////////////////////////////////////
 
-  int TRYNO = 0;
-  std::cerr << "Lock Attempt..." << std::endl;
+  unsigned int TRYNO = 0;
+  // std::cerr << "Lock Attempt..." << std::endl;
   while (TRYNO >= 0) { // only a return can break out of the while loop
 
     if (fcntl(*fd, F_SETLK, &lck) == 0) {
-      std::cerr << "TRYNO: " << TRYNO << std::endl;
+      if (TRYNO > TRYNUM_DISP) {
+        std::cerr << "TRYNO: " << TRYNO << std::endl;
+      }
       return *fd;
     } else if (errno == EAGAIN || errno == EACCES) { // file in use
       // std::cerr<<"File in use..."<<std::endl;
@@ -513,7 +553,7 @@ int MagneticGrid::LockAttempt(const char *filename, int *fd, std::string rwtype)
       // std::cerr<<"errno: "<<errno<<std::endl;
       // return -2;
     }
-    TRYNO = TRYNO + 1;
+    TRYNO++;
   }
 
   return -3; // nothing happened!

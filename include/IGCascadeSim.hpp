@@ -21,6 +21,7 @@
 #include "DIRBR.hpp"
 #include "GalacticGrid.hpp"
 #include "HighPrecProp.hpp"
+#include "IGMFPropagator.hpp"
 #include "KleinNishina.hpp"
 #include "MFTurbulentContinuous.h"
 #include "PairProduction.hpp"
@@ -40,6 +41,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <stack>
 #include <stdio.h>
@@ -65,6 +67,8 @@ public:
 
   void RunCascade(const int numIterations);
 
+  ~IGCascadeSim();
+
 private:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Private Functions   ///////////////////////////////
@@ -77,10 +81,6 @@ private:
       const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
       const string &s_ze, const string &s_cellsize, const string &s_file_num,
       const string &output_dir
-  );
-  string DefineMFfile(
-      const string &static_var_file, const string &s_Bmag,
-      const string &s_cellsize, const string &s_ze
   );
   string DefineLowEgyFile(
       const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
@@ -167,9 +167,11 @@ private:
   Table2D *m_optDepthTable;
   double m_tauCutoff;
 
+  // To specify MagneticGrid vs. MFTurbulentContinuous
+  bool m_use_mf_grid;
+
   RandomNumbers *m_rng;
-  //   MagneticGrid *m_BFieldPropagator;
-  MFTurbulentContinuous *m_BFieldPropagator;
+  IGMFPropagator *m_BFieldPropagator;
   PairProduction *m_pspace;
   KleinNishina *m_kspace;
 

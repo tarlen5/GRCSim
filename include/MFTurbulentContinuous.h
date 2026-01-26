@@ -23,6 +23,7 @@
 
 #include "FastNoiseLite.h"
 #include "HighPrecProp.hpp"
+#include "IGMFPropagator.hpp"
 #include "PhysicsConstants.hpp"
 #include "RandomNumbers.hpp"
 #include "RelParticle.hpp"
@@ -31,7 +32,7 @@
 
 namespace IGCascade {
 
-class MFTurbulentContinuous {
+class MFTurbulentContinuous : public IGMFPropagator {
 public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Constructors///////////////////////////////////////
@@ -54,7 +55,6 @@ public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Public Data Members////////////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  VEC3D_T m_DE; // minimum precision for root finding at z_s = 0 surface
 
 private:
   Vec3D GetUpdatedPositionWithMFDeflection(

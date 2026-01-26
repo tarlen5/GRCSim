@@ -224,6 +224,9 @@ void AnyOption::cleanup() {
   free(optionchars);
   free(optchartype);
   free(optcharindex);
+  for (int i = 0; i < max_usage_lines; i++) {
+    if (usage[i]) free((char *)usage[i]);
+  }
   free(usage);
   if (values != NULL) free(values);
   if (new_argv != NULL) free(new_argv);
@@ -912,13 +915,11 @@ void AnyOption::printAutoUsage() {
 
 void AnyOption::printUsage() {
 
-  if (once) {
-    once = false;
-    cout << endl;
-    for (int i = 0; i < usage_lines; i++)
-      cout << usage[i] << endl;
-    cout << endl;
-  }
+  cout << endl;
+  for (int i = 0; i < usage_lines; i++)
+    cout << usage[i] << endl;
+  cout << endl;
+  cout.flush();
 }
 
 void AnyOption::addUsage(const char *line) {
@@ -928,7 +929,7 @@ void AnyOption::addUsage(const char *line) {
       exit(1);
     }
   }
-  usage[usage_lines] = line;
+  usage[usage_lines] = strdup(line);
   usage_lines++;
 }
 

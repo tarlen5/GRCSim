@@ -29,6 +29,7 @@
 #define IGCASCADE_GALACTICGRID_H
 
 #include "HighPrecProp.hpp"
+#include "IGMFPropagator.hpp"
 #include "PhysicsConstants.hpp"
 #include "RandomNumbers.hpp"
 #include "RelParticle.hpp"
@@ -88,18 +89,19 @@ inline bool operator<(const ICoord &c1, const ICoord &c2) {
 //  typedef Vec3D B;
 typedef std::map<ICoord, Vec3D> Field;
 
-class MagneticGrid {
+class MagneticGrid : public IGMFPropagator {
 public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Constructors///////////////////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // Default constructor
-  inline MagneticGrid();
+  // inline MagneticGrid();
 
   MagneticGrid(
-      RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
-      std::string sfilename
+      RandomNumbers *_rng, const std::string &B_mag,
+      const std::string &s_cell_size, const std::string &redshift,
+      const std::string &mf_dir, const bool use_file_lock = true
   );
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,7 +119,7 @@ public:
 
   void PropagateBFieldRedshift(
       RelParticle &Photon, RelParticle *&Lepton, Vec3D &n_eo, VEC3D_T &PL,
-      VEC3D_T &delta_z, const bool LOCK = false
+      VEC3D_T &delta_z
   );
 
   Vec3D
@@ -128,16 +130,23 @@ public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // These are now public so we can write them to the output file...
   double m_cellsize;
-  VEC3D_T m_bmag; // B_magnitude;
-  VEC3D_T m_DE;   // relative computation precision of roots
   std::string m_sfilename;
 
 private:
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // Private Member Functions//////////////////////////
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  std::string DefineMFfile(
+      const std::string &mf_dir, const std::string &B_mag,
+      const std::string &s_cell_size, const std::string &redshift
+  );
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Private Data Members////////////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   RandomNumbers *m_rng;
   Field m_MagneticField;
+  bool m_use_file_lock;
 };
 
 } // namespace IGCascade

@@ -270,7 +270,7 @@ bins. (ADDED 4/16/2013)
 
   // interacted redshift in double-double precision.
   // z_int = (z_o - m_dz*prop_steps);
-  std::cout << "\n  z_int: " << z_int << std::endl << std::endl;
+  std::cout << "  z_int: " << z_int << std::endl;
   return true;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -282,11 +282,11 @@ bool PairProduction::UpdateGammaPhoton(
 /*!  Updates Gamma's .r4, .z, .z_s, and .p4
 
   \param
-      gam_ph_p4  - gamma ray 4 momentum
-gam_ph_r4  - gamma ray 4 position
-gam_ph_z   - gamma ray redshift
-gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
-delta_z_step - redshift difference that photon took on this step.
+    gam_ph_p4  - gamma ray 4 momentum
+    gam_ph_r4  - gamma ray 4 position
+    gam_ph_z   - gamma ray redshift
+    gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
+    delta_z_step - redshift difference that photon took on this step.
 
    \return True - if pair production occurs before z=0 False otherwise.
 */
@@ -375,12 +375,12 @@ VEC3D_T PairProduction::GetEBLPhotonEgy(
   Results in updated background photon's energy.
 
   \param
-       z_int          - redshift at which gamma photon interacts.
- z_o            - redshift at which gamma photon started.
- gam_ph_egy     - gamma photon energy
- bg_ph_egy      - background photon energy
- TotalLambdaInt - total lambda integral, as calculated in
-                  CheckPairProductionEBL() fn.
+    z_int          - redshift at which gamma photon interacts.
+    z_o            - redshift at which gamma photon started.
+    gam_ph_egy     - gamma photon energy
+    bg_ph_egy      - background photon energy
+    TotalLambdaInt - total lambda integral, as calculated in
+                      CheckPairProductionEBL() fn.
 
   \returns - ebl photon egy which interacted to pair produce
 */
@@ -416,7 +416,7 @@ VEC3D_T PairProduction::GetEBLPhotonEgy(
   //  Note: units are in [ eV m^-2 sr^-1 s^-1 ]
   double dirbr = nJtoeV_d * dirbr_temp;
 
-  std::cout << std::endl << "Integrating to find EBL Photon energy...\n\n";
+  std::cout << "Integrating to find EBL Photon energy...\n";
 
   while (LambdaInt < TotalLambdaInt * chi_rand) {
 
@@ -468,19 +468,20 @@ void PairProduction::UpdateEBLPhoton(
     Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z, VEC3D_T &gam_ph_z_s,
     Vec4D &bg_ph_p4, Vec4D &bg_ph_r4, VEC3D_T &bg_ph_z
 )
-/*! Routine defines the EBL 3 momentum, by calling the ImpactAngle()
+/*!
+  Routine defines the EBL 3 momentum, by calling the ImpactAngle()
   function and rotating into the frame where direction of gamma
   photon is along z_axis.
   Also updates all of EBLPhoton dynamical parameters.
 
   \param
       gam_ph_p4  - gamma ray 4 momentum
-gam_ph_r4  - gamma ray 4 position
-gam_ph_z   - gamma ray redshift
-gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
-bg_ph_p4   - background photon 4 momentum; calculated here
-bg_ph_r4   - background photon 4 position; calculated here
-bg_ph_z    - background photon redshift; calculated here
+      gam_ph_r4  - gamma ray 4 position
+      gam_ph_z   - gamma ray redshift
+      gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
+      bg_ph_p4   - background photon 4 momentum; calculated here
+      bg_ph_r4   - background photon 4 position; calculated here
+      bg_ph_z    - background photon redshift; calculated here
 */
 {
 
@@ -621,17 +622,17 @@ bool PairProduction::RelativisticKinematics(
 
   \param
       gam_ph_p4  - gamma ray 4 momentum
-bg_ph_p4   - background photon 4 momentum
-elec_p4    - electron 4 momentum
-pos_p4     - positron 4 momentum
+      bg_ph_p4   - background photon 4 momentum
+      elec_p4    - electron 4 momentum
+      pos_p4     - positron 4 momentum
 
   \note All input parameters are assumed to be in the lab frame.
 
 */
 {
 
-  std::cout << "Computing relativistic kinematics of interaction..."
-            << std::endl;
+  std::cout << "Computing relativistic kinematics of interaction...";
+  // << std::endl;
 
   VEC3D_T me_sq = (PhysConst::eV_MELEC) * (PhysConst::eV_MELEC); // [eV^2]
 
