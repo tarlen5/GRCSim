@@ -20,7 +20,8 @@ namespace IGCascade {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 MFTurbulentContinuous::MFTurbulentContinuous(
     RandomNumbers *rng, VEC3D_T b_mag, VEC3D_T coh_len
-) {
+)
+    : IGMFPropagator(rng, b_mag) {
 
   std::cout << "Initializing MFTurbulentContinuous with B = " << Double(b_mag)
             << " G, Coherence Length = " << Double(coh_len) << " Mpc."

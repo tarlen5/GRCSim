@@ -29,6 +29,7 @@
 #define IGCASCADE_GALACTICGRID_H
 
 #include "HighPrecProp.hpp"
+#include "IGMFPropagator.hpp"
 #include "PhysicsConstants.hpp"
 #include "RandomNumbers.hpp"
 #include "RelParticle.hpp"
@@ -88,7 +89,7 @@ inline bool operator<(const ICoord &c1, const ICoord &c2) {
 //  typedef Vec3D B;
 typedef std::map<ICoord, Vec3D> Field;
 
-class MagneticGrid {
+class MagneticGrid : public IGMFPropagator {
 public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Constructors///////////////////////////////////////
@@ -129,8 +130,6 @@ public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // These are now public so we can write them to the output file...
   double m_cellsize;
-  VEC3D_T m_bmag; // B_magnitude;
-  VEC3D_T m_DE;   // relative computation precision of roots
   std::string m_sfilename;
 
 private:

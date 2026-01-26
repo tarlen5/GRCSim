@@ -21,6 +21,7 @@
 #include "DIRBR.hpp"
 #include "GalacticGrid.hpp"
 #include "HighPrecProp.hpp"
+#include "IGMFPropagator.hpp"
 #include "KleinNishina.hpp"
 #include "MFTurbulentContinuous.h"
 #include "PairProduction.hpp"
@@ -170,8 +171,7 @@ private:
   double m_tauCutoff;
 
   RandomNumbers *m_rng;
-  MagneticGrid *m_BFieldPropagator;
-  //   MFTurbulentContinuous *m_BFieldPropagator;
+  IGMFPropagator *m_BFieldPropagator;
   PairProduction *m_pspace;
   KleinNishina *m_kspace;
 

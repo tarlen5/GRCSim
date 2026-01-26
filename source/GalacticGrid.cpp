@@ -55,7 +55,8 @@ MagneticGrid::MagneticGrid(
     RandomNumbers *_rng, const std::string &B_mag,
     const std::string &s_cell_size, const std::string &redshift,
     const std::string &mf_dir, const bool use_file_lock
-) {
+)
+    : IGMFPropagator(_rng, B_mag.c_str()) {
 
   // public member:
   m_DE = "1.0E-25";

@@ -632,7 +632,7 @@ bool PairProduction::RelativisticKinematics(
 {
 
   std::cout << "Computing relativistic kinematics of interaction...";
-            // << std::endl;
+  // << std::endl;
 
   VEC3D_T me_sq = (PhysConst::eV_MELEC) * (PhysConst::eV_MELEC); // [eV^2]
 
