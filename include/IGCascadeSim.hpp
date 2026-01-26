@@ -170,6 +170,9 @@ private:
   Table2D *m_optDepthTable;
   double m_tauCutoff;
 
+  // To specify MagneticGrid vs. MFTurbulentContinuous
+  bool m_use_mf_grid;
+
   RandomNumbers *m_rng;
   IGMFPropagator *m_BFieldPropagator;
   PairProduction *m_pspace;

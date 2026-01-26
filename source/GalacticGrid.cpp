@@ -70,6 +70,11 @@ MagneticGrid::MagneticGrid(
   m_bmag = B_mag.c_str();                      // [gauss]
 
   m_sfilename = DefineMFfile(mf_dir, B_mag, s_cell_size, redshift);
+
+  std::cout << "Initializing MagneticGrid with B = " << Double(m_bmag)
+            << " G, Coherence Length = " << s_cell_size << " Mpc "
+            << "Magnetic Field File: " << m_sfilename
+            << " and lock: " << m_use_file_lock << std::endl;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -526,7 +531,7 @@ int MagneticGrid::LockAttempt(const char *filename, int *fd, std::string rwtype)
   //   Check them to see what the problem was if needed! (or online)
   ///////////////////////////////////////////////////////////////
 
-  int TRYNO = 0;
+  unsigned int TRYNO = 0;
   // std::cerr << "Lock Attempt..." << std::endl;
   while (TRYNO >= 0) { // only a return can break out of the while loop
 
@@ -548,7 +553,7 @@ int MagneticGrid::LockAttempt(const char *filename, int *fd, std::string rwtype)
       // std::cerr<<"errno: "<<errno<<std::endl;
       // return -2;
     }
-    TRYNO = TRYNO + 1;
+    TRYNO++;
   }
 
   return -3; // nothing happened!

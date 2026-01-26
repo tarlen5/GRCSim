@@ -78,17 +78,27 @@ IGCascadeSim::IGCascadeSim(
     m_rng = new RandomNumbers(0.0, 1.0);
   }
 
-  m_BFieldPropagator =
-      new MagneticGrid(m_rng, mag_field, coh_len, redshift, mf_dir, m_LOCK);
-  // m_BFieldPropagator =
-  //     new MFTurbulentContinuous(m_rng, m_bmag, numeric_coh_len);
+  // Define Magnetic Field Propagator:
+  if (m_use_mf_grid) {
+    cout << "Using MagneticGrid for IGMF propagation." << endl;
+    m_BFieldPropagator =
+        new MagneticGrid(m_rng, mag_field, coh_len, redshift, mf_dir, m_LOCK);
+  } else {
+    cout << "Using MFTurbulentContinuous for IGMF propagation." << endl;
+    VEC3D_T numeric_coh_len = coh_len.c_str();
+    m_BFieldPropagator =
+        new MFTurbulentContinuous(m_rng, m_bmag, numeric_coh_len);
+  }
   m_pspace = new PairProduction(m_rng, m_ze);
   m_kspace = new KleinNishina(m_rng);
 
   cout << endl;
   cout << "Using cascade file:   " + m_cascade_file << endl;
-  // cout << "Using Mag Grid file:  " << MFfilename << endl;
   cout << "Using opt depth file: " << optDepthFile << endl;
+
+  // Pause and wait for user input before continuing
+  std::cout << "Press Enter to continue..." << std::endl;
+  std::cin.get();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -101,6 +111,7 @@ void IGCascadeSim::ProcessOptions(
   mf_dir = "MagneticFieldFiles/";
   opt_depth_dir = "OptDepthFiles/";
   output_dir = "";
+  m_use_mf_grid = false;
   m_egy_gamma_min = 0.1;
   m_egy_lepton_min = 75.0;
 
@@ -114,6 +125,7 @@ void IGCascadeSim::ProcessOptions(
     m_egy_gamma_min = opt->getValue("gam_egy_min");
   if (opt->getValue("lep_egy_min") != NULL)
     m_egy_lepton_min = opt->getValue("lep_egy_min");
+  if (opt->getFlag("use_mf_grid")) m_use_mf_grid = true;
 
   // Seed option:
   m_seed_provided = false;
@@ -139,12 +151,13 @@ void IGCascadeSim::ProcessOptions(
 
   cout << "\n>> Options processed" << endl;
   cout << "   --eblmodel:      " << eblmodel << endl;
-  cout << "   --mf_dir:        " << mf_dir << endl;
   cout << "   --opt_depth_dir: " << opt_depth_dir << endl;
   cout << "   --output_dir:    " << output_dir << endl;
+  cout << "   --mf_dir:        " << mf_dir << endl;
+  cout << "   --mf_no_lock:    " << (!m_LOCK) << endl;
+  cout << "   --use_mf_grid:   " << m_use_mf_grid << endl;
   cout << "   --gam_egy_min:   " << m_egy_gamma_min << endl;
   cout << "   --lep_egy_min:   " << m_egy_lepton_min << endl;
-  cout << "   --mf_no_lock:    " << (!m_LOCK) << endl;
   cout << "   --single_gen:    " << m_single_gen_bool << endl;
   cout << "   --trk_delay:     " << m_trk_delay_bool << endl;
   cout << "   --trk_leptons:   " << m_trk_leptons_bool << endl;
