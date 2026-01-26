@@ -82,10 +82,6 @@ private:
       const string &s_ze, const string &s_cellsize, const string &s_file_num,
       const string &output_dir
   );
-  //   string DefineMFfile(
-  //       const string &static_var_file, const string &s_Bmag,
-  //       const string &s_cellsize, const string &s_ze
-  //   );
   string DefineLowEgyFile(
       const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
       const string &s_ze, const string &s_cellsize, const string &s_file_num
