@@ -100,7 +100,7 @@ public:
   MagneticGrid(
       RandomNumbers *_rng, const std::string &B_mag,
       const std::string &s_cell_size, const std::string &redshift,
-      const std::string &mf_dir
+      const std::string &mf_dir, const bool use_file_lock = true
   );
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,7 +118,7 @@ public:
 
   void PropagateBFieldRedshift(
       RelParticle &Photon, RelParticle *&Lepton, Vec3D &n_eo, VEC3D_T &PL,
-      VEC3D_T &delta_z, const bool LOCK = false
+      VEC3D_T &delta_z
   );
 
   Vec3D
@@ -135,14 +135,19 @@ public:
 
 private:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // Private Data Members////////////////////////////////
+  // Private Member Functions//////////////////////////
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  RandomNumbers *m_rng;
-  Field m_MagneticField;
   std::string DefineMFfile(
       const std::string &mf_dir, const std::string &B_mag,
       const std::string &s_cell_size, const std::string &redshift
   );
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // Private Data Members////////////////////////////////
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  RandomNumbers *m_rng;
+  Field m_MagneticField;
+  bool m_use_file_lock;
 };
 
 } // namespace IGCascade

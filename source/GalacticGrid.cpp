@@ -54,12 +54,13 @@ namespace IGCascade {
 MagneticGrid::MagneticGrid(
     RandomNumbers *_rng, const std::string &B_mag,
     const std::string &s_cell_size, const std::string &redshift,
-    const std::string &mf_dir
+    const std::string &mf_dir, const bool use_file_lock
 ) {
 
   // public member:
   m_DE = "1.0E-25";
   m_rng = _rng;
+  m_use_file_lock = use_file_lock;
 
   // cellsize defined in units of Mpc but converted to cm
   std::istringstream(s_cell_size) >> m_cellsize; // [Mpc]
@@ -98,7 +99,7 @@ std::string MagneticGrid::DefineMFfile(
 
 void MagneticGrid::PropagateBFieldRedshift(
     RelParticle &Photon, RelParticle *&Lepton, Vec3D &n_eo, VEC3D_T &PL,
-    VEC3D_T &delta_z, const bool LOCK
+    VEC3D_T &delta_z
 )
 /* Designed to work with the KleinNishina class. A propagation
    length has been determined and the IC scattered photon and
@@ -118,8 +119,6 @@ void MagneticGrid::PropagateBFieldRedshift(
      delta_z - change in redshift of the lepton over the
                distance of the propagation length.
 
-     LOCK - if 'true', use CheckMagneticField_Lock; default value is 'false'.
-
      IMPORTANT: assumes delta_z is always a positive quantity.
 
     \note: returns void, but updates photon/lepton 4-position and
@@ -137,7 +136,7 @@ void MagneticGrid::PropagateBFieldRedshift(
     ICoord c_cur = CheckCurrentCell(Lepton->m_r4.r);
 
     Vec3D e_b(0., 0., 0.);
-    if (LOCK)
+    if (m_use_file_lock)
       e_b = CheckMagneticField_Lock(c_cur);
     else
       e_b = CheckMagneticField(c_cur);
@@ -496,15 +495,16 @@ int MagneticGrid::LockAttempt(const char *filename, int *fd, std::string rwtype)
 
   const int WAIT_TIME = 10; // 10 musec
   struct flock lck;
+  unsigned int TRYNUM_DISP = 10;
 
   if (rwtype == "read") { // read_write = TRUE for read lock
     *fd = open(filename, O_RDONLY);
     lck.l_type = F_RDLCK;
-    std::cerr << "Read lock attempted." << std::endl;
+    // std::cerr << "Read lock attempted." << std::endl;
   } else if (rwtype == "write") {
     *fd = open(filename, O_WRONLY);
     lck.l_type = F_WRLCK;
-    std::cerr << "Write lock attempted." << std::endl;
+    // std::cerr << "Write lock attempted." << std::endl;
   } else {
     std::cerr << "Invalid Lock Type: " << rwtype << std::endl;
     exit(EXIT_FAILURE);
@@ -526,11 +526,13 @@ int MagneticGrid::LockAttempt(const char *filename, int *fd, std::string rwtype)
   ///////////////////////////////////////////////////////////////
 
   int TRYNO = 0;
-  std::cerr << "Lock Attempt..." << std::endl;
+  // std::cerr << "Lock Attempt..." << std::endl;
   while (TRYNO >= 0) { // only a return can break out of the while loop
 
     if (fcntl(*fd, F_SETLK, &lck) == 0) {
-      std::cerr << "TRYNO: " << TRYNO << std::endl;
+      if (TRYNO > TRYNUM_DISP) {
+        std::cerr << "TRYNO: " << TRYNO << std::endl;
+      }
       return *fd;
     } else if (errno == EAGAIN || errno == EACCES) { // file in use
       // std::cerr<<"File in use..."<<std::endl;

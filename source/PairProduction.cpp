@@ -270,7 +270,7 @@ bins. (ADDED 4/16/2013)
 
   // interacted redshift in double-double precision.
   // z_int = (z_o - m_dz*prop_steps);
-  std::cout << "\n  z_int: " << z_int << std::endl << std::endl;
+  std::cout << "  z_int: " << z_int << std::endl;
   return true;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -416,7 +416,7 @@ VEC3D_T PairProduction::GetEBLPhotonEgy(
   //  Note: units are in [ eV m^-2 sr^-1 s^-1 ]
   double dirbr = nJtoeV_d * dirbr_temp;
 
-  std::cout << std::endl << "Integrating to find EBL Photon energy...\n\n";
+  std::cout << "Integrating to find EBL Photon energy...\n";
 
   while (LambdaInt < TotalLambdaInt * chi_rand) {
 
@@ -631,8 +631,8 @@ bool PairProduction::RelativisticKinematics(
 */
 {
 
-  std::cout << "Computing relativistic kinematics of interaction..."
-            << std::endl;
+  std::cout << "Computing relativistic kinematics of interaction...";
+            // << std::endl;
 
   VEC3D_T me_sq = (PhysConst::eV_MELEC) * (PhysConst::eV_MELEC); // [eV^2]
 

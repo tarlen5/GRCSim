@@ -78,14 +78,8 @@ IGCascadeSim::IGCascadeSim(
     m_rng = new RandomNumbers(0.0, 1.0);
   }
 
-  VEC3D_T numeric_coh_len = coh_len.c_str();
-  // NOTE: this file is only needed if using a grid-based MF propagator class
-  // string MFfilename = DefineMFfile(mf_dir, mag_field, coh_len, redshift);
-  // m_BFieldPropagator = new MagneticGrid(m_rng, m_bmag, m_cellsize,
-  // MFfilename);
-
   m_BFieldPropagator =
-      new MagneticGrid(m_rng, mag_field, coh_len, redshift, mf_dir);
+      new MagneticGrid(m_rng, mag_field, coh_len, redshift, mf_dir, m_LOCK);
   // m_BFieldPropagator =
   //     new MFTurbulentContinuous(m_rng, m_bmag, numeric_coh_len);
   m_pspace = new PairProduction(m_rng, m_ze);
@@ -171,35 +165,8 @@ string IGCascadeSim::DefineCascadeFile(
                     "_B" + s_Bmag + "_L" + s_cellsize + "_" + s_file_num +
                     ".h5";
 
-  // HDF5 dataset will be created when first writing
-
   return filename;
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// string IGCascadeSim::DefineMFfile(
-//     const string &mf_dir, const string &s_Bmag, const string &s_cellsize,
-//     const string &s_ze
-// ) {
-//   string MFfilename = mf_dir + "MagneticGrid_B" + s_Bmag + "_L" + s_cellsize
-//   +
-//                       "_z" + s_ze + ".txt";
-
-//   // Ensure the directory exists
-//   string dir = mf_dir;
-//   if (!dir.empty() && dir.back() == '/') dir.pop_back();
-//   system(("mkdir -p " + dir).c_str());
-
-//   // Create the file if it does not exist
-//   std::ifstream check(MFfilename.c_str());
-//   if (!check.good()) {
-//     std::ofstream create(MFfilename.c_str());
-//     create.close();
-//     cout << "Creating magnetic field file: " << MFfilename << endl;
-//   }
-//   return MFfilename;
-// }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 string IGCascadeSim::DefineLowEgyFile(
     const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
@@ -210,7 +177,6 @@ string IGCascadeSim::DefineLowEgyFile(
                     ".txt";
   return filename;
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 string IGCascadeSim::DefineTrackLeptonFile(
     const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
@@ -227,7 +193,6 @@ string IGCascadeSim::DefineTrackLeptonFile(
 
   return filename;
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 string IGCascadeSim::DefineTrackTimeDelayFile(
     const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
@@ -239,7 +204,6 @@ string IGCascadeSim::DefineTrackTimeDelayFile(
 
   return filename;
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void IGCascadeSim::DefineRp(void)
 /*!
@@ -430,7 +394,8 @@ void IGCascadeSim::RunSinglePhotonCascade(void) {
       static clock_t last_time = clock();
       clock_t current_time = clock();
       double elapsed = double(current_time - last_time) / CLOCKS_PER_SEC;
-      cout << "    CPU time since last report: " << elapsed << " sec" << endl;
+      if (counter > 0)
+        cout << "    CPU time since last report: " << elapsed << " sec" << endl;
       last_time = current_time;
     }
     counter++;
