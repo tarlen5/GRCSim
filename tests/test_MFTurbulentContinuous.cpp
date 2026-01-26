@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
   auto random_dist = [coh_len_Mpc, rng]() {
     float rand_uniform = static_cast<float>(rng->Uniform());
     return rand_uniform * static_cast<float>(coh_len_Mpc / 10.0);
-    // return rv_propagation_length(rng, static_cast<float>(coh_len_Mpc / 10.0));
+    // return rv_propagation_length(rng, static_cast<float>(coh_len_Mpc
+    // / 10.0));
   };
 
   // Set up RelParticle electron as a pointer

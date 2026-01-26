@@ -282,11 +282,11 @@ bool PairProduction::UpdateGammaPhoton(
 /*!  Updates Gamma's .r4, .z, .z_s, and .p4
 
   \param
-      gam_ph_p4  - gamma ray 4 momentum
-gam_ph_r4  - gamma ray 4 position
-gam_ph_z   - gamma ray redshift
-gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
-delta_z_step - redshift difference that photon took on this step.
+    gam_ph_p4  - gamma ray 4 momentum
+    gam_ph_r4  - gamma ray 4 position
+    gam_ph_z   - gamma ray redshift
+    gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
+    delta_z_step - redshift difference that photon took on this step.
 
    \return True - if pair production occurs before z=0 False otherwise.
 */
@@ -375,12 +375,12 @@ VEC3D_T PairProduction::GetEBLPhotonEgy(
   Results in updated background photon's energy.
 
   \param
-       z_int          - redshift at which gamma photon interacts.
- z_o            - redshift at which gamma photon started.
- gam_ph_egy     - gamma photon energy
- bg_ph_egy      - background photon energy
- TotalLambdaInt - total lambda integral, as calculated in
-                  CheckPairProductionEBL() fn.
+    z_int          - redshift at which gamma photon interacts.
+    z_o            - redshift at which gamma photon started.
+    gam_ph_egy     - gamma photon energy
+    bg_ph_egy      - background photon energy
+    TotalLambdaInt - total lambda integral, as calculated in
+                      CheckPairProductionEBL() fn.
 
   \returns - ebl photon egy which interacted to pair produce
 */
@@ -468,19 +468,20 @@ void PairProduction::UpdateEBLPhoton(
     Vec4D &gam_ph_p4, Vec4D &gam_ph_r4, VEC3D_T &gam_ph_z, VEC3D_T &gam_ph_z_s,
     Vec4D &bg_ph_p4, Vec4D &bg_ph_r4, VEC3D_T &bg_ph_z
 )
-/*! Routine defines the EBL 3 momentum, by calling the ImpactAngle()
+/*!
+  Routine defines the EBL 3 momentum, by calling the ImpactAngle()
   function and rotating into the frame where direction of gamma
   photon is along z_axis.
   Also updates all of EBLPhoton dynamical parameters.
 
   \param
       gam_ph_p4  - gamma ray 4 momentum
-gam_ph_r4  - gamma ray 4 position
-gam_ph_z   - gamma ray redshift
-gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
-bg_ph_p4   - background photon 4 momentum; calculated here
-bg_ph_r4   - background photon 4 position; calculated here
-bg_ph_z    - background photon redshift; calculated here
+      gam_ph_r4  - gamma ray 4 position
+      gam_ph_z   - gamma ray redshift
+      gam_ph_z_s - gamma ray z_s, ( ~ time delay; see Cosmology writeup!)
+      bg_ph_p4   - background photon 4 momentum; calculated here
+      bg_ph_r4   - background photon 4 position; calculated here
+      bg_ph_z    - background photon redshift; calculated here
 */
 {
 
@@ -621,9 +622,9 @@ bool PairProduction::RelativisticKinematics(
 
   \param
       gam_ph_p4  - gamma ray 4 momentum
-bg_ph_p4   - background photon 4 momentum
-elec_p4    - electron 4 momentum
-pos_p4     - positron 4 momentum
+      bg_ph_p4   - background photon 4 momentum
+      elec_p4    - electron 4 momentum
+      pos_p4     - positron 4 momentum
 
   \note All input parameters are assumed to be in the lab frame.
 

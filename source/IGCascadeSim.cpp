@@ -47,7 +47,6 @@ IGCascadeSim::IGCascadeSim(
   m_cascade_file = DefineCascadeFile(
       eblmodel, egy, mag_field, redshift, coh_len, file_count, output_dir
   );
-  string MFfilename = DefineMFfile(mf_dir, mag_field, coh_len, redshift);
   string optDepthFile = DefineOptDepthTable(opt_depth_dir, eblmodel, redshift);
 
   if (m_trk_leptons_bool)
@@ -80,16 +79,21 @@ IGCascadeSim::IGCascadeSim(
   }
 
   VEC3D_T numeric_coh_len = coh_len.c_str();
+  // NOTE: this file is only needed if using a grid-based MF propagator class
+  // string MFfilename = DefineMFfile(mf_dir, mag_field, coh_len, redshift);
   // m_BFieldPropagator = new MagneticGrid(m_rng, m_bmag, m_cellsize,
   // MFfilename);
+
   m_BFieldPropagator =
-      new MFTurbulentContinuous(m_rng, m_bmag, numeric_coh_len);
+      new MagneticGrid(m_rng, mag_field, coh_len, redshift, mf_dir);
+  // m_BFieldPropagator =
+  //     new MFTurbulentContinuous(m_rng, m_bmag, numeric_coh_len);
   m_pspace = new PairProduction(m_rng, m_ze);
   m_kspace = new KleinNishina(m_rng);
 
   cout << endl;
   cout << "Using cascade file:   " + m_cascade_file << endl;
-  cout << "Using Mag Grid file:  " << MFfilename << endl;
+  // cout << "Using Mag Grid file:  " << MFfilename << endl;
   cout << "Using opt depth file: " << optDepthFile << endl;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -173,27 +177,28 @@ string IGCascadeSim::DefineCascadeFile(
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string IGCascadeSim::DefineMFfile(
-    const string &mf_dir, const string &s_Bmag, const string &s_cellsize,
-    const string &s_ze
-) {
-  string MFfilename = mf_dir + "MagneticGrid_B" + s_Bmag + "_L" + s_cellsize +
-                      "_z" + s_ze + ".txt";
+// string IGCascadeSim::DefineMFfile(
+//     const string &mf_dir, const string &s_Bmag, const string &s_cellsize,
+//     const string &s_ze
+// ) {
+//   string MFfilename = mf_dir + "MagneticGrid_B" + s_Bmag + "_L" + s_cellsize
+//   +
+//                       "_z" + s_ze + ".txt";
 
-  // Ensure the directory exists
-  string dir = mf_dir;
-  if (!dir.empty() && dir.back() == '/') dir.pop_back();
-  system(("mkdir -p " + dir).c_str());
+//   // Ensure the directory exists
+//   string dir = mf_dir;
+//   if (!dir.empty() && dir.back() == '/') dir.pop_back();
+//   system(("mkdir -p " + dir).c_str());
 
-  // Create the file if it does not exist
-  std::ifstream check(MFfilename.c_str());
-  if (!check.good()) {
-    std::ofstream create(MFfilename.c_str());
-    create.close();
-    cout << "Creating magnetic field file: " << MFfilename << endl;
-  }
-  return MFfilename;
-}
+//   // Create the file if it does not exist
+//   std::ifstream check(MFfilename.c_str());
+//   if (!check.good()) {
+//     std::ofstream create(MFfilename.c_str());
+//     create.close();
+//     cout << "Creating magnetic field file: " << MFfilename << endl;
+//   }
+//   return MFfilename;
+// }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 string IGCascadeSim::DefineLowEgyFile(
@@ -293,11 +298,6 @@ void IGCascadeSim::DefineRp(void)
   //////////////////////////////////////
 
   m_R_0 = R_p * R_H;
-
-  // cout<<"R_p from integral: "<<R_p<<"\n  in "<<num_steps<<" steps."<<endl;
-  // cout<<"percent error: "<<fabs(R_p - m_R_0)/m_R_0*100.0<<endl;
-  // char getline;
-  // cin>>getline;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -414,9 +414,10 @@ void IGCascadeSim::RunSinglePhotonCascade(void) {
        << endl;
 
   unsigned int counter = 0;
+  unsigned int display_interval = 500;
   while (!lepton_stack.empty()) {
 
-    if (counter % 500 == 0) {
+    if (counter % display_interval == 0) {
       cout << "  Lepton stack energies and redshifts (at iteration " << counter
            << "):" << endl;
       stack<RelParticle *> tmp_stack(lepton_stack);
@@ -433,6 +434,12 @@ void IGCascadeSim::RunSinglePhotonCascade(void) {
       last_time = current_time;
     }
     counter++;
+    // Every 5th time of display interval, double it:
+    if (counter % (5 * display_interval) == 0) {
+      display_interval *= 2;
+      cout << "  (Increasing display interval to " << display_interval << ")"
+           << endl;
+    }
 
     PropagateLepton(lepton_stack, GammaPhoton);
 
@@ -1162,5 +1169,14 @@ void IGCascadeSim::SaveToTrackTimeDelayFile(RelParticle &Photon) {
   ofile.close();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+IGCascadeSim::~IGCascadeSim() {
+  delete m_rng;
+  delete m_BFieldPropagator;
+  delete m_pspace;
+  delete m_kspace;
+  delete m_ebl;
+  delete m_optDepthTable;
+}
 
 } // namespace IGCascade

@@ -95,11 +95,12 @@ public:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // Default constructor
-  inline MagneticGrid();
+  // inline MagneticGrid();
 
   MagneticGrid(
-      RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
-      std::string sfilename
+      RandomNumbers *_rng, const std::string &B_mag,
+      const std::string &s_cell_size, const std::string &redshift,
+      const std::string &mf_dir
   );
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,6 +139,10 @@ private:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   RandomNumbers *m_rng;
   Field m_MagneticField;
+  std::string DefineMFfile(
+      const std::string &mf_dir, const std::string &B_mag,
+      const std::string &s_cell_size, const std::string &redshift
+  );
 };
 
 } // namespace IGCascade

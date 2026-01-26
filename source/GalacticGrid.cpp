@@ -46,9 +46,15 @@ namespace IGCascade {
 /// Overloaded class constructor (1)
 /// \param _MagneticField: m_MagneticField
 /// \param _rng: rng
+// MagneticGrid(
+//     RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
+//     std::string sfilename
+// );
+
 MagneticGrid::MagneticGrid(
-    RandomNumbers *_rng, VEC3D_T B_mag, std::string s_cell_size,
-    std::string filename
+    RandomNumbers *_rng, const std::string &B_mag,
+    const std::string &s_cell_size, const std::string &redshift,
+    const std::string &mf_dir
 ) {
 
   // public member:
@@ -59,10 +65,36 @@ MagneticGrid::MagneticGrid(
   std::istringstream(s_cell_size) >> m_cellsize; // [Mpc]
   // MpcToCm = 3.086E+24;                        // [cm/Mpc]
   m_cellsize = m_cellsize * Double(MPC_TO_CM); // [cm]
-  m_bmag = B_mag;                              // [gauss]
-  m_sfilename = filename;
+  m_bmag = B_mag.c_str();                      // [gauss]
+
+  m_sfilename = DefineMFfile(mf_dir, B_mag, s_cell_size, redshift);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Private Methods:
+///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+std::string MagneticGrid::DefineMFfile(
+    const std::string &mf_dir, const std::string &s_Bmag,
+    const std::string &s_cellsize, const std::string &redshift
+) {
+  std::string MFfilename = mf_dir + "MagneticGrid_B" + s_Bmag + "_L" +
+                           s_cellsize + "_z" + redshift + ".txt";
+
+  // Ensure the directory exists
+  std::string dir = mf_dir;
+  if (!dir.empty() && dir.back() == '/') dir.pop_back();
+  system(("mkdir -p " + dir).c_str());
+
+  // Create the file if it does not exist
+  std::ifstream check(MFfilename.c_str());
+  if (!check.good()) {
+    std::ofstream create(MFfilename.c_str());
+    create.close();
+    std::cout << "Creating magnetic field file: " << MFfilename << std::endl;
+  }
+  return MFfilename;
+}
 
 void MagneticGrid::PropagateBFieldRedshift(
     RelParticle &Photon, RelParticle *&Lepton, Vec3D &n_eo, VEC3D_T &PL,

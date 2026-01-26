@@ -65,6 +65,8 @@ public:
 
   void RunCascade(const int numIterations);
 
+  ~IGCascadeSim();
+
 private:
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Private Functions   ///////////////////////////////
@@ -78,10 +80,10 @@ private:
       const string &s_ze, const string &s_cellsize, const string &s_file_num,
       const string &output_dir
   );
-  string DefineMFfile(
-      const string &static_var_file, const string &s_Bmag,
-      const string &s_cellsize, const string &s_ze
-  );
+  //   string DefineMFfile(
+  //       const string &static_var_file, const string &s_Bmag,
+  //       const string &s_cellsize, const string &s_ze
+  //   );
   string DefineLowEgyFile(
       const string &s_eblmodel, const string &s_egy, const string &s_Bmag,
       const string &s_ze, const string &s_cellsize, const string &s_file_num
@@ -168,8 +170,8 @@ private:
   double m_tauCutoff;
 
   RandomNumbers *m_rng;
-  //   MagneticGrid *m_BFieldPropagator;
-  MFTurbulentContinuous *m_BFieldPropagator;
+  MagneticGrid *m_BFieldPropagator;
+  //   MFTurbulentContinuous *m_BFieldPropagator;
   PairProduction *m_pspace;
   KleinNishina *m_kspace;
 
