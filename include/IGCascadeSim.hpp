@@ -143,6 +143,7 @@ private:
   bool m_LOCK;
   bool m_seed_provided;
   uint32_t m_seed_value;
+  uint32_t m_mf_cont_seed;
 
   // Cascade parameters
   VEC3D_T m_egy_cascade; // TeV
@@ -171,6 +172,7 @@ private:
   bool m_use_mf_grid;
 
   RandomNumbers *m_rng;
+  RandomNumbers *m_rng_mfc;
   IGMFPropagator *m_BFieldPropagator;
   PairProduction *m_pspace;
   KleinNishina *m_kspace;

@@ -57,23 +57,32 @@ AnyOption *DefineOptions(int argc, char *argv[], const string &progname) {
   // opt->addUsage( "Usage: " );
   opt->addUsage("\nOptions:");
   opt->addUsage(" -h  --help      Prints this help ");
-  opt->addUsage(" --eblmodel      EBLModel4msld        EBLModel name.");
-  opt->addUsage(" --opt_depth_dir OptDepthFiles/       opt depth files dir.");
-  opt->addUsage(" --output_dir    (cwd)      Directory to output files.");
+  opt->addUsage(" --eblmodel      EBLModel name [Default: EBLModel4msld].");
+  opt->addUsage(" --opt_depth_dir Opt depth files dir for pre-computed speedup "
+                "[Default: OptDepthFiles/].");
+  opt->addUsage(
+      " --output_dir    Directory to save output files [Default: cwd]."
+  );
 
   // IGMFPropagator specific options:
-  opt->addUsage(
-      " --mf_dir        MagneticFieldFiles/  magnetic field files dir."
-  );
-  opt->addUsage(" --mf_no_lock    No locking of mf files, so cosmic variance "
-                "is not preserved in simulation. ");
-  opt->addUsage(" --use_mf_grid  Use MagneticGrid class for grid-based "
+  opt->addUsage(" --use_mf_grid   Use MagneticGrid class for grid-based "
                 "magnetic field propagation. ");
+  opt->addUsage(" --mf_dir        Magnetic field files dir (MagneticGrid class "
+                "only) [Default: "
+                "MagneticFieldFiles/].");
+  opt->addUsage(" --mf_no_lock    No locking of mf files, so cosmic variance "
+                "is not preserved in simulation (MagneticGrid class only). ");
+  opt->addUsage(" --mf_cont_seed  <uint32_t> rng seed for continuous magnetic "
+                "field (MFTurbulentContinuous class only).");
 
-  opt->addUsage(" --gam_egy_min   0.1 min energy [GeV] to track gammas.");
-  opt->addUsage(" --lep_egy_min   75. min energy [GeV] to track leptons.");
   opt->addUsage(
-      " --seed          <uint32_t> Random number seed for reproducibility."
+      " --gam_egy_min   Min energy [GeV] to track gammas [Default: 0.1]."
+  );
+  opt->addUsage(
+      " --lep_egy_min   Min energy [GeV] to track leptons [Default: 75.]."
+  );
+  opt->addUsage(
+      " --seed          <uint32_t> Global rng seed for reproducibility."
   );
 
   opt->addUsage(" --single_gen    Forces single generation of cascade.");

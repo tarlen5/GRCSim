@@ -20,5 +20,8 @@ MagneticFieldFiles/*
 # all HDF5 files:
 *.h5
 
+# test data:
+tests/*.csv
+
 # analysis directory
 analysis/

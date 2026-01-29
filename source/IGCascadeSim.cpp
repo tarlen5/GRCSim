@@ -79,15 +79,18 @@ IGCascadeSim::IGCascadeSim(
   }
 
   // Define Magnetic Field Propagator:
+  m_rng_mfc = nullptr; // Only needed if using MFTurbulentContinuous
   if (m_use_mf_grid) {
     cout << "Using MagneticGrid for IGMF propagation." << endl;
     m_BFieldPropagator =
         new MagneticGrid(m_rng, mag_field, coh_len, redshift, mf_dir, m_LOCK);
   } else {
     cout << "Using MFTurbulentContinuous for IGMF propagation." << endl;
+    // Use separate seed for continuous MF to preserve cosmic variance:
+    m_rng_mfc = new RandomNumbers(0.0, 1.0, m_mf_cont_seed);
     VEC3D_T numeric_coh_len = coh_len.c_str();
     m_BFieldPropagator =
-        new MFTurbulentContinuous(m_rng, m_bmag, numeric_coh_len);
+        new MFTurbulentContinuous(m_rng_mfc, m_bmag, numeric_coh_len);
   }
   m_pspace = new PairProduction(m_rng, m_ze);
   m_kspace = new KleinNishina(m_rng);
@@ -127,12 +130,19 @@ void IGCascadeSim::ProcessOptions(
     m_egy_lepton_min = opt->getValue("lep_egy_min");
   if (opt->getFlag("use_mf_grid")) m_use_mf_grid = true;
 
-  // Seed option:
+  // Global seed option:
   m_seed_provided = false;
   m_seed_value = 0;
   if (opt->getValue("seed") != NULL) {
     m_seed_value = atoi(opt->getValue("seed"));
     m_seed_provided = true;
+  }
+
+  // MF Continuous seed option. Must give the simulation MF seed
+  // otherwise the cosmic variance will not be preserved.
+  m_mf_cont_seed = 29010816;
+  if (opt->getValue("mf_cont_seed") != NULL) {
+    m_mf_cont_seed = atoi(opt->getValue("mf_cont_seed"));
   }
 
   // Convert to eV:
@@ -165,6 +175,7 @@ void IGCascadeSim::ProcessOptions(
        << (m_seed_provided ? std::to_string(m_seed_value)
                            : "not provided (unseeded)")
        << endl;
+  cout << "   --mf_cont_seed:  " << m_mf_cont_seed << endl;
   cout << "-------------------------------------" << endl << endl;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1155,6 +1166,9 @@ IGCascadeSim::~IGCascadeSim() {
   delete m_kspace;
   delete m_ebl;
   delete m_optDepthTable;
+  if (m_rng_mfc != nullptr) {
+    delete m_rng_mfc;
+  }
 }
 
 } // namespace IGCascade
