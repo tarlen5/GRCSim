@@ -44,11 +44,12 @@ const VEC3D_T CGS_ELEC_RAD =
 const VEC3D_T CGS_THOM_CS = 8.0 / 3.0 * VEC3D_PI * CGS_ELEC_RAD * CGS_ELEC_RAD;
 
 // LCDM FRW Cosmology
-const VEC3D_T HUB_CONST = "2.2683e-18";
-const VEC3D_T CGS_HUBRAD = CGS_C / HUB_CONST; // [cm] Hubble Radius
-const VEC3D_T OMEGA_R = "8.4e-5";             // Omega radiation
-const VEC3D_T OMEGA_M = "0.3";                // Omega matter
-const VEC3D_T OMEGA_L = 0.7 - OMEGA_R;        // Omega lambda
+// NOTE: The Hubble constant corresponds to H0 ~ 67.3 km/s/Mpc
+const VEC3D_T HUB_CONST = "2.1808e-18";          // [s^-1] Hubble constant
+const VEC3D_T CGS_HUBRAD = CGS_C / HUB_CONST;    // [cm] Hubble Radius
+const VEC3D_T OMEGA_R = "8.4e-5";                // Omega radiation
+const VEC3D_T OMEGA_M = "0.315";                 // Omega matter
+const VEC3D_T OMEGA_L = 1.0 - OMEGA_M - OMEGA_R; // Omega lambda
 const VEC3D_T OMEGA_0 = OMEGA_M + OMEGA_R + OMEGA_L;
 
 } // namespace PhysConst
